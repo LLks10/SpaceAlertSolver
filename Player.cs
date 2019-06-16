@@ -29,7 +29,7 @@ namespace SpaceAlertSolver
 
         public void Delay(int action)
         {
-            if (action >= 11)
+            if (action >= 11 && actions[action] == Act.empty)
                 return;
 
             //Delay subsequent actions
