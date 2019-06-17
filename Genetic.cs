@@ -156,6 +156,7 @@ namespace SpaceAlertSolver
                 if (generation % 10000 == 0)
                 {
                     Console.WriteLine(best.Rep());
+                        //best.setEval(trajs, evs);
                 }
             }
                

@@ -7,43 +7,44 @@ using System.Threading.Tasks;
 namespace SpaceAlertSolver
 {
     //External threat parent class
-    public abstract class ExThreat
+    public abstract class InThreat
     {
-        public int health, shield, speed, distance , distanceRange, scoreWin, scoreLose, zone, time;
+        public int health, speed, distance, position, scoreWin, scoreLose, time;
         public Trajectory trajectory;
-        public bool rocketImmune, alive, beaten;
+        public InDmgSource vulnerability;
+        public bool alive, beaten, fightBack;
         public Ship ship;
         public int damage;
 
-        public ExThreat(Ship ship, Trajectory traj, int zone, int time)
+        public InThreat(Ship ship, Trajectory traj, int time)
         {
             this.ship = ship;
             this.trajectory = traj;
-            this.zone = zone;
             this.time = time;
             alive = true;
 
             //Get trajectory information
             distance = traj.maxDistance;
-
-            //Set new distance range
-            if (distance <= trajectory.dist1)
-                distanceRange = 1;
-            else if (distance <= trajectory.dist2)
-                distanceRange = 2;
-            else
-                distanceRange = 3;
         }
 
-        public virtual void DealDamage(int damage, int range, ExDmgSource source)
+        public virtual bool DealDamage(int damage, int position, InDmgSource source)
         {
-            if(range >= distanceRange)
-                this.damage += damage; 
+            if(source == vulnerability && AtPosition(position) && !beaten)
+            {
+                this.damage += damage;
+                return true;
+            }
+            return false;
+        }
+
+        public virtual bool AtPosition(int position)
+        {
+            return position == this.position;
         }
 
         public virtual bool ProcessDamage()
         {
-            health = health - Math.Max(0,(damage - shield));
+            health -= damage;
             damage = 0;
 
             if (health < 0)
@@ -73,14 +74,6 @@ namespace SpaceAlertSolver
             distance -= curSpd;
             if (distance <= 0)
                 beaten = true;
-
-            //Set new distance range
-            if (distance <= trajectory.dist1)
-                distanceRange = 1;
-            else if (distance <= trajectory.dist2)
-                distanceRange = 2;
-            else
-                distanceRange = 3;
         }
 
         public virtual void Move(int mSpd)
@@ -100,14 +93,6 @@ namespace SpaceAlertSolver
             distance -= mSpd;
             if (distance <= 0)
                 beaten = true;
-
-            //Set new distance range
-            if (distance <= trajectory.dist1)
-                distanceRange = 1;
-            else if (distance <= trajectory.dist2)
-                distanceRange = 2;
-            else
-                distanceRange = 3;
         }
 
         public virtual void ActX() { }
@@ -116,12 +101,11 @@ namespace SpaceAlertSolver
     }
 
     //Damage sources
-    public enum ExDmgSource
+    public enum InDmgSource
     {
-        laser,
-        plasma,
-        impulse,
-        rocket,
+        B,
+        C,
+        android,
         intercept
     }
 }

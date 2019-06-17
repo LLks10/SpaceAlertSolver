@@ -90,7 +90,8 @@ namespace SpaceAlertSolver
                 }
 
                 //Check event
-                SpawnThreat(eventIdx);
+                if (SpawnThreat(eventIdx))
+                    eventIdx++;
 
                 //Perform player actions
                 PlayerActions(turn - 1);
@@ -228,16 +229,17 @@ namespace SpaceAlertSolver
         }
 
         //Spawn a threat
-        void SpawnThreat(int eventIdx)
+        bool SpawnThreat(int eventIdx)
         {
             if (eventIdx < events.Length && events[eventIdx].turn == turn)
             {
                 //Summon threat
                 Event ev = events[eventIdx];
-                eventIdx++;
                 if (ev.external)
                     exThreats.Add(ThreatFactory.SummonEx(ev.creature, trajectories[ev.zone], ev.zone, ship, turn));
+                return true;
             }
+            return false;
         }
 
         //All players perform actions
@@ -473,8 +475,9 @@ namespace SpaceAlertSolver
                     //Deal damage to all in range
                     else
                     {
+                        if(target >= 0)
+                            exThreats[target].DealDamage(1, 1, ExDmgSource.intercept);
                         target = -2;
-                        exThreats[target].DealDamage(1, 1, ExDmgSource.intercept);
                         exThreats[i].DealDamage(1, 1, ExDmgSource.intercept);
                     }
                 }

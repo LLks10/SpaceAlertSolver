@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonExternalThreats.cs" />
+    <Compile Include="InThreat.cs" />
     <Compile Include="ExThreat.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Gene.cs" />
