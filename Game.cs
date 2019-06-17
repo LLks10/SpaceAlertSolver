@@ -16,7 +16,6 @@ namespace SpaceAlertSolver
      * 
      * Questionable stuff:
      * Surviving asteroids doesnt cause asteroid destruction effect
-     * Gyro shields only disappear if damage would've hit lifepoints
     */
 
 
@@ -185,7 +184,8 @@ namespace SpaceAlertSolver
             }
 
             //Observation bonus
-            score += observation[0]+observation[1]+observation[2];
+            if(!gameover)
+                score += observation[0]+observation[1]+observation[2];
 
             //Gameover penalty
             if (gameover)

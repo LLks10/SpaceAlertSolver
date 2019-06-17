@@ -24,7 +24,7 @@ namespace SpaceAlertSolver
 
         public String Rep()
         {
-            String output = "";
+            String output = "  1     2     3     4     5     6     7     8     9    10    11    12\n";
             for (int j = 0; j < 5; j++)
             {
                 for (int i = 0; i < 12; i++)
@@ -35,22 +35,22 @@ namespace SpaceAlertSolver
                             output += "blank ";
                             break;
                         case 1:
-                            output += "blue ";
+                            output += " blue ";
                             break;
                         case 2:
-                            output += "red ";
+                            output += " red  ";
                             break;
                         case 3:
-                            output += "lift ";
+                            output += " lift ";
                             break;
                         case 4:
-                            output += "A ";
+                            output += "  A   ";
                             break;
                         case 5:
-                            output += "B ";
+                            output += "  B   ";
                             break;
                         case 6:
-                            output += "C ";
+                            output += "  C   ";
                             break;
                         case 7:
                             output += "robot ";

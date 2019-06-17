@@ -136,8 +136,9 @@ namespace SpaceAlertSolver
                     best = g;
                 }
             }
-            Console.WriteLine("Gen {0} best: {1}", generation, highest);
-            if (generation % 10 == 0)
+            if(generation % 1000 == 0)
+                Console.WriteLine("Gen {0} best: {1}", generation, highest);
+            if (generation % 10000 == 0)
             {
                 Console.WriteLine(best.Rep());
             }

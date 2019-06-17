@@ -61,7 +61,7 @@ namespace SpaceAlertSolver
         {
             if (!hasShield)
                 return base.ProcessDamage();
-            else if (damage > shield)
+            else if (damage > 0)
             {
                 hasShield = false;
                 damage = 0;
@@ -108,6 +108,7 @@ namespace SpaceAlertSolver
             speed = 2;
             scoreLose = 4;
             scoreWin = 8;
+            rocketImmune = true;
         }
         public override void ActX()
         {
@@ -191,6 +192,7 @@ namespace SpaceAlertSolver
             speed = 3;
             scoreLose = 4;
             scoreWin = 8;
+            rocketImmune = true;
         }
         public override void ActX()
         {
@@ -379,6 +381,7 @@ namespace SpaceAlertSolver
             speed = 2;
             scoreLose = 6;
             scoreWin = 12;
+            rocketImmune = true;
         }
         public override void ActX()
         {
