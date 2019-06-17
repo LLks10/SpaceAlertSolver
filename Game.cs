@@ -81,67 +81,29 @@ namespace SpaceAlertSolver
                     //Delay actions if computer failed
                     if (!phaseComputer[phase])
                     {
-                        foreach(Player p in players)
+                        foreach (Player p in players)
                         {
                             if (p.position < 6)
-                                p.Delay(turn-1);
+                                p.Delay(turn - 1);
                         }
                     }
                 }
 
                 //Check event
-                if(eventIdx < events.Length && events[eventIdx].turn == turn)
-                {
-                    //Summon threat
-                    Event ev = events[eventIdx];
-                    eventIdx++;
-                    if(ev.external)
-                        exThreats.Add(ThreatFactory.SummonEx(ev.creature,trajectories[ev.zone],ev.zone, ship));
-                }
+                SpawnThreat(eventIdx);
 
                 //Perform player actions
-                playerActions(turn - 1);
+                PlayerActions(turn - 1);
+
+                //-> Cleanup dead internal
 
                 //Rocket hits
-                if (ship.rocketReady)
-                {
-                    ship.rocketReady = false;
-                    int target = -1;
-                    int distance = int.MaxValue;
-                    for (int i = 0; i < exThreats.Count; i++)
-                    {
-                        //Check if valid target
-                        if(!exThreats[i].rocketImmune && exThreats[i].distanceRange <= 2 && exThreats[i].distance < distance)
-                        {
-                            target = i;
-                            distance = exThreats[i].distance;
-                        }
-                    }
-                    //Deal damage
-                    if(target != -1)
-                        exThreats[target].DealDamage(3, 2, DmgSource.rocket);
-                }
-                
+                RocketFire();
 
-                //Process damage
-                for (int i = 0; i < exThreats.Count; i++)
-                    exThreats[i].ProcessDamage();
+                //Apply damage to threats and check if dead
+                ResolveDamage();
 
-                //Cleanup dead
-                for(int i = exThreats.Count - 1; i >= 0; i--)
-                {
-                    //Threat is gone
-                    if (exThreats[i].beaten)
-                    {
-                        if (exThreats[i].alive)
-                            score += exThreats[i].scoreLose;
-                        else
-                            score += exThreats[i].scoreWin;
-                        exThreats.RemoveAt(i);
-                    }
-                }
-
-                //Move threats
+                //Move threats (Fix sequencing for internal threats)
                 for (int i = 0; i < exThreats.Count; i++)
                     exThreats[i].Move();
 
@@ -156,7 +118,7 @@ namespace SpaceAlertSolver
                 observation[phase] = Math.Max(observation[phase], obsBonus[observationCount]);
 
                 //Check if gameover
-                for(int i = 0; i < 3; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     if (ship.damage[i] >= 7)
                         gameover = true;
@@ -169,7 +131,7 @@ namespace SpaceAlertSolver
 
             //Count damage
             int highestDamage = 0;
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 score -= ship.damage[i];
                 highestDamage = Math.Max(ship.damage[i], highestDamage);
@@ -177,15 +139,15 @@ namespace SpaceAlertSolver
             score -= highestDamage;
 
             //Count dead crew
-            foreach(Player p in players)
+            foreach (Player p in players)
             {
                 if (!p.alive)
                     score -= 2;
             }
 
             //Observation bonus
-            if(!gameover)
-                score += observation[0]+observation[1]+observation[2];
+            if (!gameover)
+                score += observation[0] + observation[1] + observation[2];
 
             //Gameover penalty
             if (gameover)
@@ -194,12 +156,69 @@ namespace SpaceAlertSolver
             return score;
         }
 
+        //Resolve damage against external threats
+        void ResolveDamage()
+        {
+            //Process damage
+            for (int i = 0; i < exThreats.Count; i++)
+                exThreats[i].ProcessDamage();
+
+            //Cleanup dead
+            for (int i = exThreats.Count - 1; i >= 0; i--)
+            {
+                //Threat is gone
+                if (exThreats[i].beaten)
+                {
+                    if (exThreats[i].alive)
+                        score += exThreats[i].scoreLose;
+                    else
+                        score += exThreats[i].scoreWin;
+                    exThreats.RemoveAt(i);
+                }
+            }
+        }
+
+        //Set rocket target and damage
+        void RocketFire()
+        {
+            if (ship.rocketReady)
+            {
+                ship.rocketReady = false;
+                int target = -1;
+                int distance = int.MaxValue;
+                for (int i = 0; i < exThreats.Count; i++)
+                {
+                    //Check if valid target
+                    if (!exThreats[i].rocketImmune && exThreats[i].distanceRange <= 2 && exThreats[i].distance < distance)
+                    {
+                        target = i;
+                        distance = exThreats[i].distance;
+                    }
+                }
+                //Deal damage
+                if (target != -1)
+                    exThreats[target].DealDamage(3, 2, DmgSource.rocket);
+            }
+        }
+
+        //Spawn a threat
+        void SpawnThreat(int eventIdx)
+        {
+            if (eventIdx < events.Length && events[eventIdx].turn == turn)
+            {
+                //Summon threat
+                Event ev = events[eventIdx];
+                eventIdx++;
+                if (ev.external)
+                    exThreats.Add(ThreatFactory.SummonEx(ev.creature, trajectories[ev.zone], ev.zone, ship, turn));
+            }
+        }
 
         //All players perform actions
-        void playerActions(int t)
+        void PlayerActions(int t)
         {
             //Loop over players
-            for(int i = 0; i < players.Length; i++)
+            for (int i = 0; i < players.Length; i++)
             {
                 Player p = players[i];
                 p.lastAction = t;
@@ -241,7 +260,7 @@ namespace SpaceAlertSolver
                             break;
                         ship.cannonFired[p.position] = true;
 
-                        if(p.position < 3)
+                        if (p.position < 3)
                         {
                             //Main guns
                             //Drain energy
@@ -254,14 +273,14 @@ namespace SpaceAlertSolver
                             for (int j = 0; j < exThreats.Count; j++)
                             {
                                 ExThreat et = exThreats[j];
-                                if(et.zone == z && et.distance < distance)
+                                if (et.zone == z && et.distance < distance)
                                 {
                                     target = j;
                                     distance = et.distance;
                                 }
                             }
                             //Deal damage
-                            if(target != -1)
+                            if (target != -1)
                                 exThreats[target].DealDamage(ship.laserDamage[z], 3, DmgSource.laser);
                         }
                         else
@@ -294,7 +313,7 @@ namespace SpaceAlertSolver
                                     }
                                 }
                                 //Deal damage
-                                if(target != -1)
+                                if (target != -1)
                                     exThreats[target].DealDamage(ship.plasmaDamage[z], 3, DmgSource.plasma);
                             }
                         }
@@ -302,7 +321,7 @@ namespace SpaceAlertSolver
 
                     case Act.B:
                         //Refill shield
-                        if(p.position < 3)
+                        if (p.position < 3)
                         {
                             int deficit = ship.shieldsCap[z] - ship.shields[z];
                             deficit = Math.Min(ship.reactors[z], deficit);
@@ -313,10 +332,10 @@ namespace SpaceAlertSolver
                         else
                         {
                             //Main
-                            if(z == 1)
+                            if (z == 1)
                             {
                                 //Fill main
-                                if(ship.capsules > 0)
+                                if (ship.capsules > 0)
                                 {
                                     ship.reactors[z] = ship.reactorsCap[z];
                                     ship.capsules--;
@@ -362,7 +381,6 @@ namespace SpaceAlertSolver
                         break;
                 }
             }
-        }
     }
 
     public enum Act

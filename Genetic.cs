@@ -7,7 +7,7 @@ namespace SpaceAlertSolver
     {
         private List<Gene> genes;
         private static Random random = new Random();
-        private static double mutationChance = 8.0 / 60.0;
+        private static double mutationChance = 7.0 / 60.0;
         int generation = 0;
         private int players;
 

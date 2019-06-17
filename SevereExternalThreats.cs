@@ -10,7 +10,7 @@ namespace SpaceAlertSolver
     //ID: 15
     class Fregat : ExThreat
     {
-        public Fregat(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Fregat(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 7;
             shield = 2;
@@ -36,7 +36,7 @@ namespace SpaceAlertSolver
     class GyroFregat : ExThreat
     {
         bool hasShield;
-        public GyroFregat(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public GyroFregat(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 7;
             shield = 1;
@@ -73,7 +73,7 @@ namespace SpaceAlertSolver
     //ID: 17
     class WarDeck : ExThreat
     {
-        public WarDeck(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public WarDeck(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 9;
             shield = 2;
@@ -100,7 +100,7 @@ namespace SpaceAlertSolver
     class InterStellarOctopus : ExThreat
     {
         int maxHealth;
-        public InterStellarOctopus(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public InterStellarOctopus(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 8;
             maxHealth = 8;
@@ -137,7 +137,7 @@ namespace SpaceAlertSolver
     class Maelstorm : ExThreat
     {
         int baseShield;
-        public Maelstorm(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Maelstorm(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 8;
             shield = 3;
@@ -185,7 +185,7 @@ namespace SpaceAlertSolver
     class Asteroid : ExThreat
     {
         int revenge;
-        public Asteroid(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Asteroid(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 9;
             shield = 0;
@@ -218,7 +218,7 @@ namespace SpaceAlertSolver
     //ID: 21
     class ImpulseSatellite : ExThreat
     {
-        public ImpulseSatellite(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public ImpulseSatellite(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 4;
             shield = 2;
@@ -260,7 +260,7 @@ namespace SpaceAlertSolver
     //ID: 22
     class Nemesis : ExThreat
     {
-        public Nemesis(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Nemesis(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 9;
             shield = 1;
@@ -298,7 +298,7 @@ namespace SpaceAlertSolver
     //ID: 23
     class NebulaCrab : ExThreat
     {
-        public NebulaCrab(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public NebulaCrab(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 7;
             shield = 2;
@@ -325,7 +325,7 @@ namespace SpaceAlertSolver
     //ID: 24
     class PsionicSatellite : ExThreat
     {
-        public PsionicSatellite(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public PsionicSatellite(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 5;
             shield = 2;
@@ -374,7 +374,7 @@ namespace SpaceAlertSolver
     class LargeAsteroid : ExThreat
     {
         int revenge;
-        public LargeAsteroid(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public LargeAsteroid(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 11;
             shield = 0;
