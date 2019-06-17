@@ -7,7 +7,7 @@ namespace SpaceAlertSolver
     {
         private List<Gene> genes;
         private static Random random = new Random();
-        private static double mutationChance = 7.0 / 60.0;
+        private static double mutationChance = 8.0 / 60.0;
         int generation = 0;
         private int players;
 
@@ -140,22 +140,25 @@ namespace SpaceAlertSolver
             }
             this.genes.AddRange(newGenes);
 
-            int highest = int.MinValue;
-            Gene best = null;
-            foreach (Gene g in genes)
+            if(generation % 1000 == 0)
             {
-                if (g.getScore() > highest || g.getScore() == highest && g.getBlanks() > best.getBlanks())
+                int highest = int.MinValue;
+                Gene best = null;
+                foreach (Gene g in genes)
                 {
-                    highest = g.getScore();
-                    best = g;
+                    if (g.getScore() > highest || g.getScore() == highest && g.getBlanks() > best.getBlanks())
+                    {
+                        highest = g.getScore();
+                        best = g;
+                    }
+                }
+                Console.WriteLine("Gen {0} best: {1} TB: {2}", generation, highest, best.getBlanks());
+                if (generation % 10000 == 0)
+                {
+                    Console.WriteLine(best.Rep());
                 }
             }
-            if(generation % 1000 == 0)
-                Console.WriteLine("Gen {0} best: {1} TB: {2}", generation, highest, best.getBlanks());
-            if (generation % 10000 == 0)
-            {
-                Console.WriteLine(best.Rep());
-            }
+               
         }
     }
 }
