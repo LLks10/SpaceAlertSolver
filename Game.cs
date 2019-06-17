@@ -19,13 +19,13 @@ namespace SpaceAlertSolver
     */
 
 
-    class Game
+    public class Game
     {
         Ship ship;
         Player[] players;
         Trajectory[] trajectories;
         Event[] events;
-        List<ExThreat> exThreats;
+        public List<ExThreat> exThreats;
         int turn;
         int phase;
         int score;
@@ -52,7 +52,7 @@ namespace SpaceAlertSolver
             int pCount = players.Length;
             int eventIdx = 0;
             turn = 1;
-            ship = new Ship(players);
+            ship = new Ship(players, this);
             exThreats = new List<ExThreat>();
             observation = new int[3];
             phaseComputer = new bool[3];
@@ -188,6 +188,13 @@ namespace SpaceAlertSolver
                 int distance = int.MaxValue;
                 for (int i = 0; i < exThreats.Count; i++)
                 {
+                    //Moloch edgecase
+                    if(exThreats[i] is Moloch)
+                    {
+                        exThreats[i].DealDamage(3, 2, ExDmgSource.rocket);
+                        target = -1;
+                        break;
+                    }
                     //Check if valid target
                     if (!exThreats[i].rocketImmune && exThreats[i].distanceRange <= 2 && exThreats[i].distance < distance)
                     {
@@ -197,7 +204,7 @@ namespace SpaceAlertSolver
                 }
                 //Deal damage
                 if (target != -1)
-                    exThreats[target].DealDamage(3, 2, DmgSource.rocket);
+                    exThreats[target].DealDamage(3, 2, ExDmgSource.rocket);
             }
         }
 
@@ -281,7 +288,7 @@ namespace SpaceAlertSolver
                             }
                             //Deal damage
                             if (target != -1)
-                                exThreats[target].DealDamage(ship.laserDamage[z], 3, DmgSource.laser);
+                                exThreats[target].DealDamage(ship.laserDamage[z], 3, ExDmgSource.laser);
                         }
                         else
                         {
@@ -295,7 +302,7 @@ namespace SpaceAlertSolver
                                 ship.reactors[z]--;
                                 //Hit all enemies
                                 foreach (ExThreat et in exThreats)
-                                    et.DealDamage(1, ship.pulseRange, DmgSource.impulse);
+                                    et.DealDamage(1, ship.pulseRange, ExDmgSource.impulse);
                             }
                             //Plasma cannon
                             else
@@ -314,7 +321,7 @@ namespace SpaceAlertSolver
                                 }
                                 //Deal damage
                                 if (target != -1)
-                                    exThreats[target].DealDamage(ship.plasmaDamage[z], 3, DmgSource.plasma);
+                                    exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.plasma);
                             }
                         }
                         break;
@@ -381,6 +388,7 @@ namespace SpaceAlertSolver
                         break;
                 }
             }
+        }
     }
 
     public enum Act

@@ -12,6 +12,7 @@ namespace SpaceAlertSolver
     public class Ship
     {
         public Player[] players;
+        public Game game;
         public int[] shields;
         public int[] shieldsCap;
         public int[] reactors;
@@ -29,9 +30,12 @@ namespace SpaceAlertSolver
         public bool rocketFired;
         public bool rocketReady;
 
-        public Ship(Player[] players)
+        public int scoutBonus;
+
+        public Ship(Player[] players, Game game)
         {
             this.players = players;
+            this.game = game;
             //Setup
             shields = new int[] { 1, 1, 1 };
             shieldsCap = new int[] { 2, 3, 2 };
@@ -49,7 +53,7 @@ namespace SpaceAlertSolver
 
         public void DealDamage(int zone, int amount)
         {
-            shields[zone] -= amount;
+            shields[zone] -= amount + scoutBonus;
 
             //Excess damage
             if(shields[zone] < 0)

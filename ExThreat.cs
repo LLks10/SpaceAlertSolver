@@ -15,11 +15,12 @@ namespace SpaceAlertSolver
         public Ship ship;
         public int damage;
 
-        public ExThreat(Ship ship, Trajectory traj, int zone)
+        public ExThreat(Ship ship, Trajectory traj, int zone, int time)
         {
             this.ship = ship;
             this.trajectory = traj;
             this.zone = zone;
+            this.time = time;
             alive = true;
 
             //Get trajectory information
@@ -34,7 +35,7 @@ namespace SpaceAlertSolver
                 distanceRange = 3;
         }
 
-        public virtual void DealDamage(int damage, int range, DmgSource source)
+        public virtual void DealDamage(int damage, int range, ExDmgSource source)
         {
             if(range >= distanceRange)
                 this.damage += damage; 
@@ -82,6 +83,33 @@ namespace SpaceAlertSolver
                 distanceRange = 3;
         }
 
+        public virtual void Move(int mSpd)
+        {
+            //Play actions
+            for (int i = distance - 1; i >= distance - mSpd && i >= 0; i--)
+            {
+                if (trajectory.actions[i] == 1)
+                    ActX();
+                else if (trajectory.actions[i] == 2)
+                    ActY();
+                else if (trajectory.actions[i] == 3)
+                    ActZ();
+            }
+
+            //Set new position
+            distance -= mSpd;
+            if (distance <= 0)
+                beaten = true;
+
+            //Set new distance range
+            if (distance <= trajectory.dist1)
+                distanceRange = 1;
+            else if (distance <= trajectory.dist2)
+                distanceRange = 2;
+            else
+                distanceRange = 3;
+        }
+
         public virtual void ActX() { }
         public virtual void ActY() { }
         public virtual void ActZ() { }
@@ -97,56 +125,60 @@ namespace SpaceAlertSolver
             {
                 case 0:
                     return new  ArmoredCatcher(ship, traj, zone, time);
-                case 1:                                        , time
+                case 1:                                
                     return new          Amoebe(ship, traj, zone, time);
-                case 2:                                        , time
+                case 2:                                      
                     return new      Battleship(ship, traj, zone, time);
-                case 3:                                        , time
+                case 3:                                       
                     return new          Hunter(ship, traj, zone, time);
-                case 4:                                        , time
+                case 4:                                      
                     return new      GyroHunter(ship, traj, zone, time);
-                case 5:                                        , time
+                case 5:                                       
                     return new     EnergyCloud(ship, traj, zone, time);
-                case 6:                                        , time
+                case 6:                                       
                     return new       Meteorite(ship, traj, zone, time);
-                case 7:                                        , time
+                case 7:                                      
                     return new     ImpulseBall(ship, traj, zone, time);
-                case 8:                                        , time
+                case 8:                                   
                     return new    SpaceCruiser(ship, traj, zone, time);
-                case 9:                                        , time
+                case 9:                                     
                     return new   StealthHunter(ship, traj, zone, time);
-                case 10:                                       , time
+                case 10:                                    
                     return new       JellyFish(ship, traj, zone, time);
-                case 11:                                       , time
+                case 11:                                   
                     return new   SmallAsteroid(ship, traj, zone, time);
-                case 12:                                       , time
+                case 12:                                   
                     return new        Kamikaze(ship, traj, zone, time);
-                case 13:                                       , time
+                case 13:                                  
                     return new           Swarm(ship, traj, zone, time);
-                case 14:                                       , time
+                case 14:                                 
                     return new     GhostHunter(ship, traj, zone, time);
-                case 15:                                       , time
+                case 15:
+                    return new Scout(ship, traj, zone, time);
+                case 16:                                   
                     return new          Fregat(ship, traj, zone, time);
-                case 16:                                       , time
+                case 17:                                    
                     return new      GyroFregat(ship, traj, zone, time);
-                case 17:                                       , time
+                case 18:                                     
                     return new         WarDeck(ship, traj, zone, time);
-                case 18:
-                    return new InterStellarOctopus(ship, traj, zone, time);
                 case 19:
-                    return new      Maelstorm(ship, traj, zone, time);
+                    return new InterStellarOctopus(ship, traj, zone, time);
                 case 20:
-                    return new      Asteroid(ship, traj, zone, time);
+                    return new      Maelstorm(ship, traj, zone, time);
                 case 21:
-                    return new      ImpulseSatellite(ship, traj, zone, time);
+                    return new      Asteroid(ship, traj, zone, time);
                 case 22:
-                    return new      Nemesis(ship, traj, zone, time);
+                    return new      ImpulseSatellite(ship, traj, zone, time);
                 case 23:
-                    return new      NebulaCrab(ship, traj, zone, time);
+                    return new      Nemesis(ship, traj, zone, time);
                 case 24:
-                    return new      PsionicSatellite(ship, traj, zone, time);
+                    return new      NebulaCrab(ship, traj, zone, time);
                 case 25:
+                    return new      PsionicSatellite(ship, traj, zone, time);
+                case 26:
                     return new      LargeAsteroid(ship, traj, zone, time);
+                case 27:
+                    return new Moloch(ship, traj, zone, time);
             }
             return null;
         }
@@ -164,9 +196,9 @@ namespace SpaceAlertSolver
                 case 3:
                     return "Hunter";
                 case 4:
-                    return "GyroHunter";
+                    return "Gyro Hunter";
                 case 5:
-                    return "EnergyCloud";
+                    return "Energy Cloud";
                 case 6:
                     return "Meteorite";
                 case 7:
@@ -186,34 +218,38 @@ namespace SpaceAlertSolver
                 case 14:
                     return "Ghost Hunter";
                 case 15:
-                    return "Fregat";
+                    return "Scout";
                 case 16:
-                    return "Gyro Fregat";
+                    return "Fregat";
                 case 17:
-                    return "Wardeck";
+                    return "Gyro Fregat";
                 case 18:
-                    return "Interstellar Octopus";
+                    return "Wardeck";
                 case 19:
-                    return "Maelstorm";
+                    return "Interstellar Octopus";
                 case 20:
-                    return "Asteroid";
+                    return "Maelstorm";
                 case 21:
-                    return "Impulse Satellite";
+                    return "Asteroid";
                 case 22:
-                    return "Nemesis";
+                    return "Impulse Satellite";
                 case 23:
-                    return "Nebula Crab";
+                    return "Nemesis";
                 case 24:
-                    return "Psionic Satellite";
+                    return "Nebula Crab";
                 case 25:
+                    return "Psionic Satellite";
+                case 26:
                     return "Large Asteroid";
+                case 27:
+                    return "Moloch";
             }
             return "";
         }
     }
 
     //Damage sources
-    public enum DmgSource
+    public enum ExDmgSource
     {
         laser,
         plasma,

@@ -16,11 +16,11 @@ namespace SpaceAlertSolver
             Player[] players = new Player[5];
 
             //Setup threat pool
-            int comExThreatCount = 14;
+            int comExThreatCount = 15;
             List<int> comExThreats = new List<int>();
             for (int i = 0; i <= comExThreatCount; i++)
                 comExThreats.Add(i);
-            int sevExThreatCount = 11;
+            int sevExThreatCount = 12;
             List<int> sevExThreats = new List<int>();
             for (int i = 0; i < sevExThreatCount; i++)
                 sevExThreats.Add(i + comExThreatCount + 1);

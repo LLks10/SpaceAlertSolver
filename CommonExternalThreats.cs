@@ -192,9 +192,9 @@ namespace SpaceAlertSolver
                     ship.DealDamage(i, 2);
             }
         }
-        public override void DealDamage(int damage, int range, DmgSource source)
+        public override void DealDamage(int damage, int range, ExDmgSource source)
         {
-            if (source == DmgSource.impulse && range >= distanceRange)
+            if (source == ExDmgSource.impulse && range >= distanceRange)
                 shield = 0;
             base.DealDamage(damage, range, source);
         }
@@ -472,7 +472,7 @@ namespace SpaceAlertSolver
     class GhostHunter : ExThreat
     {
         bool visible = false;
-        public GhostHunter(Ship ship, Trajectory traj, int zone,int time, int time) : base(ship, traj, zone, time)
+        public GhostHunter(Ship ship, Trajectory traj, int zone,int time) : base(ship, traj, zone, time)
         {
             health = 3;
             shield = 3;
@@ -492,14 +492,57 @@ namespace SpaceAlertSolver
         {
             ship.DealDamage(zone, 3);
         }
-        public override void DealDamage(int damage, int range, DmgSource source)
+        public override void DealDamage(int damage, int range, ExDmgSource source)
         {
             if (!visible)
                 return;
-            if (source == DmgSource.rocket)
+            if (source == ExDmgSource.rocket)
                 return;
 
             base.DealDamage(damage, range, source);
+        }
+    }
+    //ID: 15
+    class Scout : ExThreat
+    {
+        public Scout(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
+        {
+            health = 3;
+            shield = 1;
+            speed = 2;
+            scoreLose = 3;
+            scoreWin = 6;
+        }
+        public override void ActX()
+        {
+            ship.scoutBonus = 1;
+        }
+        public override void ActY()
+        {
+            List<ExThreat> trts = ship.game.exThreats;
+            for(int i = 0; i < trts.Count; i++)
+            {
+                if ( !(trts[i] is Scout) )
+                    trts[i].Move(1);
+            }
+        }
+        public override void ActZ()
+        {
+            ship.DealDamage(zone, 3);
+        }
+        public override void DealDamage(int damage, int range, ExDmgSource source)
+        {
+            if (source == ExDmgSource.laser)
+                return;
+
+            base.DealDamage(damage, range, source);
+        }
+        public override bool ProcessDamage()
+        {
+            bool r = base.ProcessDamage();
+            if (r)
+                ship.scoutBonus = 0;
+            return r;
         }
     }
     #endregion
