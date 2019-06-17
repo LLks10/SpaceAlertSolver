@@ -20,9 +20,10 @@ namespace SpaceAlertSolver
             }
         }
 
-        public Gene(int[] gene)
+        public Gene(int[] gene, int players)
         {
             this.gene = gene;
+            this.players = players;
         }
 
         public String Rep()
@@ -63,7 +64,7 @@ namespace SpaceAlertSolver
                 }
                 output += "\n";
             }
-
+            
             return output;
         }
 

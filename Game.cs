@@ -33,7 +33,7 @@ namespace SpaceAlertSolver
 
         int[] observation;
         int observationCount;
-        int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 12, 15, 18, 22 };
+        int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
 
         public void Setup(Player[] players, Trajectory[] trajectories, Event[] events)
         {
