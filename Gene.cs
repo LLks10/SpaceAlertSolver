@@ -5,8 +5,7 @@ namespace SpaceAlertSolver
     public class Gene
     {
         private int[] gene;
-        private int players;
-        private int score;
+        private int players, score, blanks;
         private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
 
         public Gene(int players)
@@ -71,6 +70,14 @@ namespace SpaceAlertSolver
         public void setEval(Trajectory[] trajs, Event[] evts)
         {
             this.score = Evaluate(this.gene, trajs, evts);
+            blanks = 0;
+            for (int i = 0; i < players * 12; i++)
+            {
+                if (gene[i] == 0)
+                {
+                    blanks++;
+                }
+            }
         }
 
         private int Evaluate(int[] gene, Trajectory[] trajs, Event[] evts)
@@ -124,6 +131,11 @@ namespace SpaceAlertSolver
         public int getScore()
         {
             return this.score;
+        }
+
+        public int getBlanks()
+        {
+            return blanks;
         }
 
         public int getGene(int pos)

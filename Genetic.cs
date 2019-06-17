@@ -61,21 +61,23 @@ namespace SpaceAlertSolver
                 // Remove the worst gene
                 Gene bestGene1, bestGene2;
 
-                if (gene1.getScore() <= gene2.getScore() && gene1.getScore() <= gene3.getScore())
-                {
-                    this.genes.Remove(gene1);
+                if ((gene1.getScore() < gene2.getScore() || gene1.getScore() == gene2.getScore() && gene1.getBlanks() < gene2.getBlanks())
+                    && gene1.getScore() < gene3.getScore() || gene1.getScore() == gene3.getScore() && gene1.getBlanks() < gene3.getBlanks())
+                { // 1 is worst
+                    genes.Remove(gene1);
                     bestGene1 = gene2;
                     bestGene2 = gene3;
                 }
-                else if (gene2.getScore() <= gene1.getScore() && gene2.getScore() <= gene3.getScore())
-                {
-                    this.genes.Remove(gene2);
+                else if ((gene2.getScore() < gene1.getScore() || gene2.getScore() == gene1.getScore() && gene2.getBlanks() < gene1.getBlanks())
+                    && gene2.getScore() < gene3.getScore() || gene2.getScore() == gene3.getScore() && gene2.getBlanks() < gene3.getBlanks())
+                { // 2 is worst
+                    genes.Remove(gene2);
                     bestGene1 = gene1;
                     bestGene2 = gene3;
                 }
                 else
-                {
-                    this.genes.Remove(gene3);
+                { // 3 is worst
+                    genes.Remove(gene3);
                     bestGene1 = gene1;
                     bestGene2 = gene2;
                 }
