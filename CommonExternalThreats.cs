@@ -522,7 +522,7 @@ namespace SpaceAlertSolver
             List<ExThreat> trts = ship.game.exThreats;
             for(int i = 0; i < trts.Count; i++)
             {
-                if ( !(trts[i] is Scout) )
+                if (!(trts[i] is Scout) && !trts[i].beaten)
                     trts[i].Move(1);
             }
         }
