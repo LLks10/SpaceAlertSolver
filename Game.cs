@@ -104,8 +104,7 @@ namespace SpaceAlertSolver
                 ResolveDamage();
 
                 //Move threats (Fix sequencing for internal threats)
-                for (int i = 0; i < exThreats.Count; i++)
-                    exThreats[i].Move();
+                MoveThreats();
 
                 //Move rocket
                 if (ship.rocketFired)
@@ -129,6 +128,14 @@ namespace SpaceAlertSolver
                 turn++;
             }
 
+            //Final movement if not gameover
+            if (!gameover)
+            {
+                RocketFire();
+                ResolveDamage();
+                MoveThreats();
+            }
+
             //Count damage
             int highestDamage = 0;
             for (int i = 0; i < 3; i++)
@@ -144,6 +151,11 @@ namespace SpaceAlertSolver
                 if (!p.alive)
                     score -= 2;
             }
+            //Count dead androids
+            if (!ship.androids[0].alive)
+                score--;
+            if (!ship.androids[1].alive)
+                score--;
 
             //Observation bonus
             if (!gameover)
@@ -154,6 +166,13 @@ namespace SpaceAlertSolver
                 score = score - 200 + turn;
 
             return score;
+        }
+
+        //Moves threats
+        void MoveThreats()
+        {
+            for (int i = 0; i < exThreats.Count; i++)
+                exThreats[i].Move();
         }
 
         //Resolve damage against external threats
@@ -232,9 +251,29 @@ namespace SpaceAlertSolver
                 Act a = p.actions[t];
                 int z = p.position % 3;
 
+                //Exit if dead
                 if (!p.alive)
                     continue;
-                //Add special inInterceptor case
+
+                //Check interceptor controls
+                if (p.inIntercept)
+                {
+                    if(a == Act.fight)
+                    {
+                        //Keep fighting
+                        InterceptorDamage();
+                        return;
+                    }
+                    else
+                    {
+                        //Return
+                        p.inIntercept = false;
+                        ship.interceptorReady = true;
+                        p.Move(0);
+                        p.Delay(t);
+                        return;
+                    }
+                }
 
                 //Perform action
                 switch (a)
@@ -362,9 +401,39 @@ namespace SpaceAlertSolver
                     case Act.C:
                         switch (p.position)
                         {
+                            //Interceptors
+                            case 0:
+                                //Check if requirements met
+                                if(p.team != null && p.team.alive && ship.interceptorReady)
+                                {
+                                    p.inIntercept = true;
+                                    ship.interceptorReady = false;
+                                    p.Move(6);
+                                    InterceptorDamage();
+                                }
+                                break;
+
                             //Computer
                             case 1:
                                 phaseComputer[phase] = true;
+                                break;
+
+                            //Androids
+                            case 2:
+                                if(!ship.androids[0].active)
+                                {
+                                    ship.androids[0].active = true;
+                                    p.team = ship.androids[0];
+                                }
+                                break;
+
+                            //Androids
+                            case 3:
+                                if (!ship.androids[1].active)
+                                {
+                                    ship.androids[1].active = true;
+                                    p.team = ship.androids[1];
+                                }
                                 break;
 
                             //Observation
@@ -388,6 +457,31 @@ namespace SpaceAlertSolver
                         break;
                 }
             }
+        }
+
+        //Deal damage with interceptors
+        void InterceptorDamage()
+        {
+            int target = -1;
+            for(int i = 0; i < exThreats.Count; i++)
+            {
+                if(exThreats[i].distanceRange == 1)
+                {
+                    //Get first enemy
+                    if (target == -1)
+                        target = i;
+                    //Deal damage to all in range
+                    else
+                    {
+                        target = -2;
+                        exThreats[target].DealDamage(1, 1, ExDmgSource.intercept);
+                        exThreats[i].DealDamage(1, 1, ExDmgSource.intercept);
+                    }
+                }
+            }
+            //Deal damage to single target
+            if (target >= 0)
+                exThreats[target].DealDamage(3, 1, ExDmgSource.intercept);
         }
     }
 

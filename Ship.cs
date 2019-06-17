@@ -12,6 +12,7 @@ namespace SpaceAlertSolver
     public class Ship
     {
         public Player[] players;
+        public Androids[] androids;
         public Game game;
         public int[] shields;
         public int[] shieldsCap;
@@ -30,6 +31,8 @@ namespace SpaceAlertSolver
         public bool rocketFired;
         public bool rocketReady;
 
+        public bool interceptorReady;
+
         public int scoutBonus;
 
         public Ship(Player[] players, Game game)
@@ -41,6 +44,7 @@ namespace SpaceAlertSolver
             shieldsCap = new int[] { 2, 3, 2 };
             reactors = new int[] { 2, 3, 2 };
             reactorsCap = new int[] { 3, 5, 3 };
+            androids = new Androids[] { new Androids(2), new Androids(3) };
             laserDamage = new int[] { 4, 5, 4 };
             plasmaDamage = new int[] { 2, 1, 2 };
             cannonFired = new bool[6];
@@ -49,6 +53,7 @@ namespace SpaceAlertSolver
             damage = new int[] { 0, 0, 0 };
             capsules = 3;
             rockets = 3;
+            interceptorReady = true;
         }
 
         public void DealDamage(int zone, int amount)

@@ -338,7 +338,7 @@ namespace SpaceAlertSolver
             for(int i = 0; i < ship.players.Length; i++)
             {
                 Player p = ship.players[i];
-                if (p.position % 3 == zone)
+                if (p.position % 3 == zone && p.position < 6)
                     p.Delay(p.lastAction + 1);
             }
         }
@@ -450,6 +450,57 @@ namespace SpaceAlertSolver
                 increaseShield = false;
             }
             return r;
+        }
+    }
+
+    //ID: 28
+    class Behemoth : ExThreat
+    {
+        int maxHealth;
+        public Behemoth(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
+        {
+            health = 7;
+            maxHealth = health;
+            shield = 4;
+            speed = 2;
+            scoreLose = 6;
+            scoreWin = 12;
+        }
+        public override void ActX()
+        {
+            if (maxHealth - health < 2)
+                ship.DealDamage(zone, 2);
+        }
+        public override void ActY()
+        {
+            if (maxHealth - health < 3)
+                ship.DealDamage(zone, 3);
+        }
+        public override void ActZ()
+        {
+            if (maxHealth - health < 6)
+                ship.DealDamage(zone, 6);
+        }
+        public override void DealDamage(int damage, int range, ExDmgSource source)
+        {
+            //Valid cause interceptor performs range check
+            if (source == ExDmgSource.intercept && damage == 3)
+            {
+                damage = 9;
+                //Kill player
+                Player[] ps = ship.players;
+                for(int i = 0; i < ps.Length; i++)
+                {
+                    if (ps[i].inIntercept)
+                    {
+                        ps[i].alive = false;
+                        ps[i].team.alive = false;
+                        break;
+                    }
+                }
+            }
+
+            base.DealDamage(damage, range, source);
         }
     }
     #endregion

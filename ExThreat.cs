@@ -179,6 +179,8 @@ namespace SpaceAlertSolver
                     return new      LargeAsteroid(ship, traj, zone, time);
                 case 27:
                     return new Moloch(ship, traj, zone, time);
+                case 28:
+                    return new Behemoth(ship, traj, zone, time);
             }
             return null;
         }
@@ -243,6 +245,8 @@ namespace SpaceAlertSolver
                     return "Large Asteroid";
                 case 27:
                     return "Moloch";
+                case 28:
+                    return "Behemoth";
             }
             return "";
         }
