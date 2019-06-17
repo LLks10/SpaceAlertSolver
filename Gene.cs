@@ -5,13 +5,17 @@ namespace SpaceAlertSolver
     public class Gene
     {
         private int[] gene;
+        private int players;
         private int score;
+        private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
 
-        public Gene()
+        public Gene(int players)
         {
+            this.players = players;
+
             Random random = new Random(Guid.NewGuid().GetHashCode());
-            this.gene = new int[60];
-            for (int i = 0; i < 60; i++) // randomly fill gene
+            gene = new int[players*12];
+            for (int i = 0; i < players*12; i++) // randomly fill gene
             {
                 gene[i] = random.Next(0, 8);
             }
@@ -24,9 +28,10 @@ namespace SpaceAlertSolver
 
         public String Rep()
         {
-            String output = "  1     2     3     4     5     6     7     8     9    10    11    12\n";
-            for (int j = 0; j < 5; j++)
+            String output = "      1     2     3     4     5     6     7     8     9    10    11    12\n";
+            for (int j = 0; j < players; j++)
             {
+                output += playerColours[j] + " | ";
                 for (int i = 0; i < 12; i++)
                 {
                     switch (this.gene[i + j * 12])

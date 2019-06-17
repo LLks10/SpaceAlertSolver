@@ -6,20 +6,18 @@ namespace SpaceAlertSolver
     public class Genetic
     {
         private List<Gene> genes;
-        private Random random;
-        private double mutationChance;
+        private static Random random = new Random();
+        private static double mutationChance = 7/60;
         int generation = 0;
+        private int players;
 
-        public Genetic(int num, Trajectory[] trajs, Event[] evs)
+        public Genetic(int num, int players, Trajectory[] trajs, Event[] evs)
         {
-            mutationChance = 1 / 60;
-
-            random = new Random();
-
+            this.players = players;
             genes = new List<Gene>();
             for (int i = 0; i < num; i++)
             {
-                genes.Add(new Gene());
+                genes.Add(new Gene(players));
             }
 
             for (int i = 0; i < num; i++)
@@ -83,16 +81,16 @@ namespace SpaceAlertSolver
                 }
 
                 // Create a new gene
-                int[] newGene = new int[60];
+                int[] newGene = new int[players*12];
 
-                for (int k = 0; k < 5; k++)
+                for (int k = 0; k < players; k++)
                 {
                     int split = random.Next(0, 12);
 
                     // Pre-split
                     for (int j = k * 12; j < split + k * 12; j++)
                     {
-                        if (random.NextDouble() < 0.1)
+                        if (random.NextDouble() < mutationChance)
                         {
                             newGene[j] = random.Next(0, 8);
                         }
@@ -105,7 +103,7 @@ namespace SpaceAlertSolver
                     // Post-split
                     for (int j = split + k * 12; j < 12 + k * 12; j++)
                     {
-                        if (random.NextDouble() < 0.1)
+                        if (random.NextDouble() < mutationChance)
                         {
                             newGene[j] = random.Next(0, 8);
                         }
