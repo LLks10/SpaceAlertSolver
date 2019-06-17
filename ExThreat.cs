@@ -57,7 +57,8 @@ namespace SpaceAlertSolver
         public virtual void Move()
         {
             //Play actions
-            for(int i = distance-1; i >= distance-speed && i >= 0; i--)
+            int curSpd = speed;
+            for(int i = distance-1; i >= distance-curSpd && i >= 0; i--)
             {
                 if (trajectory.actions[i] == 1)
                     ActX();
@@ -68,7 +69,7 @@ namespace SpaceAlertSolver
             }
 
             //Set new position
-            distance -= speed;
+            distance -= curSpd;
             if (distance <= 0)
                 beaten = true;
 

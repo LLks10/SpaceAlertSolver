@@ -16,6 +16,7 @@ namespace SpaceAlertSolver
      * 
      * Questionable stuff:
      * Surviving asteroids doesnt cause asteroid destruction effect
+     * Gyro shields only disappear if damage would've hit lifepoints
     */
 
 

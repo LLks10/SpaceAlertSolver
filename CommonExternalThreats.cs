@@ -146,12 +146,13 @@ namespace SpaceAlertSolver
         {
             if(!hasShield)
                 return base.ProcessDamage();
-            else
+            else if(damage > shield)
             {
                 hasShield = false;
                 damage = 0;
                 return false;
             }
+            return false;
         }
     }
 

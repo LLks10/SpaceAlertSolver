@@ -35,7 +35,7 @@ namespace SpaceAlertSolver
     //ID: 16
     class GyroFregat : ExThreat
     {
-        bool gyro;
+        bool hasShield;
         public GyroFregat(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
         {
             health = 7;
@@ -43,7 +43,7 @@ namespace SpaceAlertSolver
             speed = 2;
             scoreLose = 4;
             scoreWin = 8;
-            gyro = true;
+            hasShield = true;
         }
         public override void ActX()
         {
@@ -59,14 +59,15 @@ namespace SpaceAlertSolver
         }
         public override bool ProcessDamage()
         {
-            if (gyro)
+            if (!hasShield)
+                return base.ProcessDamage();
+            else if (damage > shield)
             {
-                gyro = false;
+                hasShield = false;
                 damage = 0;
                 return false;
             }
-            else
-                return base.ProcessDamage();
+            return false;
         }
     }
     //ID: 17
