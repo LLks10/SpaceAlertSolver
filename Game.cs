@@ -528,18 +528,11 @@ namespace SpaceAlertSolver
                     case Act.fight:
                         if(p.team != null && p.team.alive)
                         {
-                            //Find internal threat to attack
-                            for(int j = 0; j < inThreats.Count; j++)
+                            InThreat thrt = AttackInternal(p.position, InDmgSource.android);
+                            if(thrt != null)
                             {
-                                if (!inThreats[j].beaten)
-                                {
-                                    if (inThreats[j].DealDamage(p.position, InDmgSource.android))
-                                    {
-                                        if (inThreats[j].fightBack)
-                                            p.team.alive = false;
-                                        break;
-                                    }
-                                }
+                                if (thrt.fightBack)
+                                    p.team.alive = false;
                             }
                         }
                         break;
@@ -547,6 +540,21 @@ namespace SpaceAlertSolver
                         break;
                 }
             }
+        }
+
+        //Attack internal threat
+        InThreat AttackInternal(int position, InDmgSource source)
+        {
+            //Find internal threat to attack
+            for (int j = 0; j < inThreats.Count; j++)
+            {
+                if (!inThreats[j].beaten)
+                {
+                    if (inThreats[j].DealDamage(position, source))
+                        return inThreats[j];
+                }
+            }
+            return null;
         }
 
         //Deal damage with interceptors

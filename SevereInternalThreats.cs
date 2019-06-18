@@ -49,7 +49,7 @@ namespace SpaceAlertSolver
             for(int i = 0; i < ship.players.Length; i++)
             {
                 if (ship.players[i].position == position)
-                    ship.players[i].alive = false;
+                    ship.players[i].Kill();
             }
         }
     }
@@ -95,7 +95,7 @@ namespace SpaceAlertSolver
             for (int i = 0; i < ship.players.Length; i++)
             {
                 if (ship.players[i].position == position)
-                    ship.players[i].alive = false;
+                    ship.players[i].Kill();
             }
         }
     }
@@ -175,7 +175,7 @@ namespace SpaceAlertSolver
             for(int i = 0; i < ship.players.Length; i++)
             {
                 if (ship.players[i].team == null || ship.players[i].team.alive == false)
-                    ship.players[i].alive = false;
+                    ship.players[i].Kill();
             }
         }
     }
@@ -206,7 +206,7 @@ namespace SpaceAlertSolver
             for(int i = 0; i < ship.players.Length; i++)
             {
                 if (ship.players[i].position == position)
-                    ship.players[i].alive = false;
+                    ship.players[i].Kill();
             }
         }
 
@@ -229,8 +229,7 @@ namespace SpaceAlertSolver
                             score = ship.players[i].lastAction;
                         }
                     }
-                    ship.players[highestAct].alive = false;
-                    ship.players[highestAct].team.alive = false;
+                    ship.players[highestAct].Kill();
 
                     alive = false;
                     beaten = true;

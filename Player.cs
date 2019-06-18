@@ -27,6 +27,13 @@ namespace SpaceAlertSolver
                 team.position = pos;
         }
 
+        public void Kill()
+        {
+            alive = false;
+            if (team != null)
+                team.alive = false;
+        }
+
         public void Delay(int action)
         {
             if (action >= 11 || actions[action] == Act.empty)
