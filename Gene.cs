@@ -83,12 +83,12 @@ namespace SpaceAlertSolver
 
         private int Evaluate(int[] gene, Trajectory[] trajs, Event[] evts)
         {
-            Player[] ps = new Player[5];
-            for (int i = 0; i < 5; i++)
+            Player[] ps = new Player[players];
+            for (int i = 0; i < players; i++)
                 ps[i] = new Player();
 
             int idx = 0;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < players; i++)
             {
                 ps[i].actions = new Act[12];
                 for (int j = 0; j < 12; j++)

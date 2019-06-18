@@ -82,7 +82,7 @@ namespace SpaceAlertSolver
             Event[] evArr = events.ToArray();
 
             //Random simulations
-            Genetic genetic = new Genetic(500, 5, trajectories, evArr);
+            Genetic genetic = new Genetic(500, 7, trajectories, evArr);
             while (true)
             {
                 int sims = 0;
@@ -96,7 +96,7 @@ namespace SpaceAlertSolver
                 if (ans == "N" || ans == "n")
                     break;
                 if (ans == "R" || ans == "r")
-                    genetic = new Genetic(500, 5, trajectories, evArr);
+                    genetic = new Genetic(500, 7, trajectories, evArr);
             }
             Console.ReadLine();
         }

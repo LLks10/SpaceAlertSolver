@@ -7,7 +7,9 @@ namespace SpaceAlertSolver
     {
         private List<Gene> genes;
         private static Random random = new Random();
-        private static double mutationChance = 7.0 / 60.0;
+        private static double mutationInit = 10.0 / 60.0;
+        private double mutationChance = mutationInit;
+        private static double mutationDecrement = 2.0 / 60.0;
         int generation = 0;
         private int players;
 
@@ -41,6 +43,17 @@ namespace SpaceAlertSolver
             int cycleLength = genes.Count / 2;
             List<Gene> newGenes = new List<Gene>();
             generation++;
+
+            // Mutation chance decrement
+            if (generation % 10000 == 0)
+            {
+                mutationChance -= mutationDecrement;
+                if (mutationChance < 0)
+                {
+                    mutationChance = mutationInit;
+                }
+            }
+
             // Tournaments
             for (int i = 0; i < cycleLength; i++)
             {
