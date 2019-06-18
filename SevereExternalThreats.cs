@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace SpaceAlertSolver
 {
     #region Common
-    //ID: 15
+    //ID: 16
     class Fregat : ExThreat
     {
-        public Fregat(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Fregat(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 7;
             shield = 2;
@@ -32,11 +32,11 @@ namespace SpaceAlertSolver
             ship.DealDamage(zone, 4);
         }
     }
-    //ID: 16
+    //ID: 17
     class GyroFregat : ExThreat
     {
         bool hasShield;
-        public GyroFregat(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public GyroFregat(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 7;
             shield = 1;
@@ -70,10 +70,10 @@ namespace SpaceAlertSolver
             return false;
         }
     }
-    //ID: 17
+    //ID: 18
     class WarDeck : ExThreat
     {
-        public WarDeck(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public WarDeck(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 9;
             shield = 2;
@@ -96,11 +96,11 @@ namespace SpaceAlertSolver
             ship.DealDamage(zone, 5);
         }
     }
-    //ID: 18
+    //ID: 19
     class InterStellarOctopus : ExThreat
     {
         int maxHealth;
-        public InterStellarOctopus(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public InterStellarOctopus(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 8;
             maxHealth = 8;
@@ -133,11 +133,11 @@ namespace SpaceAlertSolver
             ship.DealDamage(zone, 2*health);
         }
     }
-    //ID: 19
+    //ID: 20
     class Maelstorm : ExThreat
     {
         int baseShield;
-        public Maelstorm(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Maelstorm(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 8;
             shield = 3;
@@ -168,9 +168,9 @@ namespace SpaceAlertSolver
                     ship.DealDamage(i, 3);
             }
         }
-        public override void DealDamage(int damage, int range, DmgSource source)
+        public override void DealDamage(int damage, int range, ExDmgSource source)
         {
-            if (source == DmgSource.impulse && range >= distanceRange)
+            if (source == ExDmgSource.impulse && range >= distanceRange)
                 shield = 0;
             base.DealDamage(damage, range, source);
         }
@@ -181,11 +181,11 @@ namespace SpaceAlertSolver
             return v;
         }
     }
-    //ID: 20
+    //ID: 21
     class Asteroid : ExThreat
     {
         int revenge;
-        public Asteroid(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Asteroid(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 9;
             shield = 0;
@@ -215,10 +215,10 @@ namespace SpaceAlertSolver
             return v;
         }
     }
-    //ID: 21
+    //ID: 22
     class ImpulseSatellite : ExThreat
     {
-        public ImpulseSatellite(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public ImpulseSatellite(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 4;
             shield = 2;
@@ -257,10 +257,10 @@ namespace SpaceAlertSolver
     #endregion
 
     #region Advanced
-    //ID: 22
+    //ID: 23
     class Nemesis : ExThreat
     {
-        public Nemesis(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Nemesis(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 9;
             shield = 1;
@@ -295,10 +295,10 @@ namespace SpaceAlertSolver
             return base.ProcessDamage();
         }
     }
-    //ID: 23
+    //ID: 24
     class NebulaCrab : ExThreat
     {
-        public NebulaCrab(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public NebulaCrab(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 7;
             shield = 2;
@@ -322,10 +322,10 @@ namespace SpaceAlertSolver
             ship.DealDamage(2, 5);
         }
     }
-    //ID: 24
+    //ID: 25
     class PsionicSatellite : ExThreat
     {
-        public PsionicSatellite(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public PsionicSatellite(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 5;
             shield = 2;
@@ -338,7 +338,7 @@ namespace SpaceAlertSolver
             for(int i = 0; i < ship.players.Length; i++)
             {
                 Player p = ship.players[i];
-                if (p.position % 3 == zone)
+                if (p.position % 3 == zone && p.position < 6)
                     p.Delay(p.lastAction + 1);
             }
         }
@@ -370,11 +370,11 @@ namespace SpaceAlertSolver
             return base.ProcessDamage();
         }
     }
-    //ID: 25
+    //ID: 26
     class LargeAsteroid : ExThreat
     {
         int revenge;
-        public LargeAsteroid(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public LargeAsteroid(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 11;
             shield = 0;
@@ -402,6 +402,105 @@ namespace SpaceAlertSolver
             if (v)
                 ship.DealDamage(zone, revenge * 3);
             return v;
+        }
+    }
+
+    //ID: 27
+    class Moloch : ExThreat
+    {
+        bool increaseShield = false;
+        public Moloch(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
+        {
+            health = 10;
+            shield = 3;
+            speed = 1;
+            scoreLose = 6;
+            scoreWin = 12;
+        }
+        public override void ActX()
+        {
+            ship.DealDamage(zone, 2);
+            speed += 2;
+        }
+        public override void ActY()
+        {
+            ship.DealDamage(zone, 3);
+            speed += 2;
+        }
+        public override void ActZ()
+        {
+            ship.DealDamage(zone, 7);
+        }
+        public override void DealDamage(int damage, int range, ExDmgSource source)
+        {
+            if(source == ExDmgSource.rocket)
+            {
+                increaseShield = true;
+                this.damage += damage;
+            }
+            else
+                base.DealDamage(damage, range, source);
+        }
+        public override bool ProcessDamage()
+        {
+            bool r = base.ProcessDamage();
+            if (increaseShield)
+            {
+                shield++;
+                increaseShield = false;
+            }
+            return r;
+        }
+    }
+
+    //ID: 28
+    class Behemoth : ExThreat
+    {
+        int maxHealth;
+        public Behemoth(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
+        {
+            health = 7;
+            maxHealth = health;
+            shield = 4;
+            speed = 2;
+            scoreLose = 6;
+            scoreWin = 12;
+        }
+        public override void ActX()
+        {
+            if (maxHealth - health < 2)
+                ship.DealDamage(zone, 2);
+        }
+        public override void ActY()
+        {
+            if (maxHealth - health < 3)
+                ship.DealDamage(zone, 3);
+        }
+        public override void ActZ()
+        {
+            if (maxHealth - health < 6)
+                ship.DealDamage(zone, 6);
+        }
+        public override void DealDamage(int damage, int range, ExDmgSource source)
+        {
+            //Valid cause interceptor performs range check
+            if (source == ExDmgSource.intercept && damage == 3)
+            {
+                damage = 9;
+                //Kill player
+                Player[] ps = ship.players;
+                for(int i = 0; i < ps.Length; i++)
+                {
+                    if (ps[i].inIntercept)
+                    {
+                        ps[i].alive = false;
+                        ps[i].team.alive = false;
+                        break;
+                    }
+                }
+            }
+
+            base.DealDamage(damage, range, source);
         }
     }
     #endregion

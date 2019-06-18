@@ -11,7 +11,7 @@ namespace SpaceAlertSolver
     class ArmoredCatcher : ExThreat
     {
         int maxHealth;
-        public ArmoredCatcher(Ship ship, Trajectory traj, int zone) : base(ship,traj,zone)
+        public ArmoredCatcher(Ship ship, Trajectory traj, int zone, int time) : base(ship,traj,zone,time)
         {
             health = 4;
             maxHealth = 4;
@@ -39,7 +39,7 @@ namespace SpaceAlertSolver
     class Amoebe : ExThreat
     {
         int maxHealth;
-        public Amoebe(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Amoebe(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 8;
             maxHealth = 8;
@@ -67,7 +67,7 @@ namespace SpaceAlertSolver
     //ID: 2
     class Battleship : ExThreat
     {
-        public Battleship(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Battleship(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 5;
             shield = 2;
@@ -93,7 +93,7 @@ namespace SpaceAlertSolver
     //ID: 3
     class Hunter : ExThreat
     {
-        public Hunter(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Hunter(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 4;
             shield = 2;
@@ -120,7 +120,7 @@ namespace SpaceAlertSolver
     class GyroHunter : ExThreat
     {
         bool hasShield;
-        public GyroHunter(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public GyroHunter(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 4;
             shield = 1;
@@ -160,7 +160,7 @@ namespace SpaceAlertSolver
     class EnergyCloud : ExThreat
     {
         int baseShield;
-        public EnergyCloud(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public EnergyCloud(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 5;
             shield = 3;
@@ -192,9 +192,9 @@ namespace SpaceAlertSolver
                     ship.DealDamage(i, 2);
             }
         }
-        public override void DealDamage(int damage, int range, DmgSource source)
+        public override void DealDamage(int damage, int range, ExDmgSource source)
         {
-            if (source == DmgSource.impulse && range >= distanceRange)
+            if (source == ExDmgSource.impulse && range >= distanceRange)
                 shield = 0;
             base.DealDamage(damage, range, source);
         }
@@ -209,7 +209,7 @@ namespace SpaceAlertSolver
     //ID: 6
     class Meteorite : ExThreat
     {
-        public Meteorite(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Meteorite(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 5;
             shield = 0;
@@ -227,7 +227,7 @@ namespace SpaceAlertSolver
     //ID: 7
     class ImpulseBall : ExThreat
     {
-        public ImpulseBall(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public ImpulseBall(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 5;
             shield = 1;
@@ -258,7 +258,7 @@ namespace SpaceAlertSolver
     //ID: 8
     class SpaceCruiser : ExThreat
     {
-        public SpaceCruiser(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public SpaceCruiser(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 5;
             shield = 2;
@@ -290,7 +290,7 @@ namespace SpaceAlertSolver
     class StealthHunter : ExThreat
     {
         bool visible = false;
-        public StealthHunter(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public StealthHunter(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 4;
             shield = 2;
@@ -327,7 +327,7 @@ namespace SpaceAlertSolver
     class JellyFish : ExThreat
     {
         int baseHealth;
-        public JellyFish(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public JellyFish(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 13;
             baseHealth = health;
@@ -361,7 +361,7 @@ namespace SpaceAlertSolver
     class SmallAsteroid : ExThreat
     {
         int revenge;
-        public SmallAsteroid(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public SmallAsteroid(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 7;
             shield = 0;
@@ -384,7 +384,7 @@ namespace SpaceAlertSolver
         }
         public override bool ProcessDamage()
         {
-            health = health - (damage - shield);
+            health = health - Math.Max(0, (damage - shield));
             damage = 0;
 
             if (health < 0)
@@ -402,7 +402,7 @@ namespace SpaceAlertSolver
     //ID: 12
     class Kamikaze : ExThreat
     {
-        public Kamikaze(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Kamikaze(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 5;
             shield = 2;
@@ -429,7 +429,7 @@ namespace SpaceAlertSolver
     //ID: 13
     class Swarm : ExThreat
     {
-        public Swarm(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public Swarm(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 3;
             shield = 0;
@@ -472,7 +472,7 @@ namespace SpaceAlertSolver
     class GhostHunter : ExThreat
     {
         bool visible = false;
-        public GhostHunter(Ship ship, Trajectory traj, int zone) : base(ship, traj, zone)
+        public GhostHunter(Ship ship, Trajectory traj, int zone,int time) : base(ship, traj, zone, time)
         {
             health = 3;
             shield = 3;
@@ -492,14 +492,57 @@ namespace SpaceAlertSolver
         {
             ship.DealDamage(zone, 3);
         }
-        public override void DealDamage(int damage, int range, DmgSource source)
+        public override void DealDamage(int damage, int range, ExDmgSource source)
         {
             if (!visible)
                 return;
-            if (source == DmgSource.rocket)
+            if (source == ExDmgSource.rocket)
                 return;
 
             base.DealDamage(damage, range, source);
+        }
+    }
+    //ID: 15
+    class Scout : ExThreat
+    {
+        public Scout(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
+        {
+            health = 3;
+            shield = 1;
+            speed = 2;
+            scoreLose = 3;
+            scoreWin = 6;
+        }
+        public override void ActX()
+        {
+            ship.scoutBonus = 1;
+        }
+        public override void ActY()
+        {
+            List<ExThreat> trts = ship.game.exThreats;
+            for(int i = 0; i < trts.Count; i++)
+            {
+                if (!(trts[i] is Scout) && !trts[i].beaten)
+                    trts[i].Move(1);
+            }
+        }
+        public override void ActZ()
+        {
+            ship.DealDamage(zone, 3);
+        }
+        public override void DealDamage(int damage, int range, ExDmgSource source)
+        {
+            if (source == ExDmgSource.laser)
+                return;
+
+            base.DealDamage(damage, range, source);
+        }
+        public override bool ProcessDamage()
+        {
+            bool r = base.ProcessDamage();
+            if (r)
+                ship.scoutBonus = 0;
+            return r;
         }
     }
     #endregion

@@ -153,22 +153,26 @@ namespace SpaceAlertSolver
             }
             this.genes.AddRange(newGenes);
 
-            int highest = int.MinValue;
-            Gene best = null;
-            foreach (Gene g in genes)
+            if(generation % 1000 == 0)
             {
-                if (g.getScore() > highest || g.getScore() == highest && g.getBlanks() > best.getBlanks())
+                int highest = int.MinValue;
+                Gene best = null;
+                foreach (Gene g in genes)
                 {
-                    highest = g.getScore();
-                    best = g;
+                    if (g.getScore() > highest || g.getScore() == highest && g.getBlanks() > best.getBlanks())
+                    {
+                        highest = g.getScore();
+                        best = g;
+                    }
+                }
+                Console.WriteLine("Gen {0} best: {1} TB: {2}", generation, highest, best.getBlanks());
+                if (generation % 10000 == 0)
+                {
+                    Console.WriteLine(best.Rep());
+                        //best.setEval(trajs, evs);
                 }
             }
-            if(generation % 1000 == 0)
-                Console.WriteLine("Gen {0} best: {1} TB: {2}", generation, highest, best.getBlanks());
-            if (generation % 10000 == 0)
-            {
-                Console.WriteLine(best.Rep());
-            }
+               
         }
     }
 }

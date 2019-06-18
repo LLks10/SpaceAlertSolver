@@ -92,5 +92,11 @@ namespace SpaceAlertSolver
         public bool active;
         public int position;
         public bool alive;
+
+        public Androids(int position)
+        {
+            active = false;
+            alive = true;
+        }
     }
 }
