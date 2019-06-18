@@ -31,7 +31,8 @@ namespace SpaceAlertSolver
         {
             if (action >= 11 || actions[action] == Act.empty)
             {
-                actions[action] = Act.empty;
+                if(action < 12)
+                    actions[action] = Act.empty;
                 return;
             }
 

@@ -48,7 +48,7 @@ namespace SpaceAlertSolver
             if (generation % 10000 == 0)
             {
                 mutationChance -= mutationDecrement;
-                if (mutationChance < 0)
+                if (mutationChance <= 0)
                 {
                     mutationChance = mutationInit;
                 }
