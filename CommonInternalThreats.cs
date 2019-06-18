@@ -135,5 +135,73 @@ namespace SpaceAlertSolver
             ship.DealDamageIntern(z, 3);
         }
     }
+    //ID: 4
+    class SoldiersRed : InThreat
+    {
+        public SoldiersRed(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 2;
+            position = 0;
+            speed = 2;
+            scoreLose = 3;
+            scoreWin = 6;
+            vulnerability = InDmgSource.android;
+            fightBack = true;
+        }
+
+        public override void ActX()
+        {
+            if (position < 3)
+                position += 3;
+            else
+                position -= 3;
+
+        }
+        public override void ActY()
+        {
+            if (position != 2 && position != 5)
+                position++;
+        }
+        public override void ActZ()
+        {
+            int z = position % 3;
+            ship.DealDamageIntern(z, 4);
+        }
+    }
+    //ID: 5
+    class SoldiersBlue : InThreat
+    {
+        public SoldiersBlue(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 2;
+            position = 5;
+            speed = 2;
+            scoreLose = 3;
+            scoreWin = 6;
+            vulnerability = InDmgSource.android;
+            fightBack = true;
+        }
+
+        public override void ActX()
+        {
+            if (position < 3)
+                position += 3;
+            else
+                position -= 3;
+            
+        }
+        public override void ActY()
+        {
+            if (position != 0 && position != 3)
+                position--;
+        }
+        public override void ActZ()
+        {
+            int z = position % 3;
+            ship.DealDamageIntern(z, 4);
+        }
+    }
+    
+
     #endregion
 }

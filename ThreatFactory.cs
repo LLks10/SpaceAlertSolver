@@ -9,7 +9,7 @@ namespace SpaceAlertSolver
     //Create threats
     public static class ThreatFactory
     {
-        const int sevInStart = 0;
+        const int sevInStart = 6;
         //External threat
         public static ExThreat SummonEx(int number, Trajectory traj, int zone, Ship ship, int time)
         {
@@ -156,6 +156,21 @@ namespace SpaceAlertSolver
                     return new SkirmisherRed(ship, traj, time);
                 case 3:
                     return new SkirmisherBlue(ship, traj, time);
+                case 4:
+                    return new SoldiersRed(ship, traj, time);
+                case 5:
+                    return new SoldiersBlue(ship, traj, time);
+
+                case sevInStart:
+                    return new CommandosRed(ship, traj, time);
+                case sevInStart + 1:
+                    return new CommandosBlue(ship, traj, time);
+                case sevInStart + 2:
+                    return new Alien(ship, traj, time);
+                case sevInStart + 3:
+                    return new Eliminator(ship, traj, time);
+                case sevInStart + 4:
+                    return new SearchRobot(ship, traj, time);
             }
             return null;
         }
@@ -172,6 +187,21 @@ namespace SpaceAlertSolver
                     return "Red Skirmisher";
                 case 3:
                     return "Blue Skirmisher";
+                case 4:
+                    return "Red Soldiers";
+                case 5:
+                    return "Blue Soldiers";
+
+                case sevInStart:
+                    return "Red Commandos";
+                case sevInStart + 1:
+                    return "Blue Commandos";
+                case sevInStart + 2:
+                    return "Alien";
+                case sevInStart + 3:
+                    return "Eliminator";
+                case sevInStart + 4:
+                    return "Search Robot";
             }
             return "";
         }

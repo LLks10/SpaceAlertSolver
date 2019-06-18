@@ -16,22 +16,22 @@ namespace SpaceAlertSolver
             Player[] players = new Player[5];
 
             //Setup threat pool
-            int comExThreatCount = 15;
+            int comExThreatCount = 16;
             List<int> comExThreats = new List<int>();
-            for (int i = 0; i <= comExThreatCount; i++)
+            for (int i = 0; i < comExThreatCount; i++)
                 comExThreats.Add(i);
             int sevExThreatCount = 13;
             List<int> sevExThreats = new List<int>();
             for (int i = 0; i < sevExThreatCount; i++)
-                sevExThreats.Add(i + comExThreatCount + 1);
-            int comInThreatCount = 4;
+                sevExThreats.Add(i + comExThreatCount);
+            int comInThreatCount = 6;
             List<int> comInThreats = new List<int>();
-            for (int i = 0; i <= comInThreatCount; i++)
+            for (int i = 0; i < comInThreatCount; i++)
                 comInThreats.Add(i);
-            int sevInThreatCount = 0;
+            int sevInThreatCount = 5;
             List<int> sevInThreats = new List<int>();
             for (int i = 0; i < sevInThreatCount; i++)
-                sevInThreats.Add(i + comInThreatCount + 1);
+                sevInThreats.Add(i + comInThreatCount);
 
             //Load trajectories
             Trajectory[] trajectories = new Trajectory[4];
@@ -105,7 +105,7 @@ namespace SpaceAlertSolver
             Event[] evArr = events.ToArray();
 
             //Random simulations
-            Genetic genetic = new Genetic(500, 7, trajectories, evArr);
+            Genetic genetic = new Genetic(500, 5, trajectories, evArr);
             while (true)
             {
                 int sims = 0;
@@ -119,7 +119,7 @@ namespace SpaceAlertSolver
                 if (ans == "N" || ans == "n")
                     break;
                 if (ans == "R" || ans == "r")
-                    genetic = new Genetic(500, 7, trajectories, evArr);
+                    genetic = new Genetic(500, 5, trajectories, evArr);
             }
             Console.ReadLine();
         }

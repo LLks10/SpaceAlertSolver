@@ -9,7 +9,7 @@ namespace SpaceAlertSolver
     /* ----------------
      *Adjusted rulings: 
      * -Ship damage doesnt cause defects
-     * -No internal threats (Check if internal threat isnt beaten while checking for damage target!!)
+     * -No defects
      * 
      * Questionable stuff:
      * Surviving asteroids doesnt cause asteroid destruction effect
