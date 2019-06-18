@@ -67,5 +67,10 @@ namespace SpaceAlertSolver
                 shields[zone] = 0;
             }
         }
+
+        public void DealDamageIntern(int zone, int amount)
+        {
+            damage[zone] += amount;
+        }
     }
 }

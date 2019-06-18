@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonInternalThreats.cs" />
     <Compile Include="CommonExternalThreats.cs" />
     <Compile Include="InThreat.cs" />
     <Compile Include="ExThreat.cs" />

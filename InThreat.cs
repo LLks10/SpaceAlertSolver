@@ -14,7 +14,6 @@ namespace SpaceAlertSolver
         public InDmgSource vulnerability;
         public bool alive, beaten, fightBack;
         public Ship ship;
-        public int damage;
 
         public InThreat(Ship ship, Trajectory traj, int time)
         {
@@ -31,7 +30,12 @@ namespace SpaceAlertSolver
         {
             if(source == vulnerability && AtPosition(position))
             {
-                this.damage++;
+                health--;
+                if(health <= 0)
+                {
+                    alive = false;
+                    beaten = true;
+                }
                 return true;
             }
             return false;
@@ -44,15 +48,6 @@ namespace SpaceAlertSolver
 
         public virtual bool ProcessDamage()
         {
-            health -= damage;
-            damage = 0;
-
-            if (health < 0)
-            {
-                alive = false;
-                beaten = true;
-                return true;
-            }
             return false;
         }
 

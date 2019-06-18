@@ -148,7 +148,14 @@ namespace SpaceAlertSolver
         {
             switch (number)
             {
-
+                case 0:
+                    return new SaboteurRed(ship, traj, time);
+                case 1:
+                    return new SaboteurBlue(ship, traj, time);
+                case 2:
+                    return new SkirmisherRed(ship, traj, time);
+                case 3:
+                    return new SkirmisherBlue(ship, traj, time);
             }
             return null;
         }
@@ -157,6 +164,14 @@ namespace SpaceAlertSolver
         {
             switch (number)
             {
+                case 0:
+                    return "Red Saboteur";
+                case 1:
+                    return "Blue Saboteur";
+                case 2:
+                    return "Red Skirmisher";
+                case 3:
+                    return "Blue Skirmisher";
             }
             return "";
         }

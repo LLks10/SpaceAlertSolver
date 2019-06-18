@@ -24,7 +24,7 @@ namespace SpaceAlertSolver
             List<int> sevExThreats = new List<int>();
             for (int i = 0; i < sevExThreatCount; i++)
                 sevExThreats.Add(i + comExThreatCount + 1);
-            int comInThreatCount = 0;
+            int comInThreatCount = 4;
             List<int> comInThreats = new List<int>();
             for (int i = 0; i <= comInThreatCount; i++)
                 comInThreats.Add(i);
@@ -97,7 +97,7 @@ namespace SpaceAlertSolver
                             thrt = sevInThreats[thrtIdx];
                             sevInThreats.RemoveAt(thrtIdx);
                         }
-                        Console.WriteLine("Loaded {0} on turn {1}", ThreatFactory.ExName(thrt), t);
+                        Console.WriteLine("Loaded {0} on turn {1}", ThreatFactory.InName(thrt), t);
                         events.Add(new Event(false, t, 3, thrt));
                     }
                 }
