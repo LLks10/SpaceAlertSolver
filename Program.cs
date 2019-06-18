@@ -24,7 +24,7 @@ namespace SpaceAlertSolver
             List<int> sevExThreats = new List<int>();
             for (int i = 0; i < sevExThreatCount; i++)
                 sevExThreats.Add(i + comExThreatCount + 1);
-            int comInThreatCount = 4;
+            int comInThreatCount = 3;
             List<int> comInThreats = new List<int>();
             for (int i = 0; i <= comInThreatCount; i++)
                 comInThreats.Add(i);
@@ -105,7 +105,7 @@ namespace SpaceAlertSolver
             Event[] evArr = events.ToArray();
 
             //Random simulations
-            Genetic genetic = new Genetic(500, 7, trajectories, evArr);
+            Genetic genetic = new Genetic(500, 5, trajectories, evArr);
             while (true)
             {
                 int sims = 0;
@@ -119,7 +119,7 @@ namespace SpaceAlertSolver
                 if (ans == "N" || ans == "n")
                     break;
                 if (ans == "R" || ans == "r")
-                    genetic = new Genetic(500, 7, trajectories, evArr);
+                    genetic = new Genetic(500, 5, trajectories, evArr);
             }
             Console.ReadLine();
         }
