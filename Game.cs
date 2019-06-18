@@ -8,14 +8,12 @@ namespace SpaceAlertSolver
 {
     /* ----------------
      *Adjusted rulings: 
-     * -No combat androids
-     * -No interceptors
      * -Ship damage doesnt cause defects
-     * -No final move phase
-     * -No internal threats
+     * -No internal threats (Check if internal threat isnt beaten while checking for damage target!!)
      * 
      * Questionable stuff:
      * Surviving asteroids doesnt cause asteroid destruction effect
+     * Scout is immune to laser instead of not being able to get targeted
     */
 
 
@@ -26,6 +24,7 @@ namespace SpaceAlertSolver
         Trajectory[] trajectories;
         Event[] events;
         public List<ExThreat> exThreats;
+        public List<InThreat> inThreats;
         int turn;
         int phase;
         int score;
@@ -54,6 +53,7 @@ namespace SpaceAlertSolver
             turn = 1;
             ship = new Ship(players, this);
             exThreats = new List<ExThreat>();
+            inThreats = new List<InThreat>();
             observation = new int[3];
             phaseComputer = new bool[3];
 
@@ -96,13 +96,27 @@ namespace SpaceAlertSolver
                 //Perform player actions
                 PlayerActions(turn - 1);
 
-                //-> Cleanup dead internal
+                //Process internal damage and cleanup
+                for (int i = 0; i < inThreats.Count; i++)
+                    inThreats[i].ProcessDamage();
+                for(int i = inThreats.Count - 1; i >= 0; i--)
+                {
+                    //Threat is gone
+                    if (inThreats[i].beaten)
+                    {
+                        if (inThreats[i].alive)
+                            score += inThreats[i].scoreLose;
+                        else
+                            score += inThreats[i].scoreWin;
+                        inThreats.RemoveAt(i);
+                    }
+                }
 
                 //Rocket hits
                 RocketFire();
 
                 //Apply damage to threats and check if dead
-                ResolveDamage();
+                ResolveExDamage();
 
                 //Move threats (Fix sequencing for internal threats)
                 MoveThreats();
@@ -133,7 +147,7 @@ namespace SpaceAlertSolver
             if (!gameover)
             {
                 RocketFire();
-                ResolveDamage();
+                ResolveExDamage();
                 MoveThreats();
             }
 
@@ -169,15 +183,37 @@ namespace SpaceAlertSolver
             return score;
         }
 
-        //Moves threats
+        //Moves threats in order
         void MoveThreats()
         {
-            for (int i = 0; i < exThreats.Count; i++)
-                exThreats[i].Move();
+            int iEx = 0, iIn = 0;
+            while (iEx < exThreats.Count || iIn < inThreats.Count)
+            {
+                if(iIn == inThreats.Count)
+                {
+                    exThreats[iEx].Move();
+                    iEx++;
+                }
+                else if(iEx == exThreats.Count)
+                {
+                    inThreats[iIn].Move();
+                    iIn++;
+                }
+                else if(exThreats[iEx]. time < inThreats[iIn].time)
+                {
+                    exThreats[iEx].Move();
+                    iEx++;
+                }
+                else
+                {
+                    inThreats[iIn].Move();
+                    iIn++;
+                }
+            }
         }
 
         //Resolve damage against external threats
-        void ResolveDamage()
+        void ResolveExDamage()
         {
             //Process damage
             for (int i = 0; i < exThreats.Count; i++)
@@ -237,6 +273,8 @@ namespace SpaceAlertSolver
                 Event ev = events[eventIdx];
                 if (ev.external)
                     exThreats.Add(ThreatFactory.SummonEx(ev.creature, trajectories[ev.zone], ev.zone, ship, turn));
+                else
+                    inThreats.Add(ThreatFactory.SummonIn(ev.creature, trajectories[3], ship, turn));
                 return true;
             }
             return false;
@@ -422,20 +460,27 @@ namespace SpaceAlertSolver
 
                             //Androids
                             case 2:
-                                if(!ship.androids[0].active)
+                                //Take androids
+                                if (!ship.androids[0].active)
                                 {
                                     ship.androids[0].active = true;
                                     p.team = ship.androids[0];
                                 }
+                                //Repair androids
+                                else if (p.team != null)
+                                    p.team.alive = true;
                                 break;
 
                             //Androids
                             case 3:
+                                //Take androids
                                 if (!ship.androids[1].active)
                                 {
                                     ship.androids[1].active = true;
                                     p.team = ship.androids[1];
                                 }
+                                else if (p.team != null)
+                                    p.team.alive = true;
                                 break;
 
                             //Observation
@@ -454,6 +499,22 @@ namespace SpaceAlertSolver
 
                     //Empty for now
                     case Act.fight:
+                        if(p.team != null && p.team.alive)
+                        {
+                            //Find internal threat to attack
+                            for(int j = 0; j < inThreats.Count; j++)
+                            {
+                                if (!inThreats[j].beaten)
+                                {
+                                    if (inThreats[j].DealDamage(p.position, InDmgSource.android))
+                                    {
+                                        if (inThreats[j].fightBack)
+                                            p.team.alive = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                         break;
                     case Act.empty:
                         break;

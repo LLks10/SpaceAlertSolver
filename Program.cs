@@ -24,6 +24,14 @@ namespace SpaceAlertSolver
             List<int> sevExThreats = new List<int>();
             for (int i = 0; i < sevExThreatCount; i++)
                 sevExThreats.Add(i + comExThreatCount + 1);
+            int comInThreatCount = 0;
+            List<int> comInThreats = new List<int>();
+            for (int i = 0; i <= comInThreatCount; i++)
+                comInThreats.Add(i);
+            int sevInThreatCount = 0;
+            List<int> sevInThreats = new List<int>();
+            for (int i = 0; i < sevInThreatCount; i++)
+                sevInThreats.Add(i + comInThreatCount + 1);
 
             //Load trajectories
             Trajectory[] trajectories = new Trajectory[4];
@@ -40,6 +48,7 @@ namespace SpaceAlertSolver
             Console.WriteLine("Lt{0} Mt{1} Rt{2} It{3}", trajectories[0].number + 1, trajectories[1].number + 1, trajectories[2].number + 1, trajectories[3].number + 1);
             Console.WriteLine();
             Console.WriteLine("Add events: 'type 1..4 ec es ic is' 'turn 1...12' 'zone 0,1,2' | Type 'start' to start simulation");
+            string[] zoneStr = new string[] { "Red", "White", "Blue", "Internal" };
             while (true)
             {
                 string str = Console.ReadLine();
@@ -69,13 +78,27 @@ namespace SpaceAlertSolver
                             sevExThreats.RemoveAt(thrtIdx);
                         }
                         
-                        Console.WriteLine("Loaded {0} on turn {1}", ThreatFactory.ExName(thrt), t);
+                        Console.WriteLine("Loaded {0} on turn {1} in zone {2}", ThreatFactory.ExName(thrt), t, zoneStr[z]);
                         events.Add(new Event(true, t, z, thrt));
                     }
                     //Internal
                     else
                     {
-
+                        int thrt;
+                        if (type == 3)
+                        {
+                            int thrtIdx = r.Next(comInThreats.Count);
+                            thrt = comInThreats[thrtIdx];
+                            comInThreats.RemoveAt(thrtIdx);
+                        }
+                        else
+                        {
+                            int thrtIdx = r.Next(sevInThreats.Count);
+                            thrt = sevInThreats[thrtIdx];
+                            sevInThreats.RemoveAt(thrtIdx);
+                        }
+                        Console.WriteLine("Loaded {0} on turn {1}", ThreatFactory.ExName(thrt), t);
+                        events.Add(new Event(false, t, 3, thrt));
                     }
                 }
             }

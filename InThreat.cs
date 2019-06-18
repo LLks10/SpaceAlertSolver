@@ -27,11 +27,11 @@ namespace SpaceAlertSolver
             distance = traj.maxDistance;
         }
 
-        public virtual bool DealDamage(int damage, int position, InDmgSource source)
+        public virtual bool DealDamage(int position, InDmgSource source)
         {
-            if(source == vulnerability && AtPosition(position) && !beaten)
+            if(source == vulnerability && AtPosition(position))
             {
-                this.damage += damage;
+                this.damage++;
                 return true;
             }
             return false;

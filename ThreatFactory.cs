@@ -9,6 +9,7 @@ namespace SpaceAlertSolver
     //Create threats
     public static class ThreatFactory
     {
+        const int sevInStart = 0;
         //External threat
         public static ExThreat SummonEx(int number, Trajectory traj, int zone, Ship ship, int time)
         {
