@@ -201,7 +201,193 @@ namespace SpaceAlertSolver
             ship.DealDamageIntern(z, 4);
         }
     }
-    
+    //ID: 6
+    class Virus : InThreat
+    {
+        public Virus(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 3;
+            position = 1;
+            ship.CDefect[1]++;
+            speed = 3;
+            scoreLose = 3;
+            scoreWin = 6;
+            vulnerability = InDmgSource.C;
+        }
 
+        public override void OnClear()
+        {
+            ship.CDefect[1]--;
+        }
+
+        public override void ActX()
+        {
+            if (ship.reactors[0] > 0)
+                ship.reactors[0]--;
+            if (ship.reactors[1] > 0)
+                ship.reactors[1]--;
+            if (ship.reactors[2] > 0)
+                ship.reactors[2]--;
+
+        }
+        public override void ActY()
+        {
+            for(int i = 0; i < ship.players.Length; i++)
+            {
+                if (ship.players[i].position < 6)
+                    ship.players[i].Delay(ship.players[i].lastAction + 1);
+            }
+        }
+        public override void ActZ()
+        {
+            ship.DealDamageIntern(0, 1);
+            ship.DealDamageIntern(1, 1);
+            ship.DealDamageIntern(2, 1);
+        }
+    }
+    //ID: 7
+    class HackedShieldsRed : InThreat
+    {
+        public HackedShieldsRed(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 3;
+            position = 0;
+            ship.BDefect[0]++;
+            speed = 2;
+            scoreLose = 2;
+            scoreWin = 4;
+            vulnerability = InDmgSource.B;
+        }
+
+        public override void OnClear()
+        {
+            ship.BDefect[0]--;
+        }
+
+        public override void ActX()
+        {
+            ship.shields[0] = 0;
+
+        }
+        public override void ActY()
+        {
+            ship.reactors[0] = 0;
+        }
+        public override void ActZ()
+        {
+            ship.DealDamageIntern(0, 2);
+        }
+    }
+    //ID: 8
+    class HackedShieldsBlue : InThreat
+    {
+        public HackedShieldsBlue(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 3;
+            position = 2;
+            ship.BDefect[2]++;
+            speed = 2;
+            scoreLose = 2;
+            scoreWin = 4;
+            vulnerability = InDmgSource.B;
+        }
+
+        public override void OnClear()
+        {
+            ship.BDefect[2]--;
+        }
+
+        public override void ActX()
+        {
+            ship.shields[2] = 0;
+
+        }
+        public override void ActY()
+        {
+            ship.reactors[2] = 0;
+        }
+        public override void ActZ()
+        {
+            ship.DealDamageIntern(2, 2);
+        }
+    }
+    //ID: 9
+    class OverheatedReactor : InThreat
+    {
+        public OverheatedReactor(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 3;
+            position = 4;
+            ship.BDefect[4]++;
+            speed = 2;
+            scoreLose = 3;
+            scoreWin = 6;
+            vulnerability = InDmgSource.B;
+        }
+
+        public override void OnClear()
+        {
+            ship.BDefect[4]--;
+        }
+
+        public override void ActX()
+        {
+            ship.DealDamageIntern(1, ship.reactors[1]);
+
+        }
+        public override void ActY()
+        {
+            if (ship.capsules > 0)
+                ship.capsules--;
+        }
+        public override void ActZ()
+        {
+            ship.DealDamageIntern(1, 2);
+        }
+        public override bool DealDamage(int position, InDmgSource source)
+        {
+            bool r = base.DealDamage(position, source);
+
+            if (r)
+            {
+                for(int i = 0; i < ship.players.Length; i++)
+                {
+                    if (ship.players[i].position == 3 || ship.players[i].position == 5)
+                        ship.players[i].Kill();
+                }
+            }
+
+            return r;
+        }
+    }
+    //ID: 10
+    class UnstableWarheads : InThreat
+    {
+        public UnstableWarheads(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = ship.rockets;
+            position = 5;
+            speed = 3;
+            scoreLose = 2;
+            scoreWin = 4;
+            vulnerability = InDmgSource.C;
+            if(health > 0)
+                ship.CDefect[5]++;
+            else
+            {
+                beaten = true;
+                alive = false;
+            }
+        }
+
+        public override void OnClear()
+        {
+            ship.CDefect[5]--;
+        }
+        public override void ActZ()
+        {
+            ship.DealDamageIntern(2, ship.rockets*3);
+        }
+    }
     #endregion
 }

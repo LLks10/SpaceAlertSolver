@@ -9,7 +9,7 @@ namespace SpaceAlertSolver
     //Create threats
     public static class ThreatFactory
     {
-        const int sevInStart = 6;
+        const int sevInStart = 11;
         //External threat
         public static ExThreat SummonEx(int number, Trajectory traj, int zone, Ship ship, int time)
         {
@@ -160,6 +160,16 @@ namespace SpaceAlertSolver
                     return new SoldiersRed(ship, traj, time);
                 case 5:
                     return new SoldiersBlue(ship, traj, time);
+                case 6:
+                    return new Virus(ship, traj, time);
+                case 7:
+                    return new HackedShieldsRed(ship, traj, time);
+                case 8:
+                    return new HackedShieldsBlue(ship, traj, time);
+                case 9:
+                    return new OverheatedReactor(ship, traj, time);
+                case 10:
+                    return new UnstableWarheads(ship, traj, time);
 
                 case sevInStart:
                     return new CommandosRed(ship, traj, time);
@@ -171,6 +181,14 @@ namespace SpaceAlertSolver
                     return new Eliminator(ship, traj, time);
                 case sevInStart + 4:
                     return new SearchRobot(ship, traj, time);
+                case sevInStart + 5:
+                    return new AtomicBomb(ship, traj, time);
+                case sevInStart + 6:
+                    return new RebelliousRobots(ship, traj, time);
+                case sevInStart + 7:
+                    return new SwitchedCables(ship, traj, time);
+                case sevInStart + 8:
+                    return new OverstrainedEnergyNet(ship, traj, time);
             }
             return null;
         }
@@ -191,6 +209,16 @@ namespace SpaceAlertSolver
                     return "Red Soldiers";
                 case 5:
                     return "Blue Soldiers";
+                case 6:
+                    return "Virus";
+                case 7:
+                    return "Red Hacked Shields";
+                case 8:
+                    return "Blue Hacked Shields";
+                case 9:
+                    return "Overheated Reactor";
+                case 10:
+                    return "Unstable Warheads";
 
                 case sevInStart:
                     return "Red Commandos";
@@ -202,6 +230,14 @@ namespace SpaceAlertSolver
                     return "Eliminator";
                 case sevInStart + 4:
                     return "Search Robot";
+                case sevInStart + 5:
+                    return "Atomic Bomb";
+                case sevInStart + 6:
+                    return "Rebellious Robots";
+                case sevInStart + 7:
+                    return "Switched Cables";
+                case sevInStart + 8:
+                    return "Overstrained Energy Net";
             }
             return "";
         }

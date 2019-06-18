@@ -9,7 +9,7 @@ namespace SpaceAlertSolver
     /* ----------------
      *Adjusted rulings: 
      * -Ship damage doesnt cause defects
-     * -No defects
+     * -Few threats are missing
      * 
      * Questionable stuff:
      * Surviving asteroids doesnt cause asteroid destruction effect
@@ -433,6 +433,13 @@ namespace SpaceAlertSolver
                         break;
 
                     case Act.B:
+                        //Check for a defect
+                        if(ship.BDefect[p.position] > 0)
+                        {
+                            AttackInternal(p.position, InDmgSource.B);
+                            break;
+                        }
+
                         //Refill shield
                         if (p.position < 3)
                         {
@@ -466,6 +473,13 @@ namespace SpaceAlertSolver
                         }
                         break;
                     case Act.C:
+                        //Check for a defect
+                        if (ship.CDefect[p.position] > 0)
+                        {
+                            AttackInternal(p.position, InDmgSource.C);
+                            break;
+                        }
+
                         switch (p.position)
                         {
                             //Interceptors
@@ -590,6 +604,7 @@ namespace SpaceAlertSolver
             output.AppendFormat("OBS: {0} {1} {2}\n", observation[0], observation[1], observation[2]);
             output.AppendFormat("P Pos: {0} {1} {2} {3} {4}\n", players[0].position, players[1].position, players[2].position, players[3].position, players[4].position);
             output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", players[0].actions[11], players[1].actions[11], players[2].actions[11], players[3].actions[11], players[4].actions[11]);
+            output.AppendFormat("Alive: {0} {1} {2} {3} {4}\n", players[0].alive, players[1].alive, players[2].alive, players[3].alive, players[4].alive);
             output.AppendFormat("ExKill: {0} | ExSurv: {1} | InKill: {2} | InSurv: {3}\n", exSlain, exSurvived, inSlain, inSurvived);
             output.AppendFormat("Reactors: {0} {1} {2}\n", ship.reactors[0], ship.reactors[1], ship.reactors[2]);
             output.AppendFormat("Shields: {0} {1} {2}\n", ship.shields[0], ship.shields[1], ship.shields[2]);

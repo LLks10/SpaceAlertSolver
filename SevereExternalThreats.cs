@@ -357,7 +357,7 @@ namespace SpaceAlertSolver
             {
                 Player p = ship.players[i];
                 if (p.position < 6)
-                    p.alive = false;
+                    p.Kill();
             }
         }
         public override bool ProcessDamage()
@@ -493,8 +493,7 @@ namespace SpaceAlertSolver
                 {
                     if (ps[i].inIntercept)
                     {
-                        ps[i].alive = false;
-                        ps[i].team.alive = false;
+                        ps[i].Kill();
                         break;
                     }
                 }

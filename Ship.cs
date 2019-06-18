@@ -20,6 +20,7 @@ namespace SpaceAlertSolver
         public int[] reactorsCap;
         public int[] laserDamage;
         public int[] plasmaDamage;
+        public int[] BDefect, CDefect;
         public int pulseRange;
         public int[] damage;
         public bool[] liftUsed;
@@ -47,6 +48,8 @@ namespace SpaceAlertSolver
             androids = new Androids[] { new Androids(2), new Androids(3) };
             laserDamage = new int[] { 4, 5, 4 };
             plasmaDamage = new int[] { 2, 1, 2 };
+            BDefect = new int[] { 0, 0, 0, 0, 0, 0 };
+            CDefect = new int[] { 0, 0, 0, 0, 0, 0, 0};
             cannonFired = new bool[6];
             liftUsed = new bool[3];
             pulseRange = 2;

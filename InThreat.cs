@@ -35,11 +35,14 @@ namespace SpaceAlertSolver
                 {
                     alive = false;
                     beaten = true;
+                    OnClear();
                 }
                 return true;
             }
             return false;
         }
+
+        public virtual void OnClear() { }
 
         public virtual bool AtPosition(int position)
         {
@@ -68,7 +71,10 @@ namespace SpaceAlertSolver
             //Set new position
             distance -= curSpd;
             if (distance <= 0)
+            {
+                OnClear();
                 beaten = true;
+            }
         }
 
         public virtual void Move(int mSpd)

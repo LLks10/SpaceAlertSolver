@@ -289,4 +289,263 @@ namespace SpaceAlertSolver
                 position = nearbyStation[best];
         }
     }
+
+    class AtomicBomb : InThreat
+    {
+        int damage = 0;
+        public AtomicBomb(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 1;
+            position = 4;
+            ship.CDefect[4]++;
+            speed = 4;
+            scoreLose = 0;
+            scoreWin = 12;
+            vulnerability = InDmgSource.C;
+        }
+        public override void ActX()
+        {
+            speed++;
+        }
+        public override void ActY()
+        {
+            speed++;
+        }
+        public override void ActZ()
+        {
+            ship.damage[0] = 7;
+            ship.damage[1] = 7;
+            ship.damage[2] = 7;
+        }
+        public override bool DealDamage(int position, InDmgSource source)
+        {
+            if (source == vulnerability && AtPosition(position))
+            {
+                damage++;
+                if(damage >= 3)
+                {
+                    health--;
+                    beaten = true;
+                    alive = false;
+                    ship.CDefect[4]--;
+                }
+                return true;
+            }
+            return false;
+        }
+        public override bool ProcessTurnEnd()
+        {
+            if (beaten)
+                return true;
+            damage = 0;
+            return false;
+        }
+    }
+
+    class RebelliousRobots : InThreat
+    {
+        bool tookExtraDamage;
+        bool[] hits = new bool[2];
+        public RebelliousRobots(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 4;
+            ship.CDefect[2]++;
+            ship.CDefect[3]++;
+            speed = 2;
+            scoreLose = 4;
+            scoreWin = 8;
+            vulnerability = InDmgSource.C;
+        }
+        public override void OnClear()
+        {
+            ship.CDefect[2]--;
+            ship.CDefect[3]--;
+        }
+        public override void ActX()
+        {
+            for(int i = 0; i < ship.players.Length; i++)
+            {
+                if (ship.players[i].team != null && ship.players[i].team.alive)
+                    ship.players[i].Kill();
+            }
+        }
+        public override void ActY()
+        {
+            for (int i = 0; i < ship.players.Length; i++)
+            {
+                if (ship.players[i].position == 2 || ship.players[i].position == 3)
+                    ship.players[i].Kill();
+            }
+        }
+        public override void ActZ()
+        {
+            for (int i = 0; i < ship.players.Length; i++)
+            {
+                if (ship.players[i].position != 1)
+                    ship.players[i].Kill();
+            }
+        }
+        public override bool DealDamage(int position, InDmgSource source)
+        {
+            if (source == vulnerability)
+            {
+                //Check if at any of the two positions
+                if(position == 2 || position == 3)
+                {
+                    health--;
+                    //Bonus damage if both stations activated
+                    hits[position - 2] = true;
+                    if (!tookExtraDamage)
+                    {
+                        if(hits[0] && hits[1])
+                        {
+                            health--;
+                            tookExtraDamage = true;
+                        }
+                    }
+                    //Check death
+                    if (health <= 0)
+                    {
+                        beaten = true;
+                        alive = false;
+                        OnClear();
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+        public override bool ProcessTurnEnd()
+        {
+            if (beaten)
+                return true;
+            tookExtraDamage = false;
+            hits[0] = false;
+            hits[1] = false;
+            return false;
+        }
+    }
+
+    class SwitchedCables : InThreat
+    {
+        public SwitchedCables(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 4;
+            position = 1;
+            ship.BDefect[1]++;
+            speed = 3;
+            scoreLose = 4;
+            scoreWin = 8;
+            vulnerability = InDmgSource.B;
+        }
+
+        public override void OnClear()
+        {
+            ship.BDefect[1]--;
+        }
+
+        public override void ActX()
+        {
+            ship.shields[1] += ship.reactors[1];
+            ship.reactors[1] = 0;
+            int excess = ship.shields[1] - ship.shieldsCap[1];
+            if(excess > 0)
+            {
+                ship.shields[1] = ship.shieldsCap[1];
+                ship.DealDamageIntern(1, excess);
+            }
+
+        }
+        public override void ActY()
+        {
+            ship.DealDamageIntern(1, ship.shields[1]);
+            ship.shields[1] = 0;
+        }
+        public override void ActZ()
+        {
+            for(int i = 0; i < 3; i++)
+            {
+                ship.DealDamageIntern(i, ship.reactors[i]);
+                ship.reactors[i] = 0;
+            }
+        }
+    }
+
+    class OverstrainedEnergyNet : InThreat
+    {
+        bool tookExtraDamage;
+        bool[] hits = new bool[3];
+        public OverstrainedEnergyNet(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 7;
+            ship.BDefect[3]++;
+            ship.BDefect[4]++;
+            ship.BDefect[5]++;
+            speed = 3;
+            scoreLose = 6;
+            scoreWin = 12;
+            vulnerability = InDmgSource.B;
+        }
+        public override void OnClear()
+        {
+            ship.BDefect[3]--;
+            ship.BDefect[4]--;
+            ship.BDefect[5]--;
+        }
+        public override void ActX()
+        {
+            ship.reactors[1] = Math.Max(0, ship.reactors[1] - 2);
+        }
+        public override void ActY()
+        {
+            for (int i = 0; i < 3; i++)
+                ship.reactors[i] = Math.Max(0, ship.reactors[i] - 1);
+        }
+        public override void ActZ()
+        {
+            ship.DealDamageIntern(0, 3);
+            ship.DealDamageIntern(1, 3);
+            ship.DealDamageIntern(2, 3);
+        }
+        public override bool DealDamage(int position, InDmgSource source)
+        {
+            if (source == vulnerability)
+            {
+                //Check if at any of the two positions
+                if (position == 3 || position == 4 || position == 5)
+                {
+                    health--;
+                    //Bonus damage if both stations activated
+                    hits[position - 3] = true;
+                    if (!tookExtraDamage)
+                    {
+                        if (hits[0] && hits[1] && hits[2])
+                        {
+                            health -= 2;
+                            tookExtraDamage = true;
+                        }
+                    }
+                    //Check death
+                    if (health <= 0)
+                    {
+                        beaten = true;
+                        alive = false;
+                        OnClear();
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+        public override bool ProcessTurnEnd()
+        {
+            if (beaten)
+                return true;
+            tookExtraDamage = false;
+            hits[0] = false;
+            hits[1] = false;
+            hits[2] = false;
+            return false;
+        }
+    }
 }
