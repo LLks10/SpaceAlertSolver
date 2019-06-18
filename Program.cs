@@ -77,7 +77,7 @@ namespace SpaceAlertSolver
                             thrt = sevExThreats[thrtIdx];
                             sevExThreats.RemoveAt(thrtIdx);
                         }
-                        
+
                         Console.WriteLine("Loaded {0} on turn {1} in zone {2}", ThreatFactory.ExName(thrt), t, zoneStr[z]);
                         events.Add(new Event(true, t, z, thrt));
                     }
