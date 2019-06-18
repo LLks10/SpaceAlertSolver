@@ -30,6 +30,8 @@ namespace SpaceAlertSolver
         int score;
         bool[] phaseComputer;
 
+        int exSlain, exSurvived, inSlain, inSurvived;
+
         int[] observation;
         int observationCount;
         int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
@@ -54,6 +56,7 @@ namespace SpaceAlertSolver
             ship = new Ship(players, this);
             exThreats = new List<ExThreat>();
             inThreats = new List<InThreat>();
+
             observation = new int[3];
             phaseComputer = new bool[3];
 
@@ -97,20 +100,7 @@ namespace SpaceAlertSolver
                 PlayerActions(turn - 1);
 
                 //Process internal damage and cleanup
-                for (int i = 0; i < inThreats.Count; i++)
-                    inThreats[i].ProcessDamage();
-                for(int i = inThreats.Count - 1; i >= 0; i--)
-                {
-                    //Threat is gone
-                    if (inThreats[i].beaten)
-                    {
-                        if (inThreats[i].alive)
-                            score += inThreats[i].scoreLose;
-                        else
-                            score += inThreats[i].scoreWin;
-                        inThreats.RemoveAt(i);
-                    }
-                }
+                ResolveInDamage();
 
                 //Rocket hits
                 RocketFire();
@@ -146,9 +136,15 @@ namespace SpaceAlertSolver
             //Final movement if not gameover
             if (!gameover)
             {
+                //Fire last rocket
                 RocketFire();
+                //Check damage
                 ResolveExDamage();
+                //Move
                 MoveThreats();
+                //Cleanup dead
+                ResolveInDamage();
+                ResolveExDamage();
             }
 
             //Count damage
@@ -212,6 +208,31 @@ namespace SpaceAlertSolver
             }
         }
 
+        //Resolve damage against internal threats
+        void ResolveInDamage()
+        {
+            for (int i = 0; i < inThreats.Count; i++)
+                inThreats[i].ProcessTurnEnd();
+            for (int i = inThreats.Count - 1; i >= 0; i--)
+            {
+                //Threat is gone
+                if (inThreats[i].beaten)
+                {
+                    if (inThreats[i].alive)
+                    {
+                        score += inThreats[i].scoreLose;
+                        inSurvived++;
+                    }
+                    else
+                    {
+                        score += inThreats[i].scoreWin;
+                        inSlain++;
+                    }
+                    inThreats.RemoveAt(i);
+                }
+            }
+        }
+
         //Resolve damage against external threats
         void ResolveExDamage()
         {
@@ -226,9 +247,15 @@ namespace SpaceAlertSolver
                 if (exThreats[i].beaten)
                 {
                     if (exThreats[i].alive)
+                    {
                         score += exThreats[i].scoreLose;
+                        exSurvived++;
+                    }
                     else
+                    {
                         score += exThreats[i].scoreWin;
+                        exSlain++;
+                    }
                     exThreats.RemoveAt(i);
                 }
             }
@@ -546,6 +573,21 @@ namespace SpaceAlertSolver
             //Deal damage to single target
             if (target >= 0)
                 exThreats[target].DealDamage(3, 1, ExDmgSource.intercept);
+        }
+
+        public string GetDebug()
+        {
+            StringBuilder output = new StringBuilder();
+            output.AppendFormat("DMG: {0} {1} {2}\n", ship.damage[0], ship.damage[1], ship.damage[2]);
+            output.AppendFormat("OBS: {0} {1} {2}\n", observation[0], observation[1], observation[2]);
+            output.AppendFormat("P Pos: {0} {1} {2} {3} {4}\n", players[0].position, players[1].position, players[2].position, players[3].position, players[4].position);
+            output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", players[0].actions[11], players[1].actions[11], players[2].actions[11], players[3].actions[11], players[4].actions[11]);
+            output.AppendFormat("ExKill: {0} | ExSurv: {1} | InKill: {2} | InSurv: {3}\n", exSlain, exSurvived, inSlain, inSurvived);
+            output.AppendFormat("Reactors: {0} {1} {2}\n", ship.reactors[0], ship.reactors[1], ship.reactors[2]);
+            output.AppendFormat("Shields: {0} {1} {2}\n", ship.shields[0], ship.shields[1], ship.shields[2]);
+            output.AppendFormat("Caps: {0} | Rockets: {1}", ship.capsules, ship.rockets);
+
+            return output.ToString();
         }
     }
 

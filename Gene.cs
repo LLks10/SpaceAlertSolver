@@ -7,6 +7,7 @@ namespace SpaceAlertSolver
         private int[] gene;
         private int players, score, blanks;
         private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
+        public string debug;
 
         public Gene(int players)
         {
@@ -126,7 +127,9 @@ namespace SpaceAlertSolver
 
             Game g = new Game();
             g.Setup(ps, trajs, evts);
-            return g.Simulate();
+            int scr = g.Simulate();
+            debug = g.GetDebug();
+            return scr;
         }
 
         public int getScore()

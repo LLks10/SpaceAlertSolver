@@ -46,7 +46,7 @@ namespace SpaceAlertSolver
             return position == this.position;
         }
 
-        public virtual bool ProcessDamage()
+        public virtual bool ProcessTurnEnd()
         {
             return false;
         }
