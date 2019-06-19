@@ -107,6 +107,5 @@ namespace SpaceAlertSolver
         B,
         C,
         android,
-        intercept
     }
 }

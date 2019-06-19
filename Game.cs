@@ -73,10 +73,8 @@ namespace SpaceAlertSolver
 
                 //Reset variables
                 observationCount = 0;
-                for (int i = 0; i < 6; i++)
-                    ship.cannonFired[i] = false;
-                for (int i = 0; i < 3; i++)
-                    ship.liftUsed[i] = false;
+                ship.cannonFired = 0;
+                ship.liftUsed = 0;
 
                 //Check computer
                 if (turn == 3 || turn == 6 || turn == 10)
@@ -316,7 +314,7 @@ namespace SpaceAlertSolver
                 Player p = players[i];
                 p.lastAction = t;
                 Act a = p.actions[t];
-                int z = p.position % 3;
+                int z = p.position % 3, bm;
 
                 //Exit if dead
                 if (!p.alive)
@@ -349,29 +347,34 @@ namespace SpaceAlertSolver
                     case Act.left:
                         if (p.position != 0 && p.position != 3)
                             p.Move(p.position - 1);
+                        ApplyStatusEffect(p);
                         break;
                     case Act.right:
                         if (p.position != 2 && p.position != 5)
                             p.Move(p.position + 1);
+                        ApplyStatusEffect(p);
                         break;
                     case Act.lift:
                         //Check if elevator was used
-                        if (ship.liftUsed[z])
+                        bm = 1 << z;
+                        if ( (ship.liftUsed & bm) == bm)
                             p.Delay(t + 1);
-                        ship.liftUsed[z] = true;
+                        ship.liftUsed |= bm;
                         //Move
                         if (p.position < 3)
                             p.Move(p.position + 3);
                         else
                             p.Move(p.position - 3);
+                        ApplyStatusEffect(p);
                         break;
 
                     //Actions
                     case Act.A:
                         //Check if can fire
-                        if (ship.cannonFired[p.position])
+                        bm = 1 << p.position; 
+                        if ( (ship.cannonFired & bm) == bm)
                             break;
-                        ship.cannonFired[p.position] = true;
+                        ship.cannonFired |= bm;
 
                         if (p.position < 3)
                         {
@@ -574,6 +577,14 @@ namespace SpaceAlertSolver
         //Deal damage with interceptors
         void InterceptorDamage()
         {
+            //Attack internal threat
+            if(ship.CDefect[6] > 0)
+            {
+                AttackInternal(6, InDmgSource.C);
+                return;
+            }
+
+            //Attack external threat
             int target = -1;
             for(int i = 0; i < exThreats.Count; i++)
             {
@@ -595,6 +606,17 @@ namespace SpaceAlertSolver
             //Deal damage to single target
             if (target >= 0)
                 exThreats[target].DealDamage(3, 1, ExDmgSource.intercept);
+        }
+
+        void ApplyStatusEffect(Player p)
+        {
+            //Check status effect
+            if (ship.stationStatus[p.position] != 0)
+            {
+                if ((ship.stationStatus[p.position] & 2) == 2)
+                    p.Kill();
+                //Check delay
+            }
         }
 
         public string GetDebug()

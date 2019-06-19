@@ -28,7 +28,7 @@ namespace SpaceAlertSolver
             List<int> comInThreats = new List<int>();
             for (int i = 0; i < comInThreatCount; i++)
                 comInThreats.Add(i);
-            int sevInThreatCount = 9;
+            int sevInThreatCount = 11;
             List<int> sevInThreats = new List<int>();
             for (int i = 0; i < sevInThreatCount; i++)
                 sevInThreats.Add(i + comInThreatCount);
@@ -36,14 +36,26 @@ namespace SpaceAlertSolver
             //Load trajectories
             Trajectory[] trajectories = new Trajectory[4];
             int[] ts = new int[] { 0, 1, 2, 3, 4, 5, 6 };
-            for(int i = 0; i < 4; i++)
+            
+            Console.WriteLine("'r' for random trajectories or xxxx to manually set");
+            string resp = Console.ReadLine();
+            if (resp == "r" || resp == "R")
             {
-                int tsi = -1;
-                while (tsi == -1)
-                    tsi = ts[r.Next(7)];
-                trajectories[i] = new Trajectory(tsi);
-                ts[tsi] = -1;
+                for (int i = 0; i < 4; i++)
+                {
+                    int tsi = -1;
+                    while (tsi == -1)
+                        tsi = ts[r.Next(7)];
+                    trajectories[i] = new Trajectory(tsi);
+                    ts[tsi] = -1;
+                }
             }
+            else
+            {
+                for(int i = 0; i < 4; i++)
+                    trajectories[i] = new Trajectory(int.Parse(resp[i].ToString())-1);
+            }
+
             Console.WriteLine("Trajectories:");
             Console.WriteLine("Lt{0} Mt{1} Rt{2} It{3}", trajectories[0].number + 1, trajectories[1].number + 1, trajectories[2].number + 1, trajectories[3].number + 1);
             Console.WriteLine();
@@ -65,17 +77,35 @@ namespace SpaceAlertSolver
                     {
                         int z = int.Parse(strsplit[2]);
                         int thrt;
+                        //Common
                         if(type == 1)
                         {
-                            int thrtIdx = r.Next(comExThreats.Count);
-                            thrt = comExThreats[thrtIdx];
-                            comExThreats.RemoveAt(thrtIdx);
+                            if(strsplit.Length > 3)
+                            {
+                                thrt = int.Parse(strsplit[3]);
+                                comExThreats.Remove(thrt);
+                            }
+                            else
+                            {
+                                int thrtIdx = r.Next(comExThreats.Count);
+                                thrt = comExThreats[thrtIdx];
+                                comExThreats.RemoveAt(thrtIdx);
+                            }
                         }
+                        //Severe
                         else
                         {
-                            int thrtIdx = r.Next(sevExThreats.Count);
-                            thrt = sevExThreats[thrtIdx];
-                            sevExThreats.RemoveAt(thrtIdx);
+                            if (strsplit.Length > 3)
+                            {
+                                thrt = int.Parse(strsplit[3]);
+                                sevExThreats.Remove(thrt);
+                            }
+                            else
+                            {
+                                int thrtIdx = r.Next(sevExThreats.Count);
+                                thrt = sevExThreats[thrtIdx];
+                                sevExThreats.RemoveAt(thrtIdx);
+                            }
                         }
 
                         Console.WriteLine("Loaded {0} on turn {1} in zone {2}", ThreatFactory.ExName(thrt), t, zoneStr[z]);
@@ -87,15 +117,31 @@ namespace SpaceAlertSolver
                         int thrt;
                         if (type == 3)
                         {
-                            int thrtIdx = r.Next(comInThreats.Count);
-                            thrt = comInThreats[thrtIdx];
-                            comInThreats.RemoveAt(thrtIdx);
+                            if (strsplit.Length > 2)
+                            {
+                                thrt = int.Parse(strsplit[2]);
+                                comInThreats.Remove(thrt);
+                            }
+                            else
+                            {
+                                int thrtIdx = r.Next(comInThreats.Count);
+                                thrt = comInThreats[thrtIdx];
+                                comInThreats.RemoveAt(thrtIdx);
+                            }
                         }
                         else
                         {
-                            int thrtIdx = r.Next(sevInThreats.Count);
-                            thrt = sevInThreats[thrtIdx];
-                            sevInThreats.RemoveAt(thrtIdx);
+                            if (strsplit.Length > 2)
+                            {
+                                thrt = int.Parse(strsplit[2]);
+                                sevInThreats.Remove(thrt);
+                            }
+                            else
+                            {
+                                int thrtIdx = r.Next(sevInThreats.Count);
+                                thrt = sevInThreats[thrtIdx];
+                                sevInThreats.RemoveAt(thrtIdx);
+                            }
                         }
                         Console.WriteLine("Loaded {0} on turn {1}", ThreatFactory.InName(thrt), t);
                         events.Add(new Event(false, t, 3, thrt));

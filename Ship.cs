@@ -9,6 +9,11 @@ namespace SpaceAlertSolver
     //Position
     //0  1  2
     //3  4  5   6-> outside
+
+    //1  2  4
+    //8 16 32   64 Bitmasks stations
+
+    //1  2  4  Bitmasks zone
     public class Ship
     {
         public Player[] players;
@@ -21,10 +26,14 @@ namespace SpaceAlertSolver
         public int[] laserDamage;
         public int[] plasmaDamage;
         public int[] BDefect, CDefect;
+        public int[] stationStatus;
         public int pulseRange;
         public int[] damage;
-        public bool[] liftUsed;
-        public bool[] cannonFired;
+        public bool[] fissured;
+
+        //Bit flags
+        public int liftUsed;
+        public int cannonFired;
 
         public int capsules;
 
@@ -48,10 +57,10 @@ namespace SpaceAlertSolver
             androids = new Androids[] { new Androids(2), new Androids(3) };
             laserDamage = new int[] { 4, 5, 4 };
             plasmaDamage = new int[] { 2, 1, 2 };
-            BDefect = new int[] { 0, 0, 0, 0, 0, 0 };
-            CDefect = new int[] { 0, 0, 0, 0, 0, 0, 0};
-            cannonFired = new bool[6];
-            liftUsed = new bool[3];
+            stationStatus = new int[6];
+            BDefect = new int[6];
+            CDefect = new int[7];
+            fissured = new bool[3];
             pulseRange = 2;
             damage = new int[] { 0, 0, 0 };
             capsules = 3;
@@ -61,7 +70,10 @@ namespace SpaceAlertSolver
 
         public void DealDamage(int zone, int amount)
         {
-            shields[zone] -= amount + scoutBonus;
+            amount += scoutBonus;
+            if (fissured[zone])
+                amount *= 2;
+            shields[zone] -= amount;
 
             //Excess damage
             if(shields[zone] < 0)
@@ -73,6 +85,9 @@ namespace SpaceAlertSolver
 
         public void DealDamageIntern(int zone, int amount)
         {
+            if (fissured[zone])
+                amount *= 2;
+
             damage[zone] += amount;
         }
     }

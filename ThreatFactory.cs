@@ -189,6 +189,10 @@ namespace SpaceAlertSolver
                     return new SwitchedCables(ship, traj, time);
                 case sevInStart + 8:
                     return new OverstrainedEnergyNet(ship, traj, time);
+                case sevInStart + 9:
+                    return new Fissure(ship, traj, time);
+                case sevInStart + 10:
+                    return new Infection(ship, traj, time);
             }
             return null;
         }
@@ -238,6 +242,10 @@ namespace SpaceAlertSolver
                     return "Switched Cables";
                 case sevInStart + 8:
                     return "Overstrained Energy Net";
+                case sevInStart + 9:
+                    return "Fissure";
+                case sevInStart + 10:
+                    return "Infection";
             }
             return "";
         }

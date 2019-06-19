@@ -548,4 +548,101 @@ namespace SpaceAlertSolver
             return false;
         }
     }
+
+    class Fissure : InThreat
+    {
+        public Fissure(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 2;
+            position = 6;
+            ship.CDefect[6]++;
+            speed = 2;
+            scoreLose = 0;
+            scoreWin = 8;
+            vulnerability = InDmgSource.C;
+        }
+        public override void OnClear()
+        {
+            ship.CDefect[6]--;
+            ship.fissured[0] = false;
+            ship.fissured[1] = false;
+            ship.fissured[2] = false;
+        }
+        public override void ActX()
+        {
+            ship.fissured[0] = true;
+        }
+        public override void ActY()
+        {
+            ship.fissured[0] = true;
+            ship.fissured[1] = true;
+            ship.fissured[2] = true;
+        }
+        public override void ActZ()
+        {
+            ship.damage[0] = 7;
+            ship.damage[1] = 7;
+            ship.damage[2] = 7;
+        }
+    }
+
+    class Infection : InThreat
+    {
+        bool[] isActive = new bool[] {true,false,true,true,false,true,false };
+        public Infection(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 3;
+            speed = 2;
+            scoreLose = 6;
+            scoreWin = 12;
+            vulnerability = InDmgSource.android;
+        }
+
+        public override void ActX()
+        {
+            for(int i = 0; i < ship.players.Length; i++)
+            {
+                if (isActive[ship.players[i].position])
+                    ship.players[i].Delay(ship.players[i].lastAction + 1);
+            }
+        }
+        public override void ActY()
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (isActive[i])
+                    ship.DealDamageIntern(i % 3, 1);
+            }
+        }
+        public override void ActZ()
+        {
+            for (int i = 0; i < ship.players.Length; i++)
+            {
+                if (isActive[ship.players[i].position])
+                    ship.players[i].Kill();
+            }
+            for(int i = 0; i < 6; i++)
+            {
+                if (isActive[i])
+                    ship.stationStatus[i] |= 2;
+            }
+        }
+        public override bool DealDamage(int position, InDmgSource source)
+        {
+            if (source == vulnerability && isActive[position])
+            {
+                isActive[position] = false;
+                health--;
+                //Check death
+                if (health <= 0)
+                {
+                    beaten = true;
+                    alive = false;
+                    OnClear();
+                }
+                return true;
+            }
+            return false;
+        }
+    }
 }
