@@ -19,6 +19,7 @@ namespace SpaceAlertSolver
         public Player[] players;
         public Androids[] androids;
         public Game game;
+        public Defects[] defectOrder;
         public int[] shields;
         public int[] shieldsCap;
         public int[] reactors;
@@ -56,16 +57,18 @@ namespace SpaceAlertSolver
             reactorsCap = new int[] { 3, 5, 3 };
             androids = new Androids[] { new Androids(2), new Androids(3) };
             laserDamage = new int[] { 4, 5, 4 };
-            plasmaDamage = new int[] { 2, 1, 2 };
+            plasmaDamage = new int[] { 2, 2, 2 };
             stationStatus = new int[6];
             BDefect = new int[6];
             CDefect = new int[7];
             fissured = new bool[3];
-            pulseRange = 2;
             damage = new int[] { 0, 0, 0 };
             capsules = 3;
             rockets = 3;
             interceptorReady = true;
+
+            if (!Extension.doRandomDefect)
+                defectOrder = Extension.defectOrder;
         }
 
         public void DealDamage(int zone, int amount)
@@ -78,7 +81,7 @@ namespace SpaceAlertSolver
             //Excess damage
             if(shields[zone] < 0)
             {
-                damage[zone] += -shields[zone];
+                ApplyDamage(zone, -shields[zone]);
                 shields[zone] = 0;
             }
         }
@@ -88,7 +91,63 @@ namespace SpaceAlertSolver
             if (fissured[zone])
                 amount *= 2;
 
-            damage[zone] += amount;
+            ApplyDamage(zone, amount);
         }
+
+        void ApplyDamage(int zone, int amount)
+        {
+            if(amount > 0)
+            {
+                //Go over defects
+                if(damage[zone] < 6)
+                {
+                    int idx = zone * 6 + damage[zone];
+                    for (int i = 0; i < amount && i < 6-damage[zone]; i++)
+                    {
+                        if (idx >= defectOrder.Length)
+                        {
+                            Console.WriteLine(zone);
+                            Console.WriteLine(damage[zone]);
+                            Console.WriteLine(i);
+                            Console.WriteLine(idx);
+                        }
+                        switch (defectOrder[idx])
+                        {
+                            case Defects.lift:
+                                liftReset |= 1 << zone;
+                                break;
+                            case Defects.reactor:
+                                reactorsCap[zone]--;
+                                reactors[zone] = Math.Min(reactors[zone], reactorsCap[zone]);
+                                break;
+                            case Defects.shield:
+                                shieldsCap[zone]--;
+                                shields[zone] = Math.Min(shields[zone], shieldsCap[zone]);
+                                break;
+                            case Defects.weaponbot:
+                                plasmaDamage[zone]--;
+                                break;
+                            case Defects.weapontop:
+                                laserDamage[zone]--;
+                                break;
+                        }
+                        idx++;
+                    }
+                }
+
+                //Add damage
+                damage[zone] += amount;
+            }
+        }
+    }
+
+    public enum Defects
+    {
+        structure,
+        lift,
+        weapontop,
+        weaponbot,
+        shield,
+        reactor
     }
 }

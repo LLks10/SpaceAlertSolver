@@ -11,6 +11,26 @@ namespace SpaceAlertSolver
     {
         static void Main(string[] args)
         {
+            //Create damage order
+            Defects[] dfcts = new Defects[] {Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
+                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
+                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop};
+            dfcts.Shuffle(0, 6);
+            dfcts.Shuffle(6, 6);
+            dfcts.Shuffle(12, 6);
+            Console.WriteLine("Damage order (Red/White/Blue)");
+            string dfctOrder = "";
+            for(int i = 0; i < 18; i++)
+            {
+                if (i != 0 && i % 6 == 0)
+                    dfctOrder += "\n";
+                dfctOrder += dfcts[i].ToString()+" ";
+            }
+            Console.WriteLine(dfctOrder);
+            Extension.doRandomDefect = false;
+            Extension.defectOrder = dfcts;
+            Console.WriteLine("-------");
+            
             Random r = new Random();
             List<Event> events = new List<Event>();
             Player[] players = new Player[5];
@@ -168,6 +188,28 @@ namespace SpaceAlertSolver
                     genetic = new Genetic(500, 5, trajectories, evArr);
             }
             Console.ReadLine();
+        }
+    }
+
+
+
+    public static class Extension
+    {
+        public static Random rng = new Random();
+        public static bool doRandomDefect;
+        public static Defects[] defectOrder;
+
+        public static void Shuffle<T>(this IList<T> list, int bot, int range)
+        {
+            int n = range;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1)+bot;
+                T value = list[k];
+                list[k] = list[n+bot];
+                list[n+bot] = value;
+            }
         }
     }
 }

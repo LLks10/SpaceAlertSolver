@@ -413,7 +413,7 @@ namespace SpaceAlertSolver
                                 ship.reactors[z]--;
                                 //Hit all enemies
                                 foreach (ExThreat et in exThreats)
-                                    et.DealDamage(1, ship.pulseRange, ExDmgSource.impulse);
+                                    et.DealDamage(1, ship.plasmaDamage[z], ExDmgSource.impulse);
                             }
                             //Plasma cannon
                             else
