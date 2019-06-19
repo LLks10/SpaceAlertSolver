@@ -32,7 +32,7 @@ namespace SpaceAlertSolver
         public bool[] fissured;
 
         //Bit flags
-        public int liftUsed;
+        public int liftUsed, liftReset;
         public int cannonFired;
 
         public int capsules;

@@ -10,6 +10,8 @@ namespace SpaceAlertSolver
      *Adjusted rulings: 
      * -Ship damage doesnt cause defects
      * -Few threats are missing
+     * -No heroic cards
+     * -No hand card limit
      * 
      * Questionable stuff:
      * Surviving asteroids doesnt cause asteroid destruction effect
@@ -74,7 +76,7 @@ namespace SpaceAlertSolver
                 //Reset variables
                 observationCount = 0;
                 ship.cannonFired = 0;
-                ship.liftUsed = 0;
+                ship.liftUsed = ship.liftReset;
 
                 //Check computer
                 if (turn == 3 || turn == 6 || turn == 10)
@@ -625,7 +627,7 @@ namespace SpaceAlertSolver
             output.AppendFormat("DMG: {0} {1} {2}\n", ship.damage[0], ship.damage[1], ship.damage[2]);
             output.AppendFormat("OBS: {0} {1} {2}\n", observation[0], observation[1], observation[2]);
             output.AppendFormat("P Pos: {0} {1} {2} {3} {4}\n", players[0].position, players[1].position, players[2].position, players[3].position, players[4].position);
-            output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", players[0].actions[11], players[1].actions[11], players[2].actions[11], players[3].actions[11], players[4].actions[11]);
+            output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", ActToString(players[0].actions[11]), ActToString(players[1].actions[11]), ActToString(players[2].actions[11]), ActToString(players[3].actions[11]), ActToString(players[4].actions[11]) );
             output.AppendFormat("Alive: {0} {1} {2} {3} {4}\n", players[0].alive, players[1].alive, players[2].alive, players[3].alive, players[4].alive);
             output.AppendFormat("ExKill: {0} | ExSurv: {1} | InKill: {2} | InSurv: {3}\n", exSlain, exSurvived, inSlain, inSurvived);
             output.AppendFormat("Reactors: {0} {1} {2}\n", ship.reactors[0], ship.reactors[1], ship.reactors[2]);
@@ -633,6 +635,31 @@ namespace SpaceAlertSolver
             output.AppendFormat("Caps: {0} | Rockets: {1}", ship.capsules, ship.rockets);
 
             return output.ToString();
+        }
+
+        string ActToString(Act a)
+        {
+            switch (a)
+            {
+                case Act.A:
+                    return "A";
+                case Act.B:
+                    return "B";
+                case Act.C:
+                    return "C";
+                case Act.empty:
+                    return "-";
+                case Act.fight:
+                    return "Robot";
+                case Act.left:
+                    return "Red";
+                case Act.right:
+                    return "Blue";
+                case Act.lift:
+                    return "Lift";
+                default:
+                    return "";
+            }
         }
     }
 
