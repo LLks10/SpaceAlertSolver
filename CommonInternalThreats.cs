@@ -14,7 +14,7 @@ namespace SpaceAlertSolver
         {
             health = 1;
             position = 4;
-            speed = 2;
+            speed = 4;
             scoreLose = 2;
             scoreWin = 4;
             vulnerability = InDmgSource.android;
