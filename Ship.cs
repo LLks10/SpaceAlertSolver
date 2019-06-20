@@ -67,8 +67,10 @@ namespace SpaceAlertSolver
             rockets = 3;
             interceptorReady = true;
 
-            if (!Extension.doRandomDefect)
-                defectOrder = Extension.defectOrder;
+            if (Extension.doRandomDefect)
+                Extension.ShuffleDefects();
+
+            defectOrder = Extension.defectOrder;
         }
 
         public void DealDamage(int zone, int amount)

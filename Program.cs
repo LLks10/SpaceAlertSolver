@@ -12,23 +12,25 @@ namespace SpaceAlertSolver
         static void Main(string[] args)
         {
             //Create damage order
-            Defects[] dfcts = new Defects[] {Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
-                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
-                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop};
-            dfcts.Shuffle(0, 6);
-            dfcts.Shuffle(6, 6);
-            dfcts.Shuffle(12, 6);
-            Console.WriteLine("Damage order (Red/White/Blue)");
-            string dfctOrder = "";
-            for(int i = 0; i < 18; i++)
+            Extension.doRandomDefect = true;
+
+            if (!Extension.doRandomDefect)
             {
-                if (i != 0 && i % 6 == 0)
-                    dfctOrder += "\n";
-                dfctOrder += dfcts[i].ToString()+" ";
+                Extension.ShuffleDefects();
+                Defects[] dfcts = Extension.defectOrder;
+                Console.WriteLine("Damage order (Red/White/Blue)");
+                string dfctOrder = "";
+                for (int i = 0; i < 18; i++)
+                {
+                    if (i != 0 && i % 6 == 0)
+                        dfctOrder += "\n";
+                    dfctOrder += dfcts[i].ToString() + " ";
+                }
+                Console.WriteLine(dfctOrder);
             }
-            Console.WriteLine(dfctOrder);
-            Extension.doRandomDefect = false;
-            Extension.defectOrder = dfcts;
+            else
+                Console.WriteLine("Random defects");
+            
             Console.WriteLine("-------");
             
             Random r = new Random();
@@ -197,7 +199,9 @@ namespace SpaceAlertSolver
     {
         public static Random rng = new Random();
         public static bool doRandomDefect;
-        public static Defects[] defectOrder;
+        public static Defects[] defectOrder = new Defects[] {Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
+                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
+                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop};
 
         public static void Shuffle<T>(this IList<T> list, int bot, int range)
         {
@@ -210,6 +214,13 @@ namespace SpaceAlertSolver
                 list[k] = list[n+bot];
                 list[n+bot] = value;
             }
+        }
+
+        public static void ShuffleDefects()
+        {
+            defectOrder.Shuffle(0, 6);
+            defectOrder.Shuffle(6, 6);
+            defectOrder.Shuffle(12, 6);
         }
     }
 }

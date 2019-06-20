@@ -165,12 +165,15 @@ namespace SpaceAlertSolver
                         best = g;
                     }
                 }
-                Console.WriteLine("Gen {0} best: {1} TB: {2}", generation, highest, best.getBlanks());
+                Console.WriteLine("Gen {0} best: {1} TB: {2}  {3}/{4}", generation, highest, best.getBlanks(),best.wins,best.losses);
                 if (generation % 10000 == 0)
                 {
                     Console.WriteLine(best.Rep());
                     Console.WriteLine(best.debug);
-                        //best.setEval(trajs, evs);
+                    /*for (int i = 0; i < 10; i++)
+                    {
+                        Console.WriteLine(best.RunSimulation(trajs, evs));
+                    }*/
                 }
             }
                

@@ -5,7 +5,7 @@ namespace SpaceAlertSolver
     public class Gene
     {
         private int[] gene;
-        private int players, score, blanks;
+        public int players, score, blanks, wins, losses;
         private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
         public string debug;
 
@@ -71,7 +71,8 @@ namespace SpaceAlertSolver
 
         public void setEval(Trajectory[] trajs, Event[] evts)
         {
-            this.score = Evaluate(this.gene, trajs, evts);
+            score = Evaluate(this.gene, trajs, evts);
+
             blanks = 0;
             for (int i = 0; i < players * 12; i++)
             {
@@ -125,10 +126,31 @@ namespace SpaceAlertSolver
                 }
             }
 
-            Game g = new Game();
-            g.Setup(ps, trajs, evts);
-            int scr = g.Simulate();
-            debug = g.GetDebug();
+            int scr;
+            
+            if (Extension.doRandomDefect)
+            {
+                scr = 0;
+                for(int i = 0; i < 20; i++)
+                {
+                    Game g = new Game();
+                    g.Setup(ps, trajs, evts);
+                    int s = g.Simulate();
+                    if (s > -40)
+                        wins++;
+                    else
+                        losses++;
+                    scr += s;
+                } 
+            }
+            else
+            {
+                Game g = new Game();
+                g.Setup(ps, trajs, evts);
+                scr = g.Simulate();
+                debug = g.GetDebug();
+            }
+
             return scr;
         }
 
@@ -145,6 +167,55 @@ namespace SpaceAlertSolver
         public int getGene(int pos)
         {
             return this.gene[pos];
+        }
+
+
+        //Runs a simulation and gives output
+        public int RunSimulation(Trajectory[] trajs, Event[] evts)
+        {
+            Player[] ps = new Player[players];
+            for (int i = 0; i < players; i++)
+                ps[i] = new Player();
+
+            int idx = 0;
+            for (int i = 0; i < players; i++)
+            {
+                ps[i].actions = new Act[12];
+                for (int j = 0; j < 12; j++)
+                {
+                    switch (gene[idx])
+                    {
+                        case 0:
+                            ps[i].actions[j] = Act.empty;
+                            break;
+                        case 1:
+                            ps[i].actions[j] = Act.right;
+                            break;
+                        case 2:
+                            ps[i].actions[j] = Act.left;
+                            break;
+                        case 3:
+                            ps[i].actions[j] = Act.lift;
+                            break;
+                        case 4:
+                            ps[i].actions[j] = Act.A;
+                            break;
+                        case 5:
+                            ps[i].actions[j] = Act.B;
+                            break;
+                        case 6:
+                            ps[i].actions[j] = Act.C;
+                            break;
+                        case 7:
+                            ps[i].actions[j] = Act.fight;
+                            break;
+                    }
+                    idx++;
+                }
+            }
+            Game g = new Game();
+            g.Setup(ps, trajs, evts);
+            return g.Simulate();
         }
     }
 }
