@@ -355,6 +355,13 @@ namespace SpaceAlertSolver
             ship.DealDamage(1, 2);
             ship.DealDamage(2, 2);
         }
+        public override bool ProcessDamage()
+        {
+            //Prevent -2 shield dealing damage
+            if(damage > 0 )
+                return base.ProcessDamage();
+            return false;
+        }
     }
 
     //ID: 11
@@ -387,7 +394,7 @@ namespace SpaceAlertSolver
             health = health - Math.Max(0, (damage - shield));
             damage = 0;
 
-            if (health < 0)
+            if (health <= 0)
             {
                 //Deal revenge damage
                 ship.DealDamage(zone, revenge);
