@@ -127,21 +127,36 @@ namespace SpaceAlertSolver
             }
 
             int scr;
-            
             if (Extension.doRandomDefect)
             {
                 scr = 0;
-                for(int i = 0; i < 20; i++)
+                //Run first game
+                Game g = new Game();
+                g.Setup(ps, trajs, evts);
+                int s = g.Simulate();
+                if (s > -40)
+                    wins++;
+                else
+                    losses++;
+                scr += s;
+
+                if (g.isDeterministic)
+                    scr *= 10;
+                //Run multiple if non deterministic
+                else
                 {
-                    Game g = new Game();
-                    g.Setup(ps, trajs, evts);
-                    int s = g.Simulate();
-                    if (s > -40)
-                        wins++;
-                    else
-                        losses++;
-                    scr += s;
-                } 
+                    for (int i = 0; i < 9; i++)
+                    {
+                        g = new Game();
+                        g.Setup(ps, trajs, evts);
+                        s = g.Simulate();
+                        if (s > -40)
+                            wins++;
+                        else
+                            losses++;
+                        scr += s;
+                    }
+                }
             }
             else
             {

@@ -8,14 +8,23 @@ namespace SpaceAlertSolver
 {
     /* ----------------
      *Adjusted rulings: 
-     * -Ship damage doesnt cause defects
      * -Few threats are missing
      * -No heroic cards
      * -No hand card limit
      * 
      * Questionable stuff:
-     * Surviving asteroids doesnt cause asteroid destruction effect
      * Scout is immune to laser instead of not being able to get targeted
+     * Invisible units immune to damage instead of not being able to get targeted
+     * Change external targetting to work similarly to internal targetting
+     * Space cruiser only doubles the damage that break through the shield
+     * Fissure damage increase should only double damage that goes through shield
+     * Check Nemesis kill due to own effect
+     * Seeker counts dead players when looking for target
+     * 
+     * #TODO
+     * Add menu class
+     * Option to remove commons from threat pool
+     * Addverbose replay mode
     */
 
 
@@ -299,9 +308,13 @@ namespace SpaceAlertSolver
                 //Summon threat
                 Event ev = events[eventIdx];
                 if (ev.external)
+                {
                     exThreats.Add(ThreatFactory.SummonEx(ev.creature, trajectories[ev.zone], ev.zone, ship, turn));
+                }
                 else
+                {
                     inThreats.Add(ThreatFactory.SummonIn(ev.creature, trajectories[3], ship, turn));
+                }
                 return true;
             }
             return false;

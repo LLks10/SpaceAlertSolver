@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace SpaceAlertSolver
     {
         static void Main(string[] args)
         {
+            //Extension.InitKeys(5, 8, 1 << 25);
             //Create damage order
             Extension.doRandomDefect = true;
 
@@ -130,7 +132,7 @@ namespace SpaceAlertSolver
                             }
                         }
 
-                        Console.WriteLine("Loaded {0} on turn {1} in zone {2}", ThreatFactory.ExName(thrt), t, zoneStr[z]);
+                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", ThreatFactory.ExName(thrt), t, zoneStr[z], thrt);
                         events.Add(new Event(true, t, z, thrt));
                     }
                     //Internal
@@ -165,7 +167,7 @@ namespace SpaceAlertSolver
                                 sevInThreats.RemoveAt(thrtIdx);
                             }
                         }
-                        Console.WriteLine("Loaded {0} on turn {1}", ThreatFactory.InName(thrt), t);
+                        Console.WriteLine("Loaded {0} on turn {1} ({2})", ThreatFactory.InName(thrt), t, thrt);
                         events.Add(new Event(false, t, 3, thrt));
                     }
                 }
@@ -173,7 +175,7 @@ namespace SpaceAlertSolver
             Event[] evArr = events.ToArray();
 
             //Random simulations
-            Genetic genetic = new Genetic(500, 5, trajectories, evArr);
+            Genetic genetic = new Genetic(400, 5, trajectories, evArr);
             while (true)
             {
                 int sims = 0;
@@ -187,7 +189,7 @@ namespace SpaceAlertSolver
                 if (ans == "N" || ans == "n")
                     break;
                 if (ans == "R" || ans == "r")
-                    genetic = new Genetic(500, 5, trajectories, evArr);
+                    genetic = new Genetic(400, 5, trajectories, evArr);
             }
             Console.ReadLine();
         }
@@ -197,6 +199,10 @@ namespace SpaceAlertSolver
 
     public static class Extension
     {
+        public static ulong[][] keys;
+        public static ulong[] hash;
+        public static ulong hashSize;
+
         public static Random rng = new Random();
         public static bool doRandomDefect;
         public static Defects[] defectOrder = new Defects[] {Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
@@ -221,6 +227,74 @@ namespace SpaceAlertSolver
             defectOrder.Shuffle(0, 6);
             defectOrder.Shuffle(6, 6);
             defectOrder.Shuffle(12, 6);
+        }
+
+        public static void InitKeys(int pCount, int actCount, ulong hashSize)
+        {
+            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+            keys = new ulong[pCount*12][];
+            for(int i = 0; i < keys.Length; i++)
+            {
+                keys[i] = new ulong[actCount];
+                for(int j = 0; j < actCount; j++)
+                {
+                    byte[] bytes = new byte[8];
+                    rng.GetBytes(bytes);
+                    keys[i][j] = BitConverter.ToUInt64(bytes, 0);
+                }
+            }
+            rng.Dispose();
+
+            hash = new ulong[hashSize];
+            Extension.hashSize = hashSize;
+        }
+
+        public static Player GetPlayer(string actions)
+        {
+            string[] splt = actions.Split();
+            Player p = new Player();
+            Act[] acts = new Act[12];
+            int idx = 0;
+            while(idx < 12)
+            {
+                switch (splt[idx])
+                {
+                    case "blank":
+                        acts[idx] = Act.empty;
+                        idx++;
+                        break;
+                    case "A":
+                        acts[idx] = Act.A;
+                        idx++;
+                        break;
+                    case "B":
+                        acts[idx] = Act.B;
+                        idx++;
+                        break;
+                    case "C":
+                        acts[idx] = Act.C;
+                        idx++;
+                        break;
+                    case "blue":
+                        acts[idx] = Act.right;
+                        idx++;
+                        break;
+                    case "red":
+                        acts[idx] = Act.left;
+                        idx++;
+                        break;
+                    case "lift":
+                        acts[idx] = Act.lift;
+                        idx++;
+                        break;
+                    case "robot":
+                        acts[idx] = Act.fight;
+                        idx++;
+                        break;
+                }
+            }
+            p.actions = acts;
+            return p;
         }
     }
 }
