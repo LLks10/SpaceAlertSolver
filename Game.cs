@@ -39,6 +39,7 @@ namespace SpaceAlertSolver
         int turn;
         int phase;
         int score;
+        public bool isDeterministic;
         bool[] phaseComputer;
 
         int exSlain, exSurvived, inSlain, inSurvived;
@@ -60,6 +61,7 @@ namespace SpaceAlertSolver
         //Simulate the game
         public int Simulate()
         {
+            isDeterministic = true;
             bool gameover = false;
             int pCount = players.Length;
             int eventIdx = 0;
