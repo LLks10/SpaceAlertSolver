@@ -272,17 +272,33 @@ namespace SpaceAlertSolver
         {
             ship.DealDamage(zone, 1);
             health--;
+            if (health <= 0)
+            {
+                beaten = true;
+                alive = false;
+            }
         }
         public override void ActY()
         {
             ship.DealDamage(zone, 2);
             health -= 2;
+            if (health <= 0)
+            {
+                beaten = true;
+                alive = false;
+            }
         }
         public override void ActZ()
         {
             ship.damage[0] = 7;
             ship.damage[1] = 7;
             ship.damage[2] = 7;
+        }
+        public override void DealDamage(int damage, int range, ExDmgSource source)
+        {
+            if (beaten)
+                return;
+            base.DealDamage(damage, range, source);
         }
         public override bool ProcessDamage()
         {
@@ -430,6 +446,13 @@ namespace SpaceAlertSolver
         public override void ActZ()
         {
             ship.DealDamage(zone, 7);
+        }
+        public override int GetDistance(int range, ExDmgSource source)
+        {
+            //Priority target for rocket
+            if (source == ExDmgSource.rocket)
+                return -100;
+            return base.GetDistance(range, source);
         }
         public override void DealDamage(int damage, int range, ExDmgSource source)
         {

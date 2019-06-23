@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SpaceAlertSolver
 {
     public class Trajectory
-    { //lol
+    { 
         public int maxDistance;
         public int[] actions;
         public int dist2, dist1;

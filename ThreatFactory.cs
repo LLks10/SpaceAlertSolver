@@ -82,35 +82,35 @@ namespace SpaceAlertSolver
             switch (number)
             {
                 case 0:
-                    return "Armored catcher";
+                    return "Armored Grappler";
                 case 1:
                     return "Amoebe";
                 case 2:
-                    return "Battleship";
+                    return "Gunship";
                 case 3:
-                    return "Hunter";
+                    return "Fighter";
                 case 4:
-                    return "Gyro Hunter";
+                    return "Gyro Fighter";
                 case 5:
                     return "Energy Cloud";
                 case 6:
                     return "Meteorite";
                 case 7:
-                    return "Impulse Ball";
+                    return "Pulse Ball";
                 case 8:
-                    return "Space Cruiser";
+                    return "Destroyer";
                 case 9:
-                    return "Stealth Hunter";
+                    return "Stealth Fighter";
                 case 10:
                     return "Jellyfish";
                 case 11:
-                    return "Small Asteroid";
+                    return "Minor Asteroid";
                 case 12:
                     return "Kamikaze";
                 case 13:
                     return "Swarm";
                 case 14:
-                    return "Ghost Hunter";
+                    return "Phantom Fighter";
                 case 15:
                     return "Scout";
                 case 16:
@@ -118,7 +118,7 @@ namespace SpaceAlertSolver
                 case 17:
                     return "Gyro Fregat";
                 case 18:
-                    return "Wardeck";
+                    return "Man-o-War";
                 case 19:
                     return "Interstellar Octopus";
                 case 20:
@@ -126,7 +126,7 @@ namespace SpaceAlertSolver
                 case 21:
                     return "Asteroid";
                 case 22:
-                    return "Impulse Satellite";
+                    return "Pulse Satellite";
                 case 23:
                     return "Nemesis";
                 case 24:
@@ -134,7 +134,7 @@ namespace SpaceAlertSolver
                 case 25:
                     return "Psionic Satellite";
                 case 26:
-                    return "Large Asteroid";
+                    return "Major Asteroid";
                 case 27:
                     return "Moloch";
                 case 28:
@@ -233,19 +233,19 @@ namespace SpaceAlertSolver
                 case sevInStart + 3:
                     return "Eliminator";
                 case sevInStart + 4:
-                    return "Search Robot";
+                    return "Seeker";
                 case sevInStart + 5:
                     return "Atomic Bomb";
                 case sevInStart + 6:
                     return "Rebellious Robots";
                 case sevInStart + 7:
-                    return "Switched Cables";
+                    return "Crossed Wire";
                 case sevInStart + 8:
-                    return "Overstrained Energy Net";
+                    return "Power System Overload";
                 case sevInStart + 9:
                     return "Fissure";
                 case sevInStart + 10:
-                    return "Infection";
+                    return "Contamination";
             }
             return "";
         }

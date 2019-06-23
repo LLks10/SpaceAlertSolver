@@ -76,14 +76,16 @@ namespace SpaceAlertSolver
         public void DealDamage(int zone, int amount)
         {
             amount += scoutBonus;
-            if (fissured[zone])
-                amount *= 2;
             shields[zone] -= amount;
+            int dmg = -shields[zone];
+
+            if (fissured[zone])
+                dmg *= 2;
 
             //Excess damage
-            if(shields[zone] < 0)
+            if (shields[zone] < 0)
             {
-                ApplyDamage(zone, -shields[zone]);
+                ApplyDamage(zone, dmg);
                 shields[zone] = 0;
             }
         }

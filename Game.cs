@@ -13,18 +13,13 @@ namespace SpaceAlertSolver
      * -No hand card limit
      * 
      * Questionable stuff:
-     * Scout is immune to laser instead of not being able to get targeted
-     * Invisible units immune to damage instead of not being able to get targeted
-     * Change external targetting to work similarly to internal targetting
-     * Space cruiser only doubles the damage that break through the shield
-     * Fissure damage increase should only double damage that goes through shield
-     * Check Nemesis kill due to own effect
      * Seeker counts dead players when looking for target
      * 
      * #TODO
      * Add menu class
      * Option to remove commons from threat pool
-     * Addverbose replay mode
+     * Add verbose replay mode
+     * Remove some double checks from GetDistance and DealDamage
     */
 
 
@@ -278,22 +273,16 @@ namespace SpaceAlertSolver
             if (ship.rocketReady)
             {
                 ship.rocketReady = false;
+                int distance = 99;
                 int target = -1;
-                int distance = int.MaxValue;
                 for (int i = 0; i < exThreats.Count; i++)
                 {
-                    //Moloch edgecase
-                    if(exThreats[i] is Moloch)
-                    {
-                        exThreats[i].DealDamage(3, 2, ExDmgSource.rocket);
-                        target = -1;
-                        break;
-                    }
-                    //Check if valid target
-                    if (!exThreats[i].rocketImmune && exThreats[i].distanceRange <= 2 && exThreats[i].distance < distance)
+                    ExThreat et = exThreats[i];
+                    int dist = et.GetDistance(2, ExDmgSource.rocket);
+                    if (dist < distance)
                     {
                         target = i;
-                        distance = exThreats[i].distance;
+                        distance = dist;
                     }
                 }
                 //Deal damage
@@ -401,17 +390,7 @@ namespace SpaceAlertSolver
                                 break;
                             ship.reactors[z]--;
                             //Find target
-                            int target = -1;
-                            int distance = int.MaxValue;
-                            for (int j = 0; j < exThreats.Count; j++)
-                            {
-                                ExThreat et = exThreats[j];
-                                if (et.zone == z && et.distance < distance)
-                                {
-                                    target = j;
-                                    distance = et.distance;
-                                }
-                            }
+                            int target = GetTargetEx(z, 3, ExDmgSource.laser);
                             //Deal damage
                             if (target != -1)
                                 exThreats[target].DealDamage(ship.laserDamage[z], 3, ExDmgSource.laser);
@@ -434,17 +413,7 @@ namespace SpaceAlertSolver
                             else
                             {
                                 //Find target
-                                int target = -1;
-                                int distance = int.MaxValue;
-                                for (int j = 0; j < exThreats.Count; j++)
-                                {
-                                    ExThreat et = exThreats[j];
-                                    if (et.zone == z && et.distance < distance)
-                                    {
-                                        target = j;
-                                        distance = et.distance;
-                                    }
-                                }
+                                int target = GetTargetEx(ship.plasmaDamage[z], 3, ExDmgSource.plasma);
                                 //Deal damage
                                 if (target != -1)
                                     exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.plasma);
@@ -589,6 +558,28 @@ namespace SpaceAlertSolver
                 }
             }
             return null;
+        }
+
+        //Gets closest external threat
+        int GetTargetEx(int zone, int range, ExDmgSource source)
+        {
+            int distance = 99;
+            int target = -1;
+            for(int i = 0; i < exThreats.Count; i++)
+            {
+                ExThreat et = exThreats[i];
+                if (et.zone == zone)
+                {
+                    int dist = et.GetDistance(range, source);
+                    if(dist < distance)
+                    {
+                        target = i;
+                        distance = dist;
+                    }
+                }
+            }
+
+            return target;
         }
 
         //Deal damage with interceptors

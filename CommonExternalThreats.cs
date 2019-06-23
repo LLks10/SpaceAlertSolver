@@ -275,10 +275,12 @@ namespace SpaceAlertSolver
         }
         public override void ActY()
         {
-            if (ship.shields[zone] <= 1)
-                ship.DealDamage(zone, 4);
-            else
-                ship.DealDamage(zone, 2);
+            int dmg = 2;
+            int bonus = 2 - ship.shields[zone];
+            if (bonus > 0)
+                dmg += bonus;
+
+            ship.DealDamage(zone, dmg);
         }
         public override void ActZ()
         {
@@ -309,6 +311,12 @@ namespace SpaceAlertSolver
         public override void ActZ()
         {
             ActY();
+        }
+        public override int GetDistance(int range, ExDmgSource source)
+        {
+            if (!visible)
+                return 100;
+            return base.GetDistance(range, source);
         }
         public override bool ProcessDamage()
         {
@@ -499,6 +507,12 @@ namespace SpaceAlertSolver
         {
             ship.DealDamage(zone, 3);
         }
+        public override int GetDistance(int range, ExDmgSource source)
+        {
+            if (!visible)
+                return 100;
+            return base.GetDistance(range, source);
+        }
         public override void DealDamage(int damage, int range, ExDmgSource source)
         {
             if (!visible)
@@ -536,6 +550,12 @@ namespace SpaceAlertSolver
         public override void ActZ()
         {
             ship.DealDamage(zone, 3);
+        }
+        public override int GetDistance(int range, ExDmgSource source)
+        {
+            if (source == ExDmgSource.laser)
+                return 100;
+            return base.GetDistance(range, source);
         }
         public override void DealDamage(int damage, int range, ExDmgSource source)
         {

@@ -35,6 +35,13 @@ namespace SpaceAlertSolver
                 distanceRange = 3;
         }
 
+        public virtual int GetDistance(int range, ExDmgSource source)
+        {
+            if (range >= distanceRange && !beaten && !(source == ExDmgSource.rocket && rocketImmune))
+                return distance;
+            return 100;
+        }
+
         public virtual void DealDamage(int damage, int range, ExDmgSource source)
         {
             if(range >= distanceRange)
