@@ -320,7 +320,8 @@ namespace SpaceAlertSolver
                 Player p = players[i];
                 p.lastAction = t;
                 Act a = p.actions[t];
-                int z = p.position % 3, bm;
+                int z = p.position % 3;
+                int bm;
 
                 //Exit if dead
                 if (!p.alive)
@@ -413,7 +414,7 @@ namespace SpaceAlertSolver
                             else
                             {
                                 //Find target
-                                int target = GetTargetEx(ship.plasmaDamage[z], 3, ExDmgSource.plasma);
+                                int target = GetTargetEx(z, 3, ExDmgSource.plasma);
                                 //Deal damage
                                 if (target != -1)
                                     exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.plasma);
