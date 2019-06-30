@@ -172,9 +172,10 @@ namespace SpaceAlertSolver
 
         private void KillAll()
         {
+            int z = position % 3;
             for(int i = 0; i < ship.players.Length; i++)
             {
-                if (ship.players[i].team == null || ship.players[i].team.alive == false)
+                if (ship.players[i].position % 3 == z && ship.players[i].position < 6 && (ship.players[i].team == null || ship.players[i].team.alive == false))
                     ship.players[i].Kill();
             }
         }

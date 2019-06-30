@@ -72,7 +72,6 @@ namespace SpaceAlertSolver
             distance -= curSpd;
             if (distance <= 0)
             {
-                OnClear();
                 beaten = true;
             }
         }
