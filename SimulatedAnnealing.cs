@@ -10,6 +10,7 @@ namespace SpaceAlertSolver
     {
         private Gene _currentState;
         private int _bestScore = int.MinValue;
+        private Gene _bestState; // use for restarts
 
         public SimulatedAnnealing(int players, Trajectory[] trajs, Event[] evts)
         {
@@ -31,7 +32,7 @@ namespace SpaceAlertSolver
             for (int iteration = 0; iteration < maxIterations; iteration++)
             {
                 Gene newState = _currentState.RandomNeighbour(rng, trajs, evts);
-                if (P(_currentState.getScore(), newState.getScore(),
+                if (P(_currentState, newState,
                         Temperature((double)iteration / maxIterations)) >= rng.NextDouble())
                 {
                     _currentState = newState;
@@ -41,6 +42,7 @@ namespace SpaceAlertSolver
                 if (_currentState.getScore() > _bestScore)
                 {
                     _bestScore = _currentState.getScore();
+                    _bestState = _currentState;
                     Console.WriteLine(_currentState.Rep() + _currentState.getScore());
                 }
             }
@@ -70,7 +72,10 @@ namespace SpaceAlertSolver
          */
         private double Temperature(double computationUsed)
         {
-            return 1 - computationUsed; // value in [1, 2]
+            double t = 1 - computationUsed; // (0, 1]
+
+            //return (Math.Exp(t) - 1) / (Math.E - 1);
+            return t;
         }
 
         /**
@@ -80,15 +85,42 @@ namespace SpaceAlertSolver
          * <param name="temperature">The temperature</param>
          * <returns>A value in the range [0, 1] that represents the probability that this move should be taken</returns>
          */
-        private double P(double currentState, double newState, double temperature)
+        private double P(Gene currentState, Gene newState, double temperature)
         {
-            if (newState > currentState) // newState is better
+            int c_score = currentState.getScore();
+            int n_score = newState.getScore();
+            int c_blanks = currentState.getBlanks();
+            int n_blanks = newState.getBlanks();
+
+            if (n_score > c_score) // newState is better
             {
                 return 1.0;
             }
-            else
+            /*else if (n_score == c_score)
             {
-                return Math.Exp((newState - currentState) / temperature);
+                if (n_blanks > c_blanks) // better in terms of blanks
+                {
+                    if (temperature < 0.15)
+                    {
+                        return 0.1 * Math.Log(2 - temperature);
+                    }
+                    else
+                    {
+                        return 0.0;
+                    }
+                }
+                else if (n_blanks == c_blanks)
+                {
+                    return 0.5;
+                }
+                else // worse in terms of blanks
+                {
+                    return Math.Log(temperature + 1);
+                }
+            }*/
+            else // newState is worse
+            {
+                return Math.Exp(0.05 * (n_score - c_score) / temperature);
             }
         }
     }
