@@ -175,7 +175,7 @@ namespace SpaceAlertSolver
             Event[] evArr = events.ToArray();
 
             //Random simulations
-            Genetic genetic = new Genetic(400, 5, trajectories, evArr);
+            /*Genetic genetic = new Genetic(400, 5, trajectories, evArr);
             while (true)
             {
                 int sims = 0;
@@ -191,6 +191,11 @@ namespace SpaceAlertSolver
                 if (ans == "R" || ans == "r")
                     genetic = new Genetic(400, 5, trajectories, evArr);
             }
+            Console.ReadLine();*/
+
+            SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
+            sa.Run(100000, trajectories, evArr);
+            Console.WriteLine(sa.getGene().Rep() + sa.getGene().getScore());
             Console.ReadLine();
         }
     }

@@ -27,6 +27,31 @@ namespace SpaceAlertSolver
             this.players = players;
         }
 
+        // copy constructor
+        public Gene(Gene other)
+        {
+            this.gene = new int[other.gene.Length];
+            other.gene.CopyTo(this.gene, 0);
+            this.players = other.players;
+        }
+
+        /**
+         * <summary>Returns a random neighbour of this gene/state</summary>
+         * <remarks>The returned gene might be weighted to better suit simulated annealing</remarks>
+         * <returns>A gene that is similar to this gene</returns>
+         * <param name="trajs">The trajectories</param>
+         * <param name="evts">The events</param>
+         */
+        public Gene RandomNeighbour(Random rng, Trajectory[] trajs, Event[] evts)
+        {
+            Gene neighbour = new Gene(this);
+            int r_index = rng.Next(neighbour.gene.Length);
+            int r_offset = rng.Next(1, 8);
+            neighbour.gene[r_index] = (neighbour.gene[r_index] + r_offset) % 8;
+            neighbour.setEval(trajs, evts);
+            return neighbour;
+        }
+
         public String Rep()
         {
             String output = "      1     2     3     4     5     6     7     8     9    10    11    12\n";
