@@ -9,6 +9,7 @@ namespace SpaceAlertSolver
     class SimulatedAnnealing
     {
         private Gene _currentState;
+        private int _bestScore = int.MinValue;
 
         public SimulatedAnnealing(int players, Trajectory[] trajs, Event[] evts)
         {
@@ -34,6 +35,13 @@ namespace SpaceAlertSolver
                         Temperature((double)iteration / maxIterations)) >= rng.NextDouble())
                 {
                     _currentState = newState;
+                }
+
+                // print new best score
+                if (_currentState.getScore() > _bestScore)
+                {
+                    _bestScore = _currentState.getScore();
+                    Console.WriteLine(_currentState.Rep() + _currentState.getScore());
                 }
             }
         }

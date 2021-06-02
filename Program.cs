@@ -6,6 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
+/*
+ * TODO
+ * different actions:
+ *  swap two players
+ *  delay actions
+ *  pull actions forward
+ * heuristic to avoid blanks
+ * super-safe playstyle (1 damage = all defects)
+ */
+
 namespace SpaceAlertSolver
 {
     class Program
@@ -194,8 +204,9 @@ namespace SpaceAlertSolver
             Console.ReadLine();*/
 
             SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
-            sa.Run(100000, trajectories, evArr);
+            sa.Run(1000000, trajectories, evArr);
             Console.WriteLine(sa.getGene().Rep() + sa.getGene().getScore());
+            Console.WriteLine("-----FINAL-----");
             Console.ReadLine();
         }
     }
