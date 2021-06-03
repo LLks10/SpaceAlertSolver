@@ -43,7 +43,10 @@ namespace SpaceAlertSolver
                 {
                     _bestScore = _currentState.getScore();
                     _bestState = _currentState;
-                    Console.WriteLine(_currentState.Rep() + _currentState.getScore());
+                    Console.WriteLine(_currentState.Rep() +
+                        "Iteration: " + (iteration + 1) + 
+                        " / " + maxIterations +
+                        "\nScore: " + _currentState.getScore());
                 }
             }
         }
