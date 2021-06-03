@@ -9,9 +9,9 @@ namespace SpaceAlertSolver
         private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
         public string debug;
 
-        private static Func<Gene, Random, Trajectory[], Event[], Gene>[] operators
-            = new Func<Gene, Random, Trajectory[], Event[], Gene>[] { PointMutation, ForwardShift, BackwardShift, SwapPlayers };
-        private static int[] op_chances = new int[]                 { 70,            100,          110,           111 };
+        private static Func<Gene, Random, Gene>[] operators
+            = new Func<Gene, Random, Gene>[]        { PointMutation, ForwardShift, BackwardShift, SwapPlayers };
+        private static int[] op_chances = new int[] { 70,            100,          110,           111 };
 
         public Gene(int players)
         {
@@ -61,12 +61,14 @@ namespace SpaceAlertSolver
                 op_i = bs + 1;
             }
 
-            return operators[op_i].Invoke(this, rng, trajs, evts);
+            Gene ret = operators[op_i].Invoke(this, rng, trajs, evts);
+            ret.setEval(trajs, evts);
+            return ret;
         }
 
         // START OPERATORS
 
-        private static Gene PointMutation(Gene g, Random rng, Trajectory[] trajs, Event[] evts)
+        private static Gene PointMutation(Gene g, Random rng)
         {
             Gene neighbour = new Gene(g);
 
@@ -74,11 +76,10 @@ namespace SpaceAlertSolver
             int r_offset = rng.Next(1, 8);
             neighbour.gene[r_index] = (neighbour.gene[r_index] + r_offset) % 8;
             
-            neighbour.setEval(trajs, evts);
             return neighbour;
         }
 
-        private static Gene ForwardShift(Gene g, Random rng, Trajectory[] trajs, Event[] evts)
+        private static Gene ForwardShift(Gene g, Random rng)
         {
             Gene neighbour = new Gene(g);
             
@@ -91,11 +92,10 @@ namespace SpaceAlertSolver
             }
             neighbour.gene[r_index] = 0;
 
-            neighbour.setEval(trajs, evts);
             return neighbour;
         }
 
-        private static Gene BackwardShift(Gene g, Random rng, Trajectory[] trajs, Event[] evts)
+        private static Gene BackwardShift(Gene g, Random rng)
         {
             Gene neighbour = new Gene(g);
 
@@ -108,11 +108,10 @@ namespace SpaceAlertSolver
             }
             neighbour.gene[r_index] = 0;
 
-            neighbour.setEval(trajs, evts);
             return neighbour;
         }
 
-        private static Gene SwapPlayers(Gene g, Random rng, Trajectory[] trajs, Event[] evts)
+        private static Gene SwapPlayers(Gene g, Random rng)
         {
             Gene neighbour = new Gene(g);
 
@@ -132,7 +131,6 @@ namespace SpaceAlertSolver
                 p2++;
             }
 
-            neighbour.setEval(trajs, evts);
             return neighbour;
         }
 
