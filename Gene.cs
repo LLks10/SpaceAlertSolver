@@ -9,6 +9,10 @@ namespace SpaceAlertSolver
         private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
         public string debug;
 
+        private static Func<Gene, Random, Trajectory[], Event[], Gene>[] operators
+            = new Func<Gene, Random, Trajectory[], Event[], Gene>[] { PointMutation, ForwardShift, BackwardShift, SwapPlayers };
+        private static int[] op_chances = new int[]                 { 70,            100,          110,           111 };
+
         public Gene(int players)
         {
             this.players = players;
@@ -44,13 +48,95 @@ namespace SpaceAlertSolver
          */
         public Gene RandomNeighbour(Random rng, Trajectory[] trajs, Event[] evts)
         {
-            Gene neighbour = new Gene(this);
+            int r = rng.Next(op_chances[op_chances.Length-1]);
+            int bs = Array.BinarySearch(op_chances, r);
+            int op_i;
+
+            if (bs < 0)
+            {
+                op_i = ~bs;
+            }
+            else
+            {
+                op_i = bs + 1;
+            }
+
+            return operators[op_i].Invoke(this, rng, trajs, evts);
+        }
+
+        // START OPERATORS
+
+        private static Gene PointMutation(Gene g, Random rng, Trajectory[] trajs, Event[] evts)
+        {
+            Gene neighbour = new Gene(g);
+
             int r_index = rng.Next(neighbour.gene.Length);
             int r_offset = rng.Next(1, 8);
             neighbour.gene[r_index] = (neighbour.gene[r_index] + r_offset) % 8;
+            
             neighbour.setEval(trajs, evts);
             return neighbour;
         }
+
+        private static Gene ForwardShift(Gene g, Random rng, Trajectory[] trajs, Event[] evts)
+        {
+            Gene neighbour = new Gene(g);
+            
+            int r_index  = rng.Next(neighbour.gene.Length);
+            int player = r_index / 12;
+
+            for (int i = (player + 1) * 12 - 1; i > r_index; i--) // loop from end of player's actions to r_index
+            {
+                neighbour.gene[i] = neighbour.gene[i-1];
+            }
+            neighbour.gene[r_index] = 0;
+
+            neighbour.setEval(trajs, evts);
+            return neighbour;
+        }
+
+        private static Gene BackwardShift(Gene g, Random rng, Trajectory[] trajs, Event[] evts)
+        {
+            Gene neighbour = new Gene(g);
+
+            int r_index = rng.Next(neighbour.gene.Length);
+            int player = r_index / 12;
+
+            for (int i = r_index - 1; i >= player * 12; i--) // loop from r_index to player's first action
+            {
+                neighbour.gene[i] = neighbour.gene[i + 1];
+            }
+            neighbour.gene[r_index] = 0;
+
+            neighbour.setEval(trajs, evts);
+            return neighbour;
+        }
+
+        private static Gene SwapPlayers(Gene g, Random rng, Trajectory[] trajs, Event[] evts)
+        {
+            Gene neighbour = new Gene(g);
+
+            int player1 = rng.Next(neighbour.players);
+            int player2 = (player1 + rng.Next(1, neighbour.players)) % neighbour.players;
+
+            int p1 = player1 * 12;
+            int p2 = player2 * 12;
+
+            for (int i = 0; i < 12; i++)
+            { // swap all 12 actions
+                int t = neighbour.gene[p1];
+                neighbour.gene[p1] = neighbour.gene[p2];
+                neighbour.gene[p2] = t;
+
+                p1++;
+                p2++;
+            }
+
+            neighbour.setEval(trajs, evts);
+            return neighbour;
+        }
+
+        // END OPERATORS
 
         public String Rep()
         {

@@ -8,12 +8,15 @@ using System.Diagnostics;
 
 /*
  * TODO
- * different actions:
- *  swap two players
- *  delay actions
- *  pull actions forward
+ * earlier stop in shift operators ?
  * heuristic to avoid blanks
  * super-safe playstyle (1 damage = all defects)
+ * 
+ * generalize variables (not hardcoded 5 and 12 and ...)
+ * use enum casting
+ * 
+ * automatic iteration-lengthening & resets
+ * user inputted iteration-lengthening & resets ?
  */
 
 namespace SpaceAlertSolver
@@ -204,7 +207,7 @@ namespace SpaceAlertSolver
             Console.ReadLine();*/
 
             SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
-            sa.Run(1000000, trajectories, evArr);
+            sa.Run(2000000, trajectories, evArr);
             Console.WriteLine(sa.getGene().Rep() + sa.getGene().getScore());
             Console.WriteLine("-----FINAL-----");
             Console.ReadLine();
