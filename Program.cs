@@ -25,6 +25,8 @@ namespace SpaceAlertSolver
 {
     class Program
     {
+        public static readonly int SEED = 0;
+
         static void Main(string[] args)
         {
             //Extension.InitKeys(5, 8, 1 << 25);
@@ -50,7 +52,7 @@ namespace SpaceAlertSolver
             
             Console.WriteLine("-------");
             
-            Random r = new Random();
+            Random r = new Random(SEED);
             List<Event> events = new List<Event>();
             Player[] players = new Player[5];
 
@@ -209,7 +211,7 @@ namespace SpaceAlertSolver
             Console.ReadLine();*/
 
             SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
-            sa.Run(2000000, trajectories, evArr);
+            sa.Run(2000000, trajectories, evArr, SEED);
             Console.WriteLine(sa.getGene().Rep() + sa.getGene().getScore());
             Console.WriteLine("-----FINAL-----");
             Console.ReadLine();
@@ -224,7 +226,7 @@ namespace SpaceAlertSolver
         public static ulong[] hash;
         public static ulong hashSize;
 
-        public static Random rng = new Random();
+        public static Random rng = new Random(Program.SEED);
         public static bool doRandomDefect;
         public static Defects[] defectOrder = new Defects[] {Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
                     Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,

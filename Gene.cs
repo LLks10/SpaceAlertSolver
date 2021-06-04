@@ -17,7 +17,7 @@ namespace SpaceAlertSolver
         {
             this.players = players;
 
-            Random random = new Random(Guid.NewGuid().GetHashCode());
+            Random random = new Random(Program.SEED);
             gene = new int[players*12];
             for (int i = 0; i < players*12; i++) // randomly fill gene
             {
@@ -151,13 +151,16 @@ namespace SpaceAlertSolver
 
             neighbour.gene[r_index] = 0; // blank at r_index
 
-            int action_to_move = neighbour.gene[r_index + 1];
-            neighbour.gene[r_index + 1] = 0;
-            for (int i = r_index + 2; i < end_index && action_to_move != 0; i++)
+            if (end_index - r_index > 1) // if not instantly at end
             {
-                int t = neighbour.gene[i];
-                neighbour.gene[i] = action_to_move;
-                action_to_move = t;
+                int action_to_move = neighbour.gene[r_index + 1];
+                neighbour.gene[r_index + 1] = 0;
+                for (int i = r_index + 2; i < end_index && action_to_move != 0; i++)
+                {
+                    int t = neighbour.gene[i];
+                    neighbour.gene[i] = action_to_move;
+                    action_to_move = t;
+                }
             }
 
             return neighbour;
