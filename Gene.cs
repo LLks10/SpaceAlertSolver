@@ -82,15 +82,19 @@ namespace SpaceAlertSolver
         private static Gene ForwardShift(Gene g, Random rng)
         {
             Gene neighbour = new Gene(g);
-            
-            int r_index  = rng.Next(neighbour.gene.Length);
-            int player = r_index / 12;
 
-            for (int i = (player + 1) * 12 - 1; i > r_index; i--) // loop from end of player's actions to r_index
-            {
-                neighbour.gene[i] = neighbour.gene[i-1];
-            }
+            int r_index = rng.Next(neighbour.gene.Length); // random action
+            int end_index = (r_index / 12 + 1) * 12; // past the last action of the player
+
+            int action_to_move = neighbour.gene[r_index];
             neighbour.gene[r_index] = 0;
+
+            for (int i = r_index + 1; i < end_index && action_to_move != 0; i++)
+            {
+                int t = neighbour.gene[i];
+                neighbour.gene[i] = action_to_move;
+                action_to_move = t;
+            }
 
             return neighbour;
         }
@@ -99,14 +103,18 @@ namespace SpaceAlertSolver
         {
             Gene neighbour = new Gene(g);
 
-            int r_index = rng.Next(neighbour.gene.Length);
-            int player = r_index / 12;
+            int r_index = rng.Next(neighbour.gene.Length); // random action
+            int end_index = r_index / 12 * 12; // first action of the player
 
-            for (int i = r_index - 1; i >= player * 12; i--) // loop from r_index to player's first action
-            {
-                neighbour.gene[i] = neighbour.gene[i + 1];
-            }
+            int action_to_move = neighbour.gene[r_index];
             neighbour.gene[r_index] = 0;
+
+            for (int i = r_index - 1; i >= end_index && action_to_move != 0; i--)
+            {
+                int t = neighbour.gene[i];
+                neighbour.gene[i] = action_to_move;
+                action_to_move = t;
+            }
 
             return neighbour;
         }
