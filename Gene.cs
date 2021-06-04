@@ -10,8 +10,8 @@ namespace SpaceAlertSolver
         public string debug;
 
         private static Func<Gene, Random, Gene>[] operators
-            = new Func<Gene, Random, Gene>[]        { PointMutation, ForwardShift, BackwardShift, SwapPlayers };
-        private static int[] op_chances = new int[] { 70,            100,          110,           111 };
+            = new Func<Gene, Random, Gene>[]        { PointMutation, ForwardShift, BackwardShift, SwapPlayers, Delay };
+        private static int[] op_chances = new int[] { 70,            100,          130,           131,         161 };
 
         public Gene(int players)
         {
@@ -61,7 +61,7 @@ namespace SpaceAlertSolver
                 op_i = bs + 1;
             }
 
-            Gene ret = operators[op_i].Invoke(this, rng, trajs, evts);
+            Gene ret = operators[op_i].Invoke(this, rng);
             ret.setEval(trajs, evts);
             return ret;
         }
@@ -129,6 +129,27 @@ namespace SpaceAlertSolver
 
                 p1++;
                 p2++;
+            }
+
+            return neighbour;
+        }
+
+        private static Gene Delay(Gene g, Random rng)
+        {
+            Gene neighbour = new Gene(g);
+
+            int r_index = rng.Next(neighbour.gene.Length); // random action
+            int end_index = (r_index / 12 + 1) * 12; // past the last action of the player
+
+            neighbour.gene[r_index] = 0; // blank at r_index
+
+            int action_to_move = neighbour.gene[r_index + 1];
+            neighbour.gene[r_index + 1] = 0;
+            for (int i = r_index + 2; i < end_index && action_to_move != 0; i++)
+            {
+                int t = neighbour.gene[i];
+                neighbour.gene[i] = action_to_move;
+                action_to_move = t;
             }
 
             return neighbour;

@@ -103,14 +103,7 @@ namespace SpaceAlertSolver
             {
                 if (n_blanks > c_blanks) // better in terms of blanks
                 {
-                    if (temperature < 0.15)
-                    {
-                        return 0.1 * Math.Log(2 - temperature);
-                    }
-                    else
-                    {
-                        return 0.0;
-                    }
+                    return 2 / (1 + Math.Exp(12 * temperature));
                 }
                 else if (n_blanks == c_blanks)
                 {
@@ -118,7 +111,7 @@ namespace SpaceAlertSolver
                 }
                 else // worse in terms of blanks
                 {
-                    return Math.Log(temperature + 1);
+                    return 2 / (1 + Math.Exp(-8 * temperature - 8));
                 }
             }*/
             else // newState is worse

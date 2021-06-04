@@ -8,7 +8,9 @@ using System.Diagnostics;
 
 /*
  * TODO
- * earlier stop in shift operators ?
+ * earlier stop in shift operators ? (stop at blank)
+ * add two blank shift
+ * add temperature to neighbour function
  * heuristic to avoid blanks
  * super-safe playstyle (1 damage = all defects)
  * 
