@@ -9,7 +9,8 @@ namespace SpaceAlertSolver
     class SimulatedAnnealing
     {
         private Gene _currentState;
-        private int _bestScore = int.MinValue;
+        private int _highestScore = int.MinValue;
+        private int _highestBlanks = int.MinValue;
         private Gene _bestState; // use for restarts
 
         public SimulatedAnnealing(int players, Trajectory[] trajs, Event[] evts)
@@ -39,14 +40,21 @@ namespace SpaceAlertSolver
                 }
 
                 // print new best score
-                if (_currentState.getScore() > _bestScore)
+                if (_currentState.getScore() > _highestScore)
                 {
-                    _bestScore = _currentState.getScore();
+                    _highestScore = _currentState.getScore();
+                    _highestBlanks = _currentState.getBlanks();
                     _bestState = _currentState;
+
                     Console.WriteLine(_currentState.Rep() +
                         "Iteration: " + (iteration + 1) + 
                         " / " + maxIterations +
                         "\nScore: " + _currentState.getScore());
+                }
+                else if (_currentState.getScore() == _highestScore && _currentState.getBlanks() > _highestBlanks)
+                {
+                    _highestBlanks =  _currentState.getBlanks();
+                    _bestState = _currentState;
                 }
             }
         }
@@ -62,9 +70,14 @@ namespace SpaceAlertSolver
             Run(maxIterations, trajs, evts, Guid.NewGuid().GetHashCode());
         }
 
-        public Gene getGene()
+        public Gene getCurrentGene()
         {
             return _currentState;
+        }
+
+        public Gene getBestGene()
+        {
+            return _bestState;
         }
 
         /**
@@ -103,7 +116,8 @@ namespace SpaceAlertSolver
             {
                 if (n_blanks > c_blanks) // better in terms of blanks
                 {
-                    return 2 / (1 + Math.Exp(12 * temperature));
+                    //return 2 / (1 + Math.Exp(6 * temperature));
+                    return 0.5;
                 }
                 else if (n_blanks == c_blanks)
                 {
@@ -111,7 +125,7 @@ namespace SpaceAlertSolver
                 }
                 else // worse in terms of blanks
                 {
-                    return 2 / (1 + Math.Exp(-8 * temperature - 8));
+                    return 2 / (1 + Math.Exp(-8 * temperature + 8));
                 }
             }
             else // newState is worse

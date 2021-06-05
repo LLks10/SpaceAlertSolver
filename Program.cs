@@ -11,6 +11,7 @@ using System.Diagnostics;
  * add temperature to neighbour function
  * heuristic to avoid blanks
  * super-safe playstyle (1 damage = all defects)
+ * pure shift operator
  * 
  * generalize variables (not hardcoded 5 and 12 and ...)
  * use enum casting
@@ -23,13 +24,13 @@ namespace SpaceAlertSolver
 {
     class Program
     {
-        public static int SEED = 0;
+        public static int SEED = 11;
 
         static void Main(string[] args)
         {
-            //Gene g = Run(SEED);
+            Gene g = Run(SEED);
 
-            int seed_start = 10;
+            /*int seed_start = 10;
             int seed_end = 20;
 
             int[] scores = new int[10];
@@ -40,7 +41,7 @@ namespace SpaceAlertSolver
             for (int i = 0; i < scores.Length; i++)
             {
                 Console.WriteLine($"{i + seed_start}: {scores[i]}");
-            }
+            }*/
 
             Console.ReadLine();
         }
@@ -230,9 +231,10 @@ namespace SpaceAlertSolver
 
             SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
             sa.Run(2000000, trajectories, evArr, seed);
-            Console.WriteLine(sa.getGene().Rep() + sa.getGene().getScore());
+            Console.WriteLine(sa.getBestGene().Rep() + sa.getBestGene().getScore());
             Console.WriteLine("-----FINAL-----");
-            return sa.getGene();
+            //Console.WriteLine(sa.getBestGene().Rep());
+            return sa.getBestGene();
         }
     }
 

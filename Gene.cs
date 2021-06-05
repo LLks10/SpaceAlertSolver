@@ -10,8 +10,8 @@ namespace SpaceAlertSolver
         public string debug;
 
         private static Func<Gene, Random, Gene>[] operators
-            = new Func<Gene, Random, Gene>[]        { PointMutation, ForwardShift, BackwardShift, SwapPlayers, Delay };
-        private static int[] op_chances = new int[] { 70,            100,          130,           131,         161 };
+            = new Func<Gene, Random, Gene>[]        { PointMutation, ForwardShift, BackwardShift, Delay, SwapPlayers };
+        private static int[] op_chances = new int[] { 100,           115,          130,           145,   146 };
 
         public Gene(int players)
         {
