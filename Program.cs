@@ -6,20 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-/*
- * TODO
- * add temperature to neighbour function
- * heuristic to avoid blanks
- * super-safe playstyle (1 damage = all defects)
- * pure shift operator
- * 
- * generalize variables (not hardcoded 5 and 12 and ...)
- * use enum casting
- * 
- * automatic iteration-lengthening & resets
- * user inputted iteration-lengthening & resets ?
- */
-
 namespace SpaceAlertSolver
 {
     class Program
