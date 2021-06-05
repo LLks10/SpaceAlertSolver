@@ -8,8 +8,6 @@ using System.Diagnostics;
 
 /*
  * TODO
- * earlier stop in shift operators ? (stop at blank)
- * add two blank shift
  * add temperature to neighbour function
  * heuristic to avoid blanks
  * super-safe playstyle (1 damage = all defects)
@@ -25,9 +23,29 @@ namespace SpaceAlertSolver
 {
     class Program
     {
-        public static readonly int SEED = 0;
+        public static int SEED = 0;
 
         static void Main(string[] args)
+        {
+            //Gene g = Run(SEED);
+
+            int seed_start = 10;
+            int seed_end = 20;
+
+            int[] scores = new int[10];
+            for (int seed = seed_start; seed < seed_end; seed++)
+            {
+                scores[seed-seed_start] = Run(seed).getScore();
+            }
+            for (int i = 0; i < scores.Length; i++)
+            {
+                Console.WriteLine($"{i + seed_start}: {scores[i]}");
+            }
+
+            Console.ReadLine();
+        }
+
+        static Gene Run(int seed)
         {
             //Extension.InitKeys(5, 8, 1 << 25);
             //Create damage order
@@ -49,10 +67,10 @@ namespace SpaceAlertSolver
             }
             else
                 Console.WriteLine("Random defects");
-            
+
             Console.WriteLine("-------");
-            
-            Random r = new Random(SEED);
+
+            Random r = new Random(seed);
             List<Event> events = new List<Event>();
             Player[] players = new Player[5];
 
@@ -77,7 +95,7 @@ namespace SpaceAlertSolver
             //Load trajectories
             Trajectory[] trajectories = new Trajectory[4];
             int[] ts = new int[] { 0, 1, 2, 3, 4, 5, 6 };
-            
+
             Console.WriteLine("'r' for random trajectories or xxxx to manually set");
             string resp = Console.ReadLine();
             if (resp == "r" || resp == "R")
@@ -93,8 +111,8 @@ namespace SpaceAlertSolver
             }
             else
             {
-                for(int i = 0; i < 4; i++)
-                    trajectories[i] = new Trajectory(int.Parse(resp[i].ToString())-1);
+                for (int i = 0; i < 4; i++)
+                    trajectories[i] = new Trajectory(int.Parse(resp[i].ToString()) - 1);
             }
 
             Console.WriteLine("Trajectories:");
@@ -114,14 +132,14 @@ namespace SpaceAlertSolver
                     int type = int.Parse(strsplit[0]);
                     int t = int.Parse(strsplit[1]);
                     //External
-                    if(type <= 2)
+                    if (type <= 2)
                     {
                         int z = int.Parse(strsplit[2]);
                         int thrt;
                         //Common
-                        if(type == 1)
+                        if (type == 1)
                         {
-                            if(strsplit.Length > 3)
+                            if (strsplit.Length > 3)
                             {
                                 thrt = int.Parse(strsplit[3]);
                                 comExThreats.Remove(thrt);
@@ -211,10 +229,10 @@ namespace SpaceAlertSolver
             Console.ReadLine();*/
 
             SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
-            sa.Run(2000000, trajectories, evArr, SEED);
+            sa.Run(2000000, trajectories, evArr, seed);
             Console.WriteLine(sa.getGene().Rep() + sa.getGene().getScore());
             Console.WriteLine("-----FINAL-----");
-            Console.ReadLine();
+            return sa.getGene();
         }
     }
 

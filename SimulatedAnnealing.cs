@@ -99,7 +99,7 @@ namespace SpaceAlertSolver
             {
                 return 1.0;
             }
-            /*else if (n_score == c_score)
+            else if (n_score == c_score)
             {
                 if (n_blanks > c_blanks) // better in terms of blanks
                 {
@@ -113,7 +113,7 @@ namespace SpaceAlertSolver
                 {
                     return 2 / (1 + Math.Exp(-8 * temperature - 8));
                 }
-            }*/
+            }
             else // newState is worse
             {
                 return Math.Exp(0.05 * (n_score - c_score) / temperature);
