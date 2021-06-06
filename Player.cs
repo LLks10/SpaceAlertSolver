@@ -21,17 +21,24 @@ namespace SpaceAlertSolver
             inIntercept = other.inIntercept;
             actions = Extension.CopyArray(other.actions);
             
-            int androidIndex = -1;
-            for (int i = 0; i < otherAndroids.Length; i++)
+            if (other.team == null)
             {
-                if (team == otherAndroids[i])
-                {
-                    androidIndex = i;
-                    break;
-                }
+                team = null;
             }
+            else
+            {
+                int androidIndex = -1;
+                for (int i = 0; i < otherAndroids.Length; i++)
+                {
+                    if (other.team == otherAndroids[i])
+                    {
+                        androidIndex = i;
+                        break;
+                    }
+                }
 
-            team = androids[androidIndex];
+                team = androids[androidIndex];
+            }
         }
 
         public Player()

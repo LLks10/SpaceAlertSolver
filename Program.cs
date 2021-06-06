@@ -10,11 +10,11 @@ namespace SpaceAlertSolver
 {
     class Program
     {
-        public static int SEED = 18;
+        public static int SEED = 17;
 
         static void Main(string[] args)
         {
-            Gene g = Run(SEED);
+            //Gene g = Run(SEED);
 
             int seed_start = 10;
             int seed_end = 20;

@@ -155,7 +155,7 @@ namespace SpaceAlertSolver
 
             if(generation % 1000 == 0)
             {
-                int highest = int.MinValue;
+                double highest = double.NegativeInfinity;
                 Gene best = null;
                 foreach (Gene g in genes)
                 {

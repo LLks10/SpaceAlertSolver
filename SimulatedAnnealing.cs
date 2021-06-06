@@ -9,7 +9,7 @@ namespace SpaceAlertSolver
     class SimulatedAnnealing
     {
         private Gene _currentState;
-        private int _highestScore = int.MinValue;
+        private double _highestScore = double.NegativeInfinity;
         private int _highestBlanks = int.MinValue;
         private Gene _bestState; // use for restarts
 
@@ -103,8 +103,8 @@ namespace SpaceAlertSolver
          */
         private double P(Gene currentState, Gene newState, double temperature)
         {
-            int c_score = currentState.getScore();
-            int n_score = newState.getScore();
+            double c_score = currentState.getScore();
+            double n_score = newState.getScore();
             int c_blanks = currentState.getBlanks();
             int n_blanks = newState.getBlanks();
 

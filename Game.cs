@@ -49,7 +49,7 @@ namespace SpaceAlertSolver
         public Game(Game other)
         {
             players = new Player[other.players.Length];
-            ship = new Ship(other.ship, players);
+            ship = new Ship(other.ship, this, players);
             for (int i = 0; i < players.Length; i++)
             {
                 players[i] = new Player(other.players[i], other.ship.androids, ship.androids);
@@ -86,7 +86,7 @@ namespace SpaceAlertSolver
         {
             gameover = false;
             eventIdx = 0;
-            ship = new Ship(players);
+            ship = new Ship(this, players);
             exThreats = new List<ExThreat>();
             inThreats = new List<InThreat>();
 

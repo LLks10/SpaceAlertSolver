@@ -18,6 +18,8 @@ namespace SpaceAlertSolver
     {
         public static int NUM_DEFECTS = 6;
 
+        public Game game;
+
         public Player[] players;
         public Androids[] androids;
         public int[] shields;
@@ -54,8 +56,9 @@ namespace SpaceAlertSolver
                                       // notDefect: it is definitely not broken (yet)
                                       // undetermined: it might be broken (this means branch if necessary)
 
-        public Ship(Ship other, Player[] players)
+        public Ship(Ship other, Game game, Player[] players)
         {
+            this.game = game;
             this.players = players;
             androids = new Androids[2] { new Androids(other.androids[0]), new Androids(other.androids[1]) };
             shields = Extension.CopyArray(other.shields);
@@ -94,8 +97,9 @@ namespace SpaceAlertSolver
             }
         }
 
-        public Ship(Player[] players)
+        public Ship(Game game, Player[] players)
         {
+            this.game = game;
             this.players = players;
             //Setup
             shields = new int[] { 1, 1, 1 };
