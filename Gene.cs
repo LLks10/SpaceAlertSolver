@@ -5,7 +5,7 @@ namespace SpaceAlertSolver
     public class Gene
     {
         private int[] gene;
-        public int players, blanks, wins, losses;
+        public int players, blanks;
         double score;
         private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
         public string debug;

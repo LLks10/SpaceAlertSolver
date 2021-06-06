@@ -413,7 +413,7 @@ namespace SpaceAlertSolver
                     ApplyStatusEffect(p);
                     break;
                 case Act.lift:
-                    // check for defect
+                    // branching
                     if (ship.defectStates[z][(int)Defects.lift] == DefectState.undetermined
                         && t < 11 && p.actions[t + 1] != Act.empty) // no branching needed if nothing to be delayed
                     {
@@ -457,11 +457,29 @@ namespace SpaceAlertSolver
                         if (ship.reactors[z] == 0)
                             break;
                         ship.reactors[z]--;
+
                         //Find target
                         int target = GetTargetEx(z, 3, ExDmgSource.laser);
-                        //Deal damage
-                        if (target != -1)
-                            exThreats[target].DealDamage(ship.laserDamage[z], 3, ExDmgSource.laser);
+                        
+                        if (target == -1) // no  target
+                            break;
+
+                        // branching
+                        if (ship.defectStates[z][(int)Defects.weapontop] == DefectState.undetermined)
+                        {
+                            double chanceOfBreaking = ship.ChanceOfDefect(z);
+                            if (chanceOfBreaking < 1.0)
+                            {
+                                Game branch = new Game(this);
+                                branch.ship.NotDefect(z, Defects.weapontop);
+
+                                scoreAddition += branch.LaserShoot(turn, player, branch.ship.laserDamage[z], target) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                                scoreMultiplier *= chanceOfBreaking;
+                            }
+                            ship.AddDefect(z, Defects.weapontop);
+                        }
+
+                        return LaserShoot(turn, player, ship.laserDamage[z], target);
                     }
                     else
                     {
@@ -473,9 +491,23 @@ namespace SpaceAlertSolver
                             if (ship.reactors[z] == 0)
                                 break;
                             ship.reactors[z]--;
-                            //Hit all enemies
-                            foreach (ExThreat et in exThreats)
-                                et.DealDamage(1, ship.plasmaDamage[z], ExDmgSource.impulse);
+
+                            // branching
+                            if (ship.defectStates[z][(int)Defects.weaponbot] == DefectState.undetermined)
+                            {
+                                double chanceOfBreaking = ship.ChanceOfDefect(z);
+                                if (chanceOfBreaking < 1.0)
+                                {
+                                    Game branch = new Game(this);
+                                    branch.ship.NotDefect(z, Defects.weaponbot);
+
+                                    scoreAddition += branch.ImpulseShoot(turn, player, branch.ship.plasmaDamage[z]) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                                    scoreMultiplier *= chanceOfBreaking;
+                                }
+                                ship.AddDefect(z, Defects.weaponbot);
+                            }
+
+                            return ImpulseShoot(turn, player, ship.plasmaDamage[z]);
                         }
                         //Plasma cannon
                         else
@@ -483,11 +515,27 @@ namespace SpaceAlertSolver
                             //Find target
                             int target = GetTargetEx(z, 3, ExDmgSource.plasma);
                             //Deal damage
-                            if (target != -1)
-                                exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.plasma);
+                            if (target == -1)
+                                break;
+
+                            // branching
+                            if (ship.defectStates[z][(int)Defects.weaponbot] == DefectState.undetermined)
+                            {
+                                double chanceOfBreaking = ship.ChanceOfDefect(z);
+                                if (chanceOfBreaking < 1.0)
+                                {
+                                    Game branch = new Game(this);
+                                    branch.ship.NotDefect(z, Defects.weaponbot);
+
+                                    scoreAddition += branch.LaserShoot(turn, player, branch.ship.plasmaDamage[z], target) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                                    scoreMultiplier *= chanceOfBreaking;
+                                }
+                                ship.AddDefect(z, Defects.weaponbot);
+                            }
+
+                            return LaserShoot(turn, player, ship.plasmaDamage[z], target);
                         }
                     }
-                    break;
 
                 case Act.B:
                     //Check for a defect
@@ -611,6 +659,22 @@ namespace SpaceAlertSolver
                     break;
             }
 
+            return PlayerActions(turn, player + 1);
+        }
+
+        // exists to shoot and route back to playeractions (jump in for branching)
+        double LaserShoot(int turn, int player, int damage, int target)
+        {
+            exThreats[target].DealDamage(damage, 3, ExDmgSource.laser);
+            return PlayerActions(turn, player + 1);
+        }
+
+        // exists to shoot impulse cannon and route back to playeractions
+        double ImpulseShoot(int turn, int player, int range)
+        {
+            //Hit all enemies
+            foreach (ExThreat et in exThreats)
+                et.DealDamage(1, range, ExDmgSource.impulse);
             return PlayerActions(turn, player + 1);
         }
 

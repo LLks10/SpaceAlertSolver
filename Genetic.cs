@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SpaceAlertSolver
 {
-    public class Genetic
+    /*public class Genetic
     {
         private List<Gene> genes;
         private static Random random = new Random();
@@ -173,10 +173,10 @@ namespace SpaceAlertSolver
                     /*for (int i = 0; i < 10; i++)
                     {
                         Console.WriteLine(best.RunSimulation(trajs, evs));
-                    }*/
+                    }
                 }
             }
                
         }
-    }
+    }*/
 }
