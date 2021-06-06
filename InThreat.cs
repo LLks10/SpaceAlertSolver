@@ -25,6 +25,27 @@ namespace SpaceAlertSolver
             //Get trajectory information
             distance = traj.maxDistance;
         }
+        public InThreat() { }
+
+        public abstract InThreat Clone(Ship ship);
+
+        protected virtual void CloneThreat(InThreat other, Ship ship)
+        {
+            health = other.health;
+            speed = other.speed;
+            distance = other.distance;
+            position = other.position;
+            scoreWin = other.scoreWin;
+            scoreLose = other.scoreLose;
+            time = other.time;
+            trajectory = other.trajectory;
+            vulnerability = other.vulnerability;
+            alive = other.alive;
+            beaten = other.beaten;
+            fightBack = other.fightBack;
+
+            this.ship = ship;
+        }
 
         public virtual bool DealDamage(int position, InDmgSource source)
         {

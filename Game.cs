@@ -56,8 +56,18 @@ namespace SpaceAlertSolver
             }
             trajectories = other.trajectories;
             events = other.events;
-            exThreats = new List<ExThreat>(other.exThreats);
-            inThreats = new List<InThreat>(other.inThreats);
+            
+            exThreats = new List<ExThreat>();
+            for (int i = 0; i < other.exThreats.Count; i++)
+            {
+                exThreats.Add(other.exThreats[i].Clone(ship));
+            }
+            inThreats = new List<InThreat>();
+            for (int i = 0; i < other.inThreats.Count; i++)
+            {
+                inThreats.Add(other.inThreats[i].Clone(ship));
+            }
+
             phase = other.phase;
             score = other.score;
             phaseComputer = Extension.CopyArray(other.phaseComputer);

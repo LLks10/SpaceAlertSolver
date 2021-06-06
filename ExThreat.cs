@@ -35,6 +35,30 @@ namespace SpaceAlertSolver
                 distanceRange = 3;
         }
 
+        public ExThreat() { }
+
+        public abstract ExThreat Clone(Ship ship);
+
+        protected virtual void CloneThreat(ExThreat other, Ship ship)
+        {
+            health = other.health;
+            shield = other.shield;
+            speed = other.speed;
+            distance = other.distance;
+            distanceRange = other.distanceRange;
+            scoreWin = other.scoreWin;
+            scoreLose = other.scoreLose;
+            zone = other.zone;
+            time = other.time;
+            trajectory = other.trajectory;
+            rocketImmune = other.rocketImmune;
+            alive = other.alive;
+            beaten = other.beaten;
+            damage = other.damage;
+
+            this.ship = ship;
+        }
+
         public virtual int GetDistance(int range, ExDmgSource source)
         {
             if (range >= distanceRange && !beaten && !(source == ExDmgSource.rocket && rocketImmune))

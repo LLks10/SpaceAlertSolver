@@ -21,6 +21,16 @@ namespace SpaceAlertSolver
             scoreWin = 4;
         }
 
+        public ArmoredCatcher() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            ArmoredCatcher clone = new ArmoredCatcher();
+            clone.CloneThreat(this, ship);
+            clone.maxHealth = maxHealth;
+            return clone;
+        }
+
         public override void ActX()
         {
             ship.DealDamage(zone, 1);
@@ -50,6 +60,16 @@ namespace SpaceAlertSolver
             rocketImmune = true;
         }
 
+        public Amoebe() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Amoebe clone = new Amoebe();
+            clone.CloneThreat(this, ship);
+            clone.maxHealth = maxHealth;
+            return clone;
+        }
+
         public override void ActX()
         {
             health = Math.Min(health + 2, maxHealth);
@@ -74,6 +94,15 @@ namespace SpaceAlertSolver
             speed = 2;
             scoreLose = 2;
             scoreWin = 4;
+        }
+
+        public Battleship() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Battleship clone = new Battleship();
+            clone.CloneThreat(this, ship);
+            return clone;
         }
 
         public override void ActX()
@@ -102,6 +131,15 @@ namespace SpaceAlertSolver
             scoreWin = 4;
         }
 
+        public Hunter() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Hunter clone = new Hunter();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             ship.DealDamage(zone, 1);
@@ -128,6 +166,16 @@ namespace SpaceAlertSolver
             scoreLose = 2;
             scoreWin = 4;
             hasShield = true;
+        }
+
+        public GyroHunter() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            GyroHunter clone = new GyroHunter();
+            clone.CloneThreat(this, ship);
+            clone.hasShield = hasShield;
+            return clone;
         }
 
         public override void ActX()
@@ -168,6 +216,16 @@ namespace SpaceAlertSolver
             speed = 2;
             scoreLose = 2;
             scoreWin = 4;
+        }
+
+        public EnergyCloud() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            EnergyCloud clone = new EnergyCloud();
+            clone.CloneThreat(this, ship);
+            clone.baseShield = baseShield;
+            return clone;
         }
 
         public override void ActX()
@@ -218,6 +276,15 @@ namespace SpaceAlertSolver
             scoreWin = 4;
             rocketImmune = true;
         }
+
+        public Meteorite() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Meteorite clone = new Meteorite();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
         public override void ActZ()
         {
             ship.DealDamage(zone, health);
@@ -235,6 +302,16 @@ namespace SpaceAlertSolver
             scoreLose = 2;
             scoreWin = 4;
         }
+
+        public ImpulseBall() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            ImpulseBall clone = new ImpulseBall();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             ship.DealDamage(0, 1);
@@ -265,6 +342,15 @@ namespace SpaceAlertSolver
             speed = 2;
             scoreLose = 2;
             scoreWin = 4;
+        }
+
+        public SpaceCruiser() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            SpaceCruiser clone = new SpaceCruiser();
+            clone.CloneThreat(this, ship);
+            return clone;
         }
         public override void ActX()
         {
@@ -299,6 +385,16 @@ namespace SpaceAlertSolver
             speed = 3;
             scoreLose = 2;
             scoreWin = 4;
+        }
+
+        public StealthHunter() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            StealthHunter clone = new StealthHunter();
+            clone.CloneThreat(this, ship);
+            clone.visible = visible;
+            return clone;
         }
         public override void ActX()
         {
@@ -345,6 +441,17 @@ namespace SpaceAlertSolver
             scoreWin = 6;
             rocketImmune = true;
         }
+
+        public JellyFish() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            JellyFish clone = new JellyFish();
+            clone.CloneThreat(this, ship);
+            clone.baseHealth = baseHealth;
+            return clone;
+        }
+
         public override void ActX()
         {
             ship.DealDamage(0, 1);
@@ -385,6 +492,17 @@ namespace SpaceAlertSolver
             scoreWin = 6;
             rocketImmune = true;
         }
+
+        public SmallAsteroid() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            SmallAsteroid clone = new SmallAsteroid();
+            clone.CloneThreat(this, ship);
+            clone.revenge = revenge;
+            return clone;
+        }
+
         public override void ActX()
         {
             revenge++;
@@ -425,6 +543,16 @@ namespace SpaceAlertSolver
             scoreLose = 3;
             scoreWin = 6;
         }
+
+        public Kamikaze() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Kamikaze clone = new Kamikaze();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             speed += 1;
@@ -453,6 +581,16 @@ namespace SpaceAlertSolver
             scoreWin = 6;
             rocketImmune = true;
         }
+
+        public Swarm() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Swarm clone = new Swarm();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             ship.DealDamage(zone, 1);
@@ -495,6 +633,16 @@ namespace SpaceAlertSolver
             scoreLose = 3;
             scoreWin = 6;
         }
+
+        public GhostHunter() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            GhostHunter clone = new GhostHunter();
+            clone.CloneThreat(this, ship);
+            clone.visible = visible;
+            return clone;
+        }
         public override void ActX()
         {
             visible = true;
@@ -533,6 +681,15 @@ namespace SpaceAlertSolver
             speed = 2;
             scoreLose = 3;
             scoreWin = 6;
+        }
+
+        public Scout() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Scout clone = new Scout();
+            clone.CloneThreat(this, ship);
+            return clone;
         }
         public override void ActX()
         {
