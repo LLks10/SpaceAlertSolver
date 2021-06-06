@@ -32,7 +32,7 @@ namespace SpaceAlertSolver
         public List<ExThreat> exThreats;
         public List<InThreat> inThreats;
         int phase;
-        int score;
+        double score;
         bool[] phaseComputer;
         bool gameover;
         int eventIdx;
@@ -43,7 +43,35 @@ namespace SpaceAlertSolver
         int observationCount;
         static int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
 
-        public void Setup(Player[] players, Trajectory[] trajectories, Event[] events)
+        double scoreMultiplier = 1.0;
+        double scoreAddition = 0.0;
+
+        public Game(Game other)
+        {
+            players = new Player[other.players.Length];
+            ship = new Ship(other.ship, players);
+            for (int i = 0; i < players.Length; i++)
+            {
+                players[i] = new Player(other.players[i], other.ship.androids, ship.androids);
+            }
+            trajectories = other.trajectories;
+            events = other.events;
+            exThreats = new List<ExThreat>(other.exThreats);
+            inThreats = new List<InThreat>(other.inThreats);
+            phase = other.phase;
+            score = other.score;
+            phaseComputer = Extension.CopyArray(other.phaseComputer);
+            gameover = other.gameover;
+            eventIdx = other.eventIdx;
+            exSlain = other.exSlain;
+            exSurvived = other.exSurvived;
+            inSlain = other.inSlain;
+            inSurvived = other.inSurvived;
+            observation = Extension.CopyArray(other.observation);
+            observationCount = other.observationCount;
+        }
+
+        public Game(Player[] players, Trajectory[] trajectories, Event[] events)
         {
             this.players = new Player[players.Length];
             for (int i = 0; i < players.Length; i++)
@@ -54,11 +82,11 @@ namespace SpaceAlertSolver
         }
 
         //Simulate the game
-        public int Simulate()
+        public double Simulate()
         {
             gameover = false;
             eventIdx = 0;
-            ship = new Ship(players, this);
+            ship = new Ship(players);
             exThreats = new List<ExThreat>();
             inThreats = new List<InThreat>();
 
@@ -69,7 +97,7 @@ namespace SpaceAlertSolver
             return GameLoop(1);
         }
 
-        int GameLoop(int turn) { 
+        double GameLoop(int turn) { 
             if (turn > 12 || gameover)
             {
                 //Final movement if not gameover
@@ -115,7 +143,7 @@ namespace SpaceAlertSolver
                 if (gameover)
                     score = score - 200 + turn;
 
-                return score;
+                return scoreMultiplier * score + scoreAddition;
             }
             else
             {
@@ -123,7 +151,7 @@ namespace SpaceAlertSolver
             }
         }
 
-        int PrePlayerActions(int turn)
+        double PrePlayerActions(int turn)
         {
             //Set phase
             if (turn <= 3)
@@ -160,7 +188,7 @@ namespace SpaceAlertSolver
             return PlayerActions(turn, 0);
         }
 
-        int PostPlayerActions(int turn)
+        double PostPlayerActions(int turn)
         {
             //Process internal damage and cleanup
             ResolveInDamage();
@@ -321,7 +349,7 @@ namespace SpaceAlertSolver
         }
 
         //All players perform actions
-        int PlayerActions(int turn, int player)
+        double PlayerActions(int turn, int player)
         {
             if (player >= players.Length)
             {
@@ -375,6 +403,22 @@ namespace SpaceAlertSolver
                     ApplyStatusEffect(p);
                     break;
                 case Act.lift:
+                    // check for defect
+                    if (ship.defectStates[z][(int)Defects.lift] == DefectState.undetermined
+                        && t < 11 && p.actions[t + 1] != Act.empty) // no branching needed if nothing to be delayed
+                    {
+                        double chanceOfBreaking = ship.ChanceOfDefect(z);
+                        if (chanceOfBreaking < 1.0)
+                        {
+                            Game branch = new Game(this);
+                            branch.ship.NotDefect(z, Defects.lift);
+
+                            scoreAddition += branch.PlayerActions(turn, player) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                            scoreMultiplier *= chanceOfBreaking;
+                        }
+                        ship.AddDefect(z, Defects.lift);
+                    }
+
                     //Check if elevator was used
                     bm = 1 << z;
                     if ( (ship.liftUsed & bm) == bm)

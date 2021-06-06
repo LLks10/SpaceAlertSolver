@@ -5,7 +5,8 @@ namespace SpaceAlertSolver
     public class Gene
     {
         private int[] gene;
-        public int players, score, blanks, wins, losses;
+        public int players, blanks, wins, losses;
+        double score;
         private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
         public string debug;
 
@@ -224,7 +225,7 @@ namespace SpaceAlertSolver
             }
         }
 
-        private int Evaluate(int[] gene, Trajectory[] trajs, Event[] evts)
+        private double Evaluate(int[] gene, Trajectory[] trajs, Event[] evts)
         {
             Player[] ps = new Player[players];
             for (int i = 0; i < players; i++)
@@ -267,50 +268,11 @@ namespace SpaceAlertSolver
                 }
             }
 
-            int scr;
-            if (Extension.doRandomDefect)
-            {
-                scr = 0;
-                //Run first game
-                Game g = new Game();
-                g.Setup(ps, trajs, evts);
-                int s = g.Simulate();
-                if (s > -40)
-                    wins++;
-                else
-                    losses++;
-                scr += s;
-
-                if (true)
-                    scr *= 10;
-                //Run multiple if non deterministic
-                else
-                {
-                    for (int i = 0; i < 9; i++)
-                    {
-                        g = new Game();
-                        g.Setup(ps, trajs, evts);
-                        s = g.Simulate();
-                        if (s > -40)
-                            wins++;
-                        else
-                            losses++;
-                        scr += s;
-                    }
-                }
-            }
-            else
-            {
-                Game g = new Game();
-                g.Setup(ps, trajs, evts);
-                scr = g.Simulate();
-                debug = g.GetDebug();
-            }
-
-            return scr;
+            Game g = new Game(ps, trajs, evts);
+            return g.Simulate();
         }
 
-        public int getScore()
+        public double getScore()
         {
             return this.score;
         }
@@ -327,7 +289,7 @@ namespace SpaceAlertSolver
 
 
         //Runs a simulation and gives output
-        public int RunSimulation(Trajectory[] trajs, Event[] evts)
+        /*public int RunSimulation(Trajectory[] trajs, Event[] evts)
         {
             Player[] ps = new Player[players];
             for (int i = 0; i < players; i++)
@@ -372,6 +334,6 @@ namespace SpaceAlertSolver
             Game g = new Game();
             g.Setup(ps, trajs, evts);
             return g.Simulate();
-        }
+        }*/
     }
 }

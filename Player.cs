@@ -13,6 +13,27 @@ namespace SpaceAlertSolver
         public Act[] actions;
         public Androids team;
 
+        public Player(Player other, Androids[] otherAndroids, Androids[] androids)
+        {
+            position = other.position;
+            lastAction = other.lastAction;
+            alive = other.alive;
+            inIntercept = other.inIntercept;
+            actions = Extension.CopyArray(other.actions);
+            
+            int androidIndex = -1;
+            for (int i = 0; i < otherAndroids.Length; i++)
+            {
+                if (team == otherAndroids[i])
+                {
+                    androidIndex = i;
+                    break;
+                }
+            }
+
+            team = androids[androidIndex];
+        }
+
         public Player()
         {
             alive = true;
@@ -103,6 +124,13 @@ namespace SpaceAlertSolver
         public bool active;
         public int position;
         public bool alive;
+
+        public Androids(Androids other)
+        {
+            active = other.active;
+            position = other.position;
+            alive = other.alive;
+        }
 
         public Androids(int position)
         {

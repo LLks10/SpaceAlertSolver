@@ -19,7 +19,7 @@ namespace SpaceAlertSolver
             int seed_start = 10;
             int seed_end = 20;
 
-            int[] scores = new int[10];
+            double[] scores = new double[10];
             for (int seed = seed_start; seed < seed_end; seed++)
             {
                 scores[seed-seed_start] = Run(seed).getScore();
@@ -36,27 +36,6 @@ namespace SpaceAlertSolver
         {
             //Extension.InitKeys(5, 8, 1 << 25);
             //Create damage order
-            Extension.doRandomDefect = true;
-
-            if (!Extension.doRandomDefect)
-            {
-                Extension.ShuffleDefects();
-                Defects[] dfcts = Extension.defectOrder;
-                Console.WriteLine("Damage order (Red/White/Blue)");
-                string dfctOrder = "";
-                for (int i = 0; i < 18; i++)
-                {
-                    if (i != 0 && i % 6 == 0)
-                        dfctOrder += "\n";
-                    dfctOrder += dfcts[i].ToString() + " ";
-                }
-                Console.WriteLine(dfctOrder);
-            }
-            else
-                Console.WriteLine("Random defects");
-
-            Console.WriteLine("-------");
-
             Random r = new Random(seed);
             List<Event> events = new List<Event>();
             Player[] players = new Player[5];
@@ -234,9 +213,16 @@ namespace SpaceAlertSolver
 
         public static Random rng = new Random(Program.SEED);
         public static bool doRandomDefect;
-        public static Defects[] defectOrder = new Defects[] {Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
-                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
-                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop};
+
+        public static T[] CopyArray<T>(T[] a)
+        {
+            T[] ret = new T[a.Length];
+            for (int i = 0; i < ret.Length; i++)
+            {
+                ret[i] = a[i];
+            }
+            return ret;
+        }
 
         public static void Shuffle<T>(this IList<T> list, int bot, int range)
         {
@@ -249,13 +235,6 @@ namespace SpaceAlertSolver
                 list[k] = list[n+bot];
                 list[n+bot] = value;
             }
-        }
-
-        public static void ShuffleDefects()
-        {
-            defectOrder.Shuffle(0, 6);
-            defectOrder.Shuffle(6, 6);
-            defectOrder.Shuffle(12, 6);
         }
 
         public static void InitKeys(int pCount, int actCount, ulong hashSize)
