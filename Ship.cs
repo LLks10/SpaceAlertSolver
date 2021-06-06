@@ -102,7 +102,6 @@ namespace SpaceAlertSolver
         {
             if(amount > 0)
             {
-                game.isDeterministic = false;
                 //Go over defects
                 if(damage[zone] < 6)
                 {

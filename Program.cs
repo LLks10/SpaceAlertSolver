@@ -10,13 +10,13 @@ namespace SpaceAlertSolver
 {
     class Program
     {
-        public static int SEED = 11;
+        public static int SEED = 18;
 
         static void Main(string[] args)
         {
             Gene g = Run(SEED);
 
-            /*int seed_start = 10;
+            int seed_start = 10;
             int seed_end = 20;
 
             int[] scores = new int[10];
@@ -27,7 +27,7 @@ namespace SpaceAlertSolver
             for (int i = 0; i < scores.Length; i++)
             {
                 Console.WriteLine($"{i + seed_start}: {scores[i]}");
-            }*/
+            }
 
             Console.ReadLine();
         }

@@ -281,7 +281,7 @@ namespace SpaceAlertSolver
                     losses++;
                 scr += s;
 
-                if (g.isDeterministic)
+                if (true)
                     scr *= 10;
                 //Run multiple if non deterministic
                 else
