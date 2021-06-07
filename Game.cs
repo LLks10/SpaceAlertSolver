@@ -209,8 +209,86 @@ namespace SpaceAlertSolver
             //Apply damage to threats and check if dead
             ResolveExDamage();
 
+            return PostResolveExDamage(turn);
+        }
+
+        // exists because nemesis might damage us when we damage it
+        double PostResolveExDamage(int turn)
+        {
+            for (int z = 0; z < 3; z++)
+            {
+                if (ship.defectStates[z][(int)Defects.shield] == DefectState.undetermined
+                        && ship.shields[z] == ship.shieldsCap[z]) // branch shields at cap
+                {
+                    double chanceOfBreaking = ship.ChanceOfDefect(z);
+                    if (chanceOfBreaking < 1.0)
+                    {
+                        Game branch = new Game(this);
+                        branch.ship.NotDefect(z, Defects.shield);
+
+                        scoreAddition += branch.PostResolveExDamage(turn) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                        scoreMultiplier *= chanceOfBreaking;
+                    }
+                    ship.AddDefect(z, Defects.shield);
+                }
+
+                if (ship.defectStates[z][(int)Defects.reactor] == DefectState.undetermined
+                        && ship.reactors[z] == ship.reactorsCap[z]) // branch reactors at cap
+                {
+                    double chanceOfBreaking = ship.ChanceOfDefect(z);
+                    if (chanceOfBreaking < 1.0)
+                    {
+                        Game branch = new Game(this);
+                        branch.ship.NotDefect(z, Defects.reactor);
+
+                        scoreAddition += branch.PostResolveExDamage(turn) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                        scoreMultiplier *= chanceOfBreaking;
+                    }
+                    ship.AddDefect(z, Defects.reactor);
+                }
+            }
+
             //Move threats (Fix sequencing for internal threats)
             MoveThreats();
+
+            return PostMoveThreats(turn);
+        }
+
+        // exists to branch after MoveThreats
+        double PostMoveThreats(int turn)
+        {
+            for (int z = 0; z < 3; z++)
+            {
+                if (ship.defectStates[z][(int)Defects.shield] == DefectState.undetermined
+                        && ship.shields[z] == ship.shieldsCap[z]) // branch shields at cap
+                {
+                    double chanceOfBreaking = ship.ChanceOfDefect(z);
+                    if (chanceOfBreaking < 1.0)
+                    {
+                        Game branch = new Game(this);
+                        branch.ship.NotDefect(z, Defects.shield);
+
+                        scoreAddition += branch.PostMoveThreats(turn) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                        scoreMultiplier *= chanceOfBreaking;
+                    }
+                    ship.AddDefect(z, Defects.shield);
+                }
+
+                if (ship.defectStates[z][(int)Defects.reactor] == DefectState.undetermined
+                        && ship.reactors[z] == ship.reactorsCap[z]) // branch reactors at cap
+                {
+                    double chanceOfBreaking = ship.ChanceOfDefect(z);
+                    if (chanceOfBreaking < 1.0)
+                    {
+                        Game branch = new Game(this);
+                        branch.ship.NotDefect(z, Defects.reactor);
+
+                        scoreAddition += branch.PostMoveThreats(turn) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                        scoreMultiplier *= chanceOfBreaking;
+                    }
+                    ship.AddDefect(z, Defects.reactor);
+                }
+            }
 
             //Move rocket
             if (ship.rocketFired)
@@ -548,6 +626,42 @@ namespace SpaceAlertSolver
                     //Refill shield
                     if (p.position < 3)
                     {
+                        if (ship.reactors[z] == 0 || ship.shields[z] == ship.shieldsCap[z]) // nothing happens regardless
+                            break;
+
+                        // we now know that we are transferring at least 1 energy
+
+                        // branching shield
+                        if (ship.defectStates[z][(int)Defects.shield] == DefectState.undetermined) // check for broken shield
+                        {
+                            double chanceOfBreaking = ship.ChanceOfDefect(z);
+                            if (chanceOfBreaking < 1.0)
+                            {
+                                Game branch = new Game(this);
+                                branch.ship.NotDefect(z, Defects.shield);
+
+                                scoreAddition += branch.PlayerActions(turn, player) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                                scoreMultiplier *= chanceOfBreaking;
+                            }
+                            ship.AddDefect(z, Defects.shield);
+                        }
+
+                        // branching reactor
+                        if (ship.defectStates[z][(int)Defects.reactor] == DefectState.undetermined
+                            && ship.reactors[z] == ship.reactorsCap[z]) // if we might lose energy due to defect
+                        {
+                            double chanceOfBreaking = ship.ChanceOfDefect(z);
+                            if (chanceOfBreaking < 1.0)
+                            {
+                                Game branch = new Game(this);
+                                branch.ship.NotDefect(z, Defects.reactor);
+
+                                scoreAddition += branch.PlayerActions(turn, player) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                                scoreMultiplier *= chanceOfBreaking;
+                            }
+                            ship.AddDefect(z, Defects.reactor);
+                        }
+
                         int deficit = ship.shieldsCap[z] - ship.shields[z];
                         deficit = Math.Min(ship.reactors[z], deficit);
                         ship.shields[z] += deficit;
@@ -560,15 +674,52 @@ namespace SpaceAlertSolver
                         if (z == 1)
                         {
                             //Fill main
-                            if (ship.capsules > 0)
-                            {
-                                ship.reactors[z] = ship.reactorsCap[z];
-                                ship.capsules--;
-                            }
+                            if (ship.capsules == 0)
+                                break;
+                            
+                            // no need to branch! it's at the cap so we can branch at a later stage
+                            ship.reactors[z] = ship.reactorsCap[z];
+                            ship.capsules--;
                         }
                         //Secondary
                         else
                         {
+                            if (ship.reactors[1] == 0 || ship.reactors[z] == ship.reactorsCap[z]) // nothing happens regardless
+                                break;
+
+                            // we now know that we are transferring at least 1 energy
+
+                            // branching small reactor
+                            if (ship.defectStates[z][(int)Defects.reactor] == DefectState.undetermined) // check for broken reactor
+                            {
+                                double chanceOfBreaking = ship.ChanceOfDefect(z);
+                                if (chanceOfBreaking < 1.0)
+                                {
+                                    Game branch = new Game(this);
+                                    branch.ship.NotDefect(z, Defects.reactor);
+
+                                    scoreAddition += branch.PlayerActions(turn, player) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                                    scoreMultiplier *= chanceOfBreaking;
+                                }
+                                ship.AddDefect(z, Defects.reactor);
+                            }
+
+                            // branching large reactor
+                            if (ship.defectStates[1][(int)Defects.reactor] == DefectState.undetermined
+                                && ship.reactors[1] == ship.reactorsCap[1]) // if we might lose energy due to defect
+                            {
+                                double chanceOfBreaking = ship.ChanceOfDefect(1);
+                                if (chanceOfBreaking < 1.0)
+                                {
+                                    Game branch = new Game(this);
+                                    branch.ship.NotDefect(1, Defects.reactor);
+
+                                    scoreAddition += branch.PlayerActions(turn, player) * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                                    scoreMultiplier *= chanceOfBreaking;
+                                }
+                                ship.AddDefect(1, Defects.reactor);
+                            }
+
                             //Pump over energy
                             int deficit = ship.reactorsCap[z] - ship.reactors[z];
                             deficit = Math.Min(ship.reactors[1], deficit);
