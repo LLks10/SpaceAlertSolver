@@ -87,6 +87,14 @@ namespace SpaceAlertSolver
             inSurvived = other.inSurvived;
             observation = Extension.CopyArray(other.observation);
             observationCount = other.observationCount;
+
+            sp = other.sp;
+            turn = other.turn;
+            actions_player_i = other.actions_player_i;
+            internal_turn_end_i = other.internal_turn_end_i;
+            external_damage_i = other.external_damage_i;
+            move_threats_iEx = other.move_threats_iEx;
+            move_threats_iIn = other.move_threats_iIn;
         }
 
         public Game(Player[] players, Trajectory[] trajectories, Event[] events)
