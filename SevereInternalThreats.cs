@@ -522,6 +522,8 @@ namespace SpaceAlertSolver
 
         public override void ActX()
         {
+            ship.game.BranchReactorFull(1);
+            ship.game.BranchConditional(1, Defects.shield);
             ship.shields[1] += ship.reactors[1];
             ship.reactors[1] = 0;
             int excess = ship.shields[1] - ship.shieldsCap[1];
@@ -534,12 +536,17 @@ namespace SpaceAlertSolver
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(1);
             ship.DealDamageIntern(1, ship.shields[1]);
             ship.shields[1] = 0;
         }
         public override void ActZ()
         {
-            for(int i = 0; i < 3; i++)
+            ship.game.BranchReactorFull(0);
+            ship.game.BranchReactorFull(1);
+            ship.game.BranchReactorFull(2);
+
+            for (int i = 0; i < 3; i++)
             {
                 ship.DealDamageIntern(i, ship.reactors[i]);
                 ship.reactors[i] = 0;
@@ -581,10 +588,14 @@ namespace SpaceAlertSolver
         }
         public override void ActX()
         {
+            ship.game.BranchReactorFull(1);
             ship.reactors[1] = Math.Max(0, ship.reactors[1] - 2);
         }
         public override void ActY()
         {
+            ship.game.BranchReactorFull(0);
+            ship.game.BranchReactorFull(1);
+            ship.game.BranchReactorFull(2);
             for (int i = 0; i < 3; i++)
                 ship.reactors[i] = Math.Max(0, ship.reactors[i] - 1);
         }

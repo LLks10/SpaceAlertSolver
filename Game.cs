@@ -775,7 +775,7 @@ namespace SpaceAlertSolver
          * <param name="zone">The zone in which the defect is</param>
          * <param name="defect">The defect type</param>
          */
-        void BranchConditional(int zone, Defects defect)
+        public void BranchConditional(int zone, Defects defect)
         {
             Debug.Assert(zone >= 0 && zone < 3);
 
@@ -785,7 +785,7 @@ namespace SpaceAlertSolver
             }
         }
 
-        void BranchReactorFull(int zone)
+        public void BranchReactorFull(int zone)
         {
             Debug.Assert(zone >= 0 && zone < 3);
 

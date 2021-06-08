@@ -40,7 +40,10 @@ namespace SpaceAlertSolver
             if (ship.reactors[z] == 0)
                 ship.DealDamageIntern(z, 1);
             else
+            {
+                ship.game.BranchReactorFull(z);
                 ship.reactors[z]--;
+            }
         }
         public override void ActZ()
         {
@@ -81,7 +84,10 @@ namespace SpaceAlertSolver
             if (ship.reactors[z] == 0)
                 ship.DealDamageIntern(z, 1);
             else
+            {
+                ship.game.BranchReactorFull(z);
                 ship.reactors[z]--;
+            }
         }
         public override void ActZ()
         {
@@ -285,6 +291,10 @@ namespace SpaceAlertSolver
 
         public override void ActX()
         {
+            ship.game.BranchReactorFull(0);
+            ship.game.BranchReactorFull(1);
+            ship.game.BranchReactorFull(2);
+
             if (ship.reactors[0] > 0)
                 ship.reactors[0]--;
             if (ship.reactors[1] > 0)
@@ -422,8 +432,8 @@ namespace SpaceAlertSolver
 
         public override void ActX()
         {
+            ship.game.BranchReactorFull(1);
             ship.DealDamageIntern(1, ship.reactors[1]);
-
         }
         public override void ActY()
         {

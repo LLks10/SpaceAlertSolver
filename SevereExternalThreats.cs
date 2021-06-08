@@ -30,14 +30,17 @@ namespace SpaceAlertSolver
 
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 3);
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 4);
         }
     }
@@ -66,14 +69,17 @@ namespace SpaceAlertSolver
         }
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 3);
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 4);
         }
         public override bool ProcessDamage()
@@ -111,16 +117,19 @@ namespace SpaceAlertSolver
         }
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
             speed++;
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 3);
             shield++;
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 5);
         }
     }
@@ -150,6 +159,13 @@ namespace SpaceAlertSolver
         }
         public override void ActX()
         {
+            if (health < maxHealth)
+            {
+                ship.game.BranchShieldFull(0);
+                ship.game.BranchShieldFull(1);
+                ship.game.BranchShieldFull(2);
+            }
+
             if(health < maxHealth)
             {
                 ship.DealDamage(0, 1);
@@ -161,6 +177,13 @@ namespace SpaceAlertSolver
         {
             if (health < maxHealth)
             {
+                ship.game.BranchShieldFull(0);
+                ship.game.BranchShieldFull(1);
+                ship.game.BranchShieldFull(2);
+            }
+
+            if (health < maxHealth)
+            {
                 ship.DealDamage(0, 2);
                 ship.DealDamage(1, 2);
                 ship.DealDamage(2, 2);
@@ -168,6 +191,7 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2*health);
         }
     }
@@ -205,11 +229,23 @@ namespace SpaceAlertSolver
             for (int i = 0; i < 3; i++)
             {
                 if (zone != i)
+                    ship.game.BranchShieldFull(i);
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (zone != i)
                     ship.DealDamage(i, 2);
             }
         }
         public override void ActZ()
         {
+            for (int i = 0; i < 3; i++)
+            {
+                if (zone != i)
+                    ship.game.BranchShieldFull(i);
+            }
+
             for (int i = 0; i < 3; i++)
             {
                 if (zone != i)
@@ -262,6 +298,7 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, health);
         }
         public override bool ProcessDamage()
@@ -300,18 +337,27 @@ namespace SpaceAlertSolver
         }
         public override void ActX()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 1);
             ship.DealDamage(1, 1);
             ship.DealDamage(2, 1);
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 2);
             ship.DealDamage(1, 2);
             ship.DealDamage(2, 2);
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 3);
             ship.DealDamage(1, 3);
             ship.DealDamage(2, 3);
@@ -351,6 +397,7 @@ namespace SpaceAlertSolver
         }
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 1);
             health--;
             if (health <= 0)
@@ -361,6 +408,7 @@ namespace SpaceAlertSolver
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
             health -= 2;
             if (health <= 0)
@@ -428,6 +476,8 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 5);
             ship.DealDamage(2, 5);
         }
@@ -522,6 +572,7 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, health);
         }
         public override bool ProcessDamage()
@@ -563,16 +614,19 @@ namespace SpaceAlertSolver
         }
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
             speed += 2;
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 3);
             speed += 2;
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 7);
         }
         public override int GetDistance(int range, ExDmgSource source)
@@ -630,17 +684,26 @@ namespace SpaceAlertSolver
         public override void ActX()
         {
             if (maxHealth - health < 2)
+            {
+                ship.game.BranchShieldFull(zone);
                 ship.DealDamage(zone, 2);
+            }
         }
         public override void ActY()
         {
             if (maxHealth - health < 3)
+            {
+                ship.game.BranchShieldFull(zone);
                 ship.DealDamage(zone, 3);
+            }
         }
         public override void ActZ()
         {
             if (maxHealth - health < 6)
+            {
+                ship.game.BranchShieldFull(zone);
                 ship.DealDamage(zone, 6);
+            }
         }
         public override void DealDamage(int damage, int range, ExDmgSource source)
         {
