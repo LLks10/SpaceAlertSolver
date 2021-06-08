@@ -8,6 +8,8 @@ namespace SpaceAlertSolver
 {
     class SimulatedAnnealing
     {
+        private List<int> _statsOfBest = null;
+
         private Gene _currentState;
         private double _highestScore = double.NegativeInfinity;
         private int _highestBlanks = int.MinValue;
@@ -32,6 +34,8 @@ namespace SpaceAlertSolver
 
             for (int iteration = 0; iteration < maxIterations; iteration++)
             {
+                Game.scores.Clear();
+
                 Gene newState = _currentState.RandomNeighbour(rng, trajs, evts);
                 if (P(_currentState, newState,
                         Temperature((double)iteration / maxIterations)) >= rng.NextDouble())
@@ -42,6 +46,9 @@ namespace SpaceAlertSolver
                 // print new best score
                 if (_currentState.getScore() > _highestScore)
                 {
+                    _statsOfBest = Game.scores;
+                    Game.scores = new List<int>();
+
                     _highestScore = _currentState.getScore();
                     _highestBlanks = _currentState.getBlanks();
                     _bestState = _currentState;
@@ -78,6 +85,11 @@ namespace SpaceAlertSolver
         public Gene getBestGene()
         {
             return _bestState;
+        }
+
+        public List<int> getBestStats()
+        {
+            return _statsOfBest;
         }
 
         /**

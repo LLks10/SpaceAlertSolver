@@ -24,6 +24,8 @@ namespace SpaceAlertSolver
 
     public class Game
     {
+        public static List<int> scores = new List<int>();
+
         Ship ship;
         Player[] players;
         Trajectory[] trajectories;
@@ -750,6 +752,8 @@ namespace SpaceAlertSolver
             //Gameover penalty
             if (gameover)
                 score = score - 200 + turn;
+
+            scores.Add((int)score);
 
             return scoreMultiplier * score + scoreAddition;
         }

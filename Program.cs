@@ -10,13 +10,13 @@ namespace SpaceAlertSolver
 {
     class Program
     {
-        public static int SEED = 17;
+        public static int SEED = 8;
 
         static void Main(string[] args)
         {
-            //Gene g = Run(SEED);
+            Run(SEED);
 
-            int seed_start = 10;
+            /*int seed_start = 10;
             int seed_end = 20;
 
             double[] scores = new double[10];
@@ -27,9 +27,39 @@ namespace SpaceAlertSolver
             for (int i = 0; i < scores.Length; i++)
             {
                 Console.WriteLine($"{i + seed_start}: {scores[i]}");
-            }
+            }*/
 
             Console.ReadLine();
+        }
+
+        public static void PrintStats(List<int> stats)
+        {
+            stats.Sort();
+            int winStart = stats.BinarySearch(-40);
+            if (winStart < 0)
+                winStart = ~winStart;
+            else
+                winStart++;
+
+            double average = 0;
+            for (int i = 0; i < stats.Count; i++)
+            {
+                average += (double)stats[i] / stats.Count;
+            }
+
+            double median;
+            if (stats.Count % 2 == 0)
+            {
+                median = stats[stats.Count / 2] / 2.0 + stats[stats.Count / 2 - 1] / 2.0;
+            }
+            else
+            {
+                median = stats[stats.Count / 2];
+            }
+
+            Console.WriteLine($"Wins: {stats.Count - winStart} | Losses: {winStart}");
+            Console.WriteLine($"Max: {stats[stats.Count-1]} | Min: {stats[0]}");
+            Console.WriteLine($"Mean: {average} | Median: {median}");
         }
 
         static Gene Run(int seed)
@@ -198,6 +228,7 @@ namespace SpaceAlertSolver
             sa.Run(2000000, trajectories, evArr, seed);
             Console.WriteLine(sa.getBestGene().Rep() + sa.getBestGene().getScore());
             Console.WriteLine("-----FINAL-----");
+            PrintStats(sa.getBestStats());
             //Console.WriteLine(sa.getBestGene().Rep());
             return sa.getBestGene();
         }
