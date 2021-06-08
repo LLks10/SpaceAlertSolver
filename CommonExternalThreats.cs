@@ -734,6 +734,8 @@ namespace SpaceAlertSolver
     //ID: 15
     class Scout : ExThreat
     {
+        int act_y_i = 0;
+
         public Scout(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 3;
@@ -749,6 +751,7 @@ namespace SpaceAlertSolver
         {
             Scout clone = new Scout();
             clone.CloneThreat(this, ship);
+            clone.act_y_i = act_y_i;
             return clone;
         }
         public override void ActX()
@@ -758,11 +761,15 @@ namespace SpaceAlertSolver
         public override void ActY()
         {
             List<ExThreat> trts = ship.game.exThreats;
-            for(int i = 0; i < trts.Count; i++)
+
+            while (act_y_i < trts.Count)
             {
-                if (!(trts[i] is Scout) && !trts[i].beaten)
-                    trts[i].Move(1);
+                if (trts[act_y_i] is Scout || trts[act_y_i].beaten)
+                    continue;
+                trts[act_y_i].Move(1);
             }
+
+            act_y_i = 0;
         }
         public override void ActZ()
         {
