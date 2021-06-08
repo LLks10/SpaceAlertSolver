@@ -266,6 +266,11 @@ namespace SpaceAlertSolver
         }
         public override bool ProcessDamage()
         {
+            if (health + shield - damage <= 0) // branch if we would die
+            {
+                ship.game.BranchShieldFull(zone);
+            }
+
             bool v = base.ProcessDamage();
             //Revenge damage if destroyed
             if (v)
@@ -380,6 +385,10 @@ namespace SpaceAlertSolver
         {
             if(damage > shield)
             {
+                ship.game.BranchShieldFull(0);
+                ship.game.BranchShieldFull(1);
+                ship.game.BranchShieldFull(2);
+
                 ship.DealDamage(0, 1);
                 ship.DealDamage(1, 1);
                 ship.DealDamage(2, 1);
@@ -517,6 +526,11 @@ namespace SpaceAlertSolver
         }
         public override bool ProcessDamage()
         {
+            if (health + shield - damage <= 0)
+            {
+                ship.game.BranchShieldFull(zone);
+            }
+
             bool v = base.ProcessDamage();
             //Revenge damage if destroyed
             if (v)

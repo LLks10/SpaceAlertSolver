@@ -517,6 +517,11 @@ namespace SpaceAlertSolver
         }
         public override bool ProcessDamage()
         {
+            if (health + shield - damage <= 0) // if we will die, branch
+            {
+                ship.game.BranchShieldFull(zone);
+            }
+
             health = health - Math.Max(0, (damage - shield));
             damage = 0;
 

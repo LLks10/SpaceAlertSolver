@@ -15,6 +15,10 @@ namespace SpaceAlertSolver
         public bool alive, beaten, fightBack;
         public Ship ship;
 
+        bool started_move = false;
+        int distance_moved;
+        int current_speed;
+
         public InThreat(Ship ship, Trajectory traj, int time)
         {
             this.ship = ship;
@@ -43,6 +47,10 @@ namespace SpaceAlertSolver
             alive = other.alive;
             beaten = other.beaten;
             fightBack = other.fightBack;
+
+            started_move = other.started_move;
+            distance_moved = other.distance_moved;
+            current_speed = other.current_speed;
 
             this.ship = ship;
         }
@@ -77,38 +85,34 @@ namespace SpaceAlertSolver
 
         public virtual void Move()
         {
-            //Play actions
-            int curSpd = speed;
-            for(int i = distance-1; i >= distance-curSpd && i >= 0; i--)
-            {
-                if (trajectory.actions[i] == 1)
-                    ActX();
-                else if (trajectory.actions[i] == 2)
-                    ActY();
-                else if (trajectory.actions[i] == 3)
-                    ActZ();
-            }
-
-            //Set new position
-            distance -= curSpd;
-            if (distance <= 0)
-            {
-                beaten = true;
-            }
+            Move(speed);
         }
 
         public virtual void Move(int mSpd)
         {
-            //Play actions
-            for (int i = distance - 1; i >= distance - mSpd && i >= 0; i--)
+            if (!started_move)
             {
-                if (trajectory.actions[i] == 1)
-                    ActX();
-                else if (trajectory.actions[i] == 2)
-                    ActY();
-                else if (trajectory.actions[i] == 3)
-                    ActZ();
+                current_speed = mSpd;
+                distance_moved = 0;
+                started_move = true;
             }
+            while (distance_moved < current_speed && distance - distance_moved > 0)
+            {
+                switch (trajectory.actions[distance - distance_moved - 1])
+                {
+                    case 1:
+                        ActX();
+                        break;
+                    case 2:
+                        ActY();
+                        break;
+                    case 3:
+                        ActZ();
+                        break;
+                }
+                distance_moved++;
+            }
+            started_move = false;
 
             //Set new position
             distance -= mSpd;
