@@ -766,7 +766,7 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
-            ship.DealDamage(zone, 3);
+            ship.DealDamageIntern(zone, 3);
         }
         public override int GetDistance(int range, ExDmgSource source)
         {
