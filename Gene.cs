@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace SpaceAlertSolver
 {
     public class Gene
     {
         private int[] gene;
-        public int players, score, blanks, wins, losses;
-        private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
+        public int players, blanks;
+        double score;
+        private static string[] playerColours = new string[10] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
         public string debug;
 
         private static Func<Gene, Random, Gene>[] operators
@@ -15,6 +17,8 @@ namespace SpaceAlertSolver
 
         public Gene(int players)
         {
+            Debug.Assert(players >= 0 && players < 10);
+
             this.players = players;
 
             Random random = new Random(Program.SEED);
@@ -27,6 +31,9 @@ namespace SpaceAlertSolver
 
         public Gene(int[] gene, int players)
         {
+            Debug.Assert(players >= 0 && players < 10
+                && gene.Length == players * 12);
+
             this.gene = gene;
             this.players = players;
         }
@@ -48,6 +55,8 @@ namespace SpaceAlertSolver
          */
         public Gene RandomNeighbour(Random rng, Trajectory[] trajs, Event[] evts)
         {
+            Debug.Assert(op_chances.Length == operators.Length);
+
             int r = rng.Next(op_chances[op_chances.Length-1]);
             int bs = Array.BinarySearch(op_chances, r);
             int op_i;
@@ -224,7 +233,7 @@ namespace SpaceAlertSolver
             }
         }
 
-        private int Evaluate(int[] gene, Trajectory[] trajs, Event[] evts)
+        private double Evaluate(int[] gene, Trajectory[] trajs, Event[] evts)
         {
             Player[] ps = new Player[players];
             for (int i = 0; i < players; i++)
@@ -267,50 +276,11 @@ namespace SpaceAlertSolver
                 }
             }
 
-            int scr;
-            if (Extension.doRandomDefect)
-            {
-                scr = 0;
-                //Run first game
-                Game g = new Game();
-                g.Setup(ps, trajs, evts);
-                int s = g.Simulate();
-                if (s > -40)
-                    wins++;
-                else
-                    losses++;
-                scr += s;
-
-                if (g.isDeterministic)
-                    scr *= 10;
-                //Run multiple if non deterministic
-                else
-                {
-                    for (int i = 0; i < 9; i++)
-                    {
-                        g = new Game();
-                        g.Setup(ps, trajs, evts);
-                        s = g.Simulate();
-                        if (s > -40)
-                            wins++;
-                        else
-                            losses++;
-                        scr += s;
-                    }
-                }
-            }
-            else
-            {
-                Game g = new Game();
-                g.Setup(ps, trajs, evts);
-                scr = g.Simulate();
-                debug = g.GetDebug();
-            }
-
-            return scr;
+            Game g = new Game(ps, trajs, evts);
+            return g.Simulate();
         }
 
-        public int getScore()
+        public double getScore()
         {
             return this.score;
         }
@@ -327,7 +297,7 @@ namespace SpaceAlertSolver
 
 
         //Runs a simulation and gives output
-        public int RunSimulation(Trajectory[] trajs, Event[] evts)
+        /*public int RunSimulation(Trajectory[] trajs, Event[] evts)
         {
             Player[] ps = new Player[players];
             for (int i = 0; i < players; i++)
@@ -372,6 +342,6 @@ namespace SpaceAlertSolver
             Game g = new Game();
             g.Setup(ps, trajs, evts);
             return g.Simulate();
-        }
+        }*/
     }
 }

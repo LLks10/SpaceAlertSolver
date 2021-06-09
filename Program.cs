@@ -10,16 +10,16 @@ namespace SpaceAlertSolver
 {
     class Program
     {
-        public static int SEED = 11;
+        public static int SEED = 8;
 
         static void Main(string[] args)
         {
-            Gene g = Run(SEED);
+            Run(SEED);
 
             /*int seed_start = 10;
             int seed_end = 20;
 
-            int[] scores = new int[10];
+            double[] scores = new double[10];
             for (int seed = seed_start; seed < seed_end; seed++)
             {
                 scores[seed-seed_start] = Run(seed).getScore();
@@ -32,31 +32,40 @@ namespace SpaceAlertSolver
             Console.ReadLine();
         }
 
+        public static void PrintStats(List<int> stats)
+        {
+            stats.Sort();
+            int winStart = stats.BinarySearch(-40);
+            if (winStart < 0)
+                winStart = ~winStart;
+            else
+                winStart++;
+
+            double average = 0;
+            for (int i = 0; i < stats.Count; i++)
+            {
+                average += (double)stats[i] / stats.Count;
+            }
+
+            double median;
+            if (stats.Count % 2 == 0)
+            {
+                median = stats[stats.Count / 2] / 2.0 + stats[stats.Count / 2 - 1] / 2.0;
+            }
+            else
+            {
+                median = stats[stats.Count / 2];
+            }
+
+            Console.WriteLine($"Wins: {stats.Count - winStart} | Losses: {winStart}");
+            Console.WriteLine($"Max: {stats[stats.Count-1]} | Min: {stats[0]}");
+            Console.WriteLine($"Mean: {average} | Median: {median}");
+        }
+
         static Gene Run(int seed)
         {
             //Extension.InitKeys(5, 8, 1 << 25);
             //Create damage order
-            Extension.doRandomDefect = true;
-
-            if (!Extension.doRandomDefect)
-            {
-                Extension.ShuffleDefects();
-                Defects[] dfcts = Extension.defectOrder;
-                Console.WriteLine("Damage order (Red/White/Blue)");
-                string dfctOrder = "";
-                for (int i = 0; i < 18; i++)
-                {
-                    if (i != 0 && i % 6 == 0)
-                        dfctOrder += "\n";
-                    dfctOrder += dfcts[i].ToString() + " ";
-                }
-                Console.WriteLine(dfctOrder);
-            }
-            else
-                Console.WriteLine("Random defects");
-
-            Console.WriteLine("-------");
-
             Random r = new Random(seed);
             List<Event> events = new List<Event>();
             Player[] players = new Player[5];
@@ -219,6 +228,7 @@ namespace SpaceAlertSolver
             sa.Run(2000000, trajectories, evArr, seed);
             Console.WriteLine(sa.getBestGene().Rep() + sa.getBestGene().getScore());
             Console.WriteLine("-----FINAL-----");
+            PrintStats(sa.getBestStats());
             //Console.WriteLine(sa.getBestGene().Rep());
             return sa.getBestGene();
         }
@@ -234,9 +244,16 @@ namespace SpaceAlertSolver
 
         public static Random rng = new Random(Program.SEED);
         public static bool doRandomDefect;
-        public static Defects[] defectOrder = new Defects[] {Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
-                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
-                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop};
+
+        public static T[] CopyArray<T>(T[] a)
+        {
+            T[] ret = new T[a.Length];
+            for (int i = 0; i < ret.Length; i++)
+            {
+                ret[i] = a[i];
+            }
+            return ret;
+        }
 
         public static void Shuffle<T>(this IList<T> list, int bot, int range)
         {
@@ -249,13 +266,6 @@ namespace SpaceAlertSolver
                 list[k] = list[n+bot];
                 list[n+bot] = value;
             }
-        }
-
-        public static void ShuffleDefects()
-        {
-            defectOrder.Shuffle(0, 6);
-            defectOrder.Shuffle(6, 6);
-            defectOrder.Shuffle(12, 6);
         }
 
         public static void InitKeys(int pCount, int actCount, ulong hashSize)

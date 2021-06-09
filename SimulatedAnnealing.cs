@@ -8,8 +8,10 @@ namespace SpaceAlertSolver
 {
     class SimulatedAnnealing
     {
+        private List<int> _statsOfBest = null;
+
         private Gene _currentState;
-        private int _highestScore = int.MinValue;
+        private double _highestScore = double.NegativeInfinity;
         private int _highestBlanks = int.MinValue;
         private Gene _bestState; // use for restarts
 
@@ -32,6 +34,8 @@ namespace SpaceAlertSolver
 
             for (int iteration = 0; iteration < maxIterations; iteration++)
             {
+                Game.scores.Clear();
+
                 Gene newState = _currentState.RandomNeighbour(rng, trajs, evts);
                 if (P(_currentState, newState,
                         Temperature((double)iteration / maxIterations)) >= rng.NextDouble())
@@ -42,6 +46,9 @@ namespace SpaceAlertSolver
                 // print new best score
                 if (_currentState.getScore() > _highestScore)
                 {
+                    _statsOfBest = Game.scores;
+                    Game.scores = new List<int>();
+
                     _highestScore = _currentState.getScore();
                     _highestBlanks = _currentState.getBlanks();
                     _bestState = _currentState;
@@ -80,6 +87,11 @@ namespace SpaceAlertSolver
             return _bestState;
         }
 
+        public List<int> getBestStats()
+        {
+            return _statsOfBest;
+        }
+
         /**
          * <summary>The temperature function</summary>
          * <param name="computationUsed">The fraction of time used</param>
@@ -103,8 +115,8 @@ namespace SpaceAlertSolver
          */
         private double P(Gene currentState, Gene newState, double temperature)
         {
-            int c_score = currentState.getScore();
-            int n_score = newState.getScore();
+            double c_score = currentState.getScore();
+            double n_score = newState.getScore();
             int c_blanks = currentState.getBlanks();
             int n_blanks = newState.getBlanks();
 
@@ -112,7 +124,7 @@ namespace SpaceAlertSolver
             {
                 return 1.0;
             }
-            else if (n_score == c_score)
+            /*else if (n_score == c_score)
             {
                 if (n_blanks > c_blanks) // better in terms of blanks
                 {
@@ -127,7 +139,7 @@ namespace SpaceAlertSolver
                 {
                     return 2 / (1 + Math.Exp(-8 * temperature + 8));
                 }
-            }
+            }*/
             else // newState is worse
             {
                 return Math.Exp(0.05 * (n_score - c_score) / temperature);

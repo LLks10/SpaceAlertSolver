@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SpaceAlertSolver
 {
@@ -25,25 +24,82 @@ namespace SpaceAlertSolver
 
     public class Game
     {
+        public static List<int> scores = new List<int>();
+
         Ship ship;
         Player[] players;
         Trajectory[] trajectories;
         Event[] events;
         public List<ExThreat> exThreats;
         public List<InThreat> inThreats;
-        int turn;
         int phase;
-        int score;
-        public bool isDeterministic;
+        double score;
         bool[] phaseComputer;
+        bool gameover;
+        int eventIdx;
 
         int exSlain, exSurvived, inSlain, inSurvived;
 
         int[] observation;
         int observationCount;
-        int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
+        static int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
 
-        public void Setup(Player[] players, Trajectory[] trajectories, Event[] events)
+        double scoreMultiplier = 1.0;
+        double scoreAddition = 0.0;
+
+        // simulation phase
+        SimulationPhase sp = SimulationPhase.SimulationPrep;
+        int turn;
+        int actions_player_i;
+        int internal_turn_end_i;
+        int external_damage_i;
+        int move_threats_iEx;
+        int move_threats_iIn;
+
+        public Game(Game other)
+        {
+            players = new Player[other.players.Length];
+            ship = new Ship(other.ship, this, players);
+            for (int i = 0; i < players.Length; i++)
+            {
+                players[i] = new Player(other.players[i], other.ship.androids, ship.androids);
+            }
+            trajectories = other.trajectories;
+            events = other.events;
+            
+            exThreats = new List<ExThreat>();
+            for (int i = 0; i < other.exThreats.Count; i++)
+            {
+                exThreats.Add(other.exThreats[i].Clone(ship));
+            }
+            inThreats = new List<InThreat>();
+            for (int i = 0; i < other.inThreats.Count; i++)
+            {
+                inThreats.Add(other.inThreats[i].Clone(ship));
+            }
+
+            phase = other.phase;
+            score = other.score;
+            phaseComputer = Extension.CopyArray(other.phaseComputer);
+            gameover = other.gameover;
+            eventIdx = other.eventIdx;
+            exSlain = other.exSlain;
+            exSurvived = other.exSurvived;
+            inSlain = other.inSlain;
+            inSurvived = other.inSurvived;
+            observation = Extension.CopyArray(other.observation);
+            observationCount = other.observationCount;
+
+            sp = other.sp;
+            turn = other.turn;
+            actions_player_i = other.actions_player_i;
+            internal_turn_end_i = other.internal_turn_end_i;
+            external_damage_i = other.external_damage_i;
+            move_threats_iEx = other.move_threats_iEx;
+            move_threats_iIn = other.move_threats_iIn;
+        }
+
+        public Game(Player[] players, Trajectory[] trajectories, Event[] events)
         {
             this.players = new Player[players.Length];
             for (int i = 0; i < players.Length; i++)
@@ -54,105 +110,622 @@ namespace SpaceAlertSolver
         }
 
         //Simulate the game
-        public int Simulate()
+        public double Simulate()
         {
-            isDeterministic = true;
-            bool gameover = false;
-            int pCount = players.Length;
-            int eventIdx = 0;
-            turn = 1;
-            ship = new Ship(players, this);
+            while (true)
+            {
+                switch (sp)
+                {
+                    case SimulationPhase.SimulationPrep:
+                        SimulationPrep();
+                        sp = SimulationPhase.TurnPrep;
+                        turn = 1;
+                        break;
+
+                    case SimulationPhase.TurnPrep:
+                        if (turn > 12 || gameover)
+                        {
+                            RocketFire();
+                            sp = SimulationPhase.FinalExternalDamage;
+                            external_damage_i = 0;
+                            break;
+                        }
+                        TurnPrep();
+                        sp = SimulationPhase.Actions;
+                        actions_player_i = 0;
+                        break;
+
+                    case SimulationPhase.Actions:
+                        if (actions_player_i == players.Length)
+                        {
+                            sp = SimulationPhase.RocketFire;
+                            break;
+                        }
+                        PlayerActions();
+                        actions_player_i++;
+                        break;
+
+                    case SimulationPhase.RocketFire:
+                        RocketFire();
+                        sp = SimulationPhase.InternalTurnEnd;
+                        internal_turn_end_i = 0;
+                        break;
+
+                    case SimulationPhase.InternalTurnEnd:
+                        if (internal_turn_end_i == inThreats.Count)
+                        {
+                            sp = SimulationPhase.CleanupInternal;
+                            break;
+                        }
+                        InternalTurnEnd();
+                        internal_turn_end_i++;
+                        break;
+
+                    case SimulationPhase.CleanupInternal:
+                        CleanupInternal();
+                        sp = SimulationPhase.ExternalDamage;
+                        external_damage_i = 0;
+                        break;
+
+                    case SimulationPhase.ExternalDamage:
+                        if (external_damage_i == exThreats.Count)
+                        {
+                            sp = SimulationPhase.CleanupExternal;
+                            break;
+                        }
+                        ExternalDamage();
+                        external_damage_i++;
+                        break;
+
+                    case SimulationPhase.FinalExternalDamage:
+                        if (external_damage_i == exThreats.Count)
+                        {
+                            sp = SimulationPhase.FinalCleanup;
+                            break;
+                        }
+                        ExternalDamage();
+                        external_damage_i++;
+                        break;
+
+                    case SimulationPhase.CleanupExternal:
+                        CleanupExternal();
+                        sp = SimulationPhase.MoveThreats;
+                        move_threats_iEx = 0;
+                        move_threats_iIn = 0;
+                        break;
+
+                    case SimulationPhase.FinalCleanup:
+                        CleanupInternal();
+                        CleanupExternal();
+                        sp = SimulationPhase.FinalMoveThreats;
+                        move_threats_iEx = 0;
+                        move_threats_iIn = 0;
+                        break;
+
+                    case SimulationPhase.MoveThreats:
+                        if (move_threats_iEx == exThreats.Count
+                            && move_threats_iIn == inThreats.Count)
+                        {
+                            sp = SimulationPhase.TurnCleanup;
+                            break;
+                        }
+                        MoveThreats(); // no increment it will happen in the function
+                        break;
+
+                    case SimulationPhase.FinalMoveThreats:
+                        if (move_threats_iEx == exThreats.Count
+                            && move_threats_iIn == inThreats.Count)
+                        {
+                            sp = SimulationPhase.FinalScoring;
+                            break;
+                        }
+                        MoveThreats(); // no increment it will happen in the function
+                        break;
+
+                    case SimulationPhase.TurnCleanup:
+                        TurnCleanup();
+                        sp = SimulationPhase.TurnPrep;
+                        turn++;
+                        break;
+
+                    case SimulationPhase.FinalScoring:
+                        CleanupInternal();
+                        CleanupExternal();
+                        return CalculateScore();
+                }
+            }
+        }
+
+        void SimulationPrep()
+        {
+            gameover = false;
+            eventIdx = 0;
+            ship = new Ship(this, players);
             exThreats = new List<ExThreat>();
             inThreats = new List<InThreat>();
 
             observation = new int[3];
             phaseComputer = new bool[3];
+        }
 
-            //Gameloop
-            while (turn <= 12)
+        void TurnPrep()
+        {
+            //Set phase
+            if (turn <= 3)
+                phase = 0;
+            else if (turn <= 7)
+                phase = 1;
+            else
+                phase = 2;
+
+            //Reset variables
+            observationCount = 0;
+            ship.cannonFired = 0;
+            ship.liftUsed = ship.liftReset;
+
+            //Check computer
+            if (turn == 3 || turn == 6 || turn == 10)
             {
-                //Set phase
-                if (turn <= 3)
-                    phase = 0;
-                else if (turn <= 7)
-                    phase = 1;
-                else
-                    phase = 2;
-
-                //Reset variables
-                observationCount = 0;
-                ship.cannonFired = 0;
-                ship.liftUsed = ship.liftReset;
-
-                //Check computer
-                if (turn == 3 || turn == 6 || turn == 10)
+                //Delay actions if computer failed
+                if (!phaseComputer[phase])
                 {
-                    //Delay actions if computer failed
-                    if (!phaseComputer[phase])
+                    foreach (Player p in players)
                     {
-                        foreach (Player p in players)
-                        {
-                            if (p.position < 6)
-                                p.Delay(turn - 1);
-                        }
+                        if (p.position < 6)
+                            p.Delay(turn - 1);
                     }
                 }
+            }
 
-                //Check event
-                if (SpawnThreat(eventIdx))
-                    eventIdx++;
+            //Check event
+            if (SpawnThreat(turn, eventIdx))
+                eventIdx++;
+        }
 
-                //Perform player actions
-                PlayerActions(turn - 1);
+        void PlayerActions()
+        {
+            int t = turn - 1;
 
-                //Process internal damage and cleanup
-                ResolveInDamage();
+            Player p = players[actions_player_i];
+            p.lastAction = t;
+            Act a = p.actions[t];
 
-                //Rocket hits
-                RocketFire();
+            //Exit if dead
+            if (!p.alive)
+                return;
 
-                //Apply damage to threats and check if dead
-                ResolveExDamage();
-
-                //Move threats (Fix sequencing for internal threats)
-                MoveThreats();
-
-                //Move rocket
-                if (ship.rocketFired)
+            //Check interceptor controls
+            if (p.inIntercept)
+            {
+                if (a == Act.fight)
                 {
-                    ship.rocketReady = true;
-                    ship.rocketFired = false;
+                    //Keep fighting
+                    InterceptorDamage();
+                    return;
                 }
-
-                //Calculate observation bonus
-                observation[phase] = Math.Max(observation[phase], obsBonus[observationCount]);
-
-                //Check if gameover
-                for (int i = 0; i < 3; i++)
+                else
                 {
-                    if (ship.damage[i] >= 7)
-                        gameover = true;
+                    //Return
+                    p.inIntercept = false;
+                    ship.interceptorReady = true;
+                    p.Move(0);
+                    p.Delay(t);
+                    return;
                 }
-                if (gameover)
+            }
+
+            //Perform action
+            switch (a)
+            {
+                case Act.left:
+                    PlayerActionMove(p, true);
+                    break;
+                case Act.right:
+                    PlayerActionMove(p, false);
+                    break;
+                case Act.lift:
+                    PlayerActionLift(p);
+                    break;
+                case Act.A:
+                    PlayerActionA(p);
+                    break;
+                case Act.B:
+                    PlayerActionB(p);
+                    break;
+                case Act.C:
+                    PlayerActionC(p);
+                    break;
+                //Empty for now
+                case Act.fight:
+                    PlayerActionFight(p);
+                    break;
+                case Act.empty:
+                    break;
+            }
+        }
+
+        void PlayerActionMove(Player p, bool left)
+        {
+            Debug.Assert(true);
+
+            if (left)
+            {
+                if (p.position != 0 && p.position != 3)
+                    p.Move(p.position - 1);
+            }
+            else
+            {
+                if (p.position != 2 && p.position != 5)
+                    p.Move(p.position + 1);
+            }
+            ApplyStatusEffect(p);
+        }
+
+        void PlayerActionLift(Player p)
+        {
+            Debug.Assert(true);
+
+            int t = turn - 1;
+            int z = p.position % 3;
+
+            // branching
+            if (t < 11 && p.actions[t + 1] != Act.empty) // no branching needed if nothing to be delayed
+            {
+                BranchConditional(z, Defects.lift);
+            }
+
+            //Check if elevator was used
+            int bm = 1 << z;
+            if ((ship.liftUsed & bm) == bm)
+                p.Delay(t + 1);
+            ship.liftUsed |= bm;
+            //Move
+            if (p.position < 3)
+                p.Move(p.position + 3);
+            else
+                p.Move(p.position - 3);
+            ApplyStatusEffect(p);
+        }
+
+        void PlayerActionA(Player p)
+        {
+            Debug.Assert(true);
+
+            int z = p.position % 3;
+
+            //Check if can fire
+            int bm = 1 << p.position;
+            if ((ship.cannonFired & bm) == bm)
+                return;
+
+            if (p.position < 3)
+            {
+                //Main guns
+                //Drain energy
+                if (ship.reactors[z] > 0)
+                {
+                    BranchReactorFull(z);
+
+                    //Find target
+                    int target = GetTargetEx(z, 3, ExDmgSource.laser);
+
+                    if (target != -1)
+                    {
+                        BranchConditional(z, Defects.weapontop);
+
+                        exThreats[target].DealDamage(ship.laserDamage[z], 3, ExDmgSource.laser);
+                    }
+
+                    ship.reactors[z]--;
+                }
+            }
+            else
+            {
+                //Secondary guns
+                //Impulse cannon
+                if (z == 1)
+                {
+                    //Drain energy
+                    if (ship.reactors[z] > 0)
+                    {
+                        BranchReactorFull(z);
+                        BranchConditional(z, Defects.weaponbot);
+
+                        ship.reactors[z]--;
+                        foreach (ExThreat et in exThreats)
+                            et.DealDamage(1, ship.plasmaDamage[z], ExDmgSource.impulse);
+                    }
+                }
+                //Plasma cannon
+                else
+                {
+                    //Find target
+                    int target = GetTargetEx(z, 3, ExDmgSource.plasma);
+                    //Deal damage
+                    if (target != -1)
+                    {
+                        BranchConditional(z, Defects.weaponbot);
+                        exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.laser);
+                    }
+                }
+            }
+
+            ship.cannonFired |= bm;
+        }
+
+        void PlayerActionB(Player p)
+        {
+            Debug.Assert(true);
+
+            int z = p.position % 3;
+
+            //Check for a defect
+            if (ship.BDefect[p.position] > 0)
+            {
+                AttackInternal(p.position, InDmgSource.B);
+                return;
+            }
+
+            //Refill shield
+            if (p.position < 3)
+            {
+                if (ship.reactors[z] == 0 || ship.shields[z] == ship.shieldsCap[z]) // nothing happens regardless
+                    return;
+
+                // we now know that we are transferring at least 1 energy
+
+                BranchConditional(z, Defects.shield);
+                int deficit = ship.shieldsCap[z] - ship.shields[z];
+                if (deficit == 0)
+                    return; // if it broke it might turn out that we no longer transfer energy
+
+                BranchReactorFull(z);
+
+                //Pump over energy
+                deficit = Math.Min(ship.reactors[z], deficit);
+                ship.shields[z] += deficit;
+                ship.reactors[z] -= deficit;
+            }
+            //Reactors
+            else
+            {
+                //Main
+                if (z == 1)
+                {
+                    //Fill main
+                    if (ship.capsules == 0)
+                        return;
+
+                    // no need to branch! it's at the cap so we can branch at a later stage
+                    ship.reactors[z] = ship.reactorsCap[z];
+                    ship.capsules--;
+                }
+                //Secondary
+                else
+                {
+                    if (ship.reactors[1] == 0 || ship.reactors[z] == ship.reactorsCap[z]) // nothing happens regardless
+                        return;
+
+                    // we now know that we are transferring at least 1 energy
+
+                    BranchConditional(z, Defects.reactor);
+                    int deficit = ship.reactorsCap[z] - ship.reactors[z];
+                    if (deficit == 0)
+                        return;
+
+                    BranchReactorFull(1);
+
+                    //Pump over energy
+                    deficit = Math.Min(ship.reactors[1], deficit);
+                    ship.reactors[z] += deficit;
+                    ship.reactors[1] -= deficit;
+                }
+            }
+        }
+
+        void PlayerActionC(Player p)
+        {
+            //Check for a defect
+            if (ship.CDefect[p.position] > 0)
+            {
+                AttackInternal(p.position, InDmgSource.C);
+                return;
+            }
+
+            switch (p.position)
+            {
+                //Interceptors
+                case 0:
+                    //Check if requirements met
+                    if (p.team != null && p.team.alive && ship.interceptorReady)
+                    {
+                        p.inIntercept = true;
+                        ship.interceptorReady = false;
+                        p.Move(6);
+                        InterceptorDamage();
+                    }
                     break;
 
-                turn++;
-            }
+                //Computer
+                case 1:
+                    phaseComputer[phase] = true;
+                    break;
 
-            //Final movement if not gameover
-            if (!gameover)
+                //Androids
+                case 2:
+                    //Take androids
+                    if (!ship.androids[0].active)
+                    {
+                        ship.androids[0].active = true;
+                        p.team = ship.androids[0];
+                    }
+                    //Repair androids
+                    else if (p.team != null)
+                        p.team.alive = true;
+                    break;
+
+                //Androids
+                case 3:
+                    //Take androids
+                    if (!ship.androids[1].active)
+                    {
+                        ship.androids[1].active = true;
+                        p.team = ship.androids[1];
+                    }
+                    else if (p.team != null)
+                        p.team.alive = true;
+                    break;
+
+                //Observation
+                case 4:
+                    observationCount++;
+                    break;
+
+                //Fire rocket
+                case 5:
+                    if (ship.rockets > 0)
+                        ship.rocketFired = true;
+                    ship.rockets--;
+                    break;
+            }
+        }
+
+        void PlayerActionFight(Player p)
+        {
+            if (p.team != null && p.team.alive)
             {
-                //Fire last rocket
-                RocketFire();
-                //Check damage
-                ResolveExDamage();
-                //Move
-                MoveThreats();
-                //Cleanup dead
-                ResolveInDamage();
-                ResolveExDamage();
+                InThreat thrt = AttackInternal(p.position, InDmgSource.android);
+                if (thrt != null)
+                {
+                    if (thrt.fightBack)
+                        p.team.alive = false;
+                }
+            }
+        }
+
+        void RocketFire()
+        {
+            if (ship.rocketReady)
+            {
+                ship.rocketReady = false;
+                int distance = 99;
+                int target = -1;
+                for (int i = 0; i < exThreats.Count; i++)
+                {
+                    ExThreat et = exThreats[i];
+                    int dist = et.GetDistance(2, ExDmgSource.rocket);
+                    if (dist < distance)
+                    {
+                        target = i;
+                        distance = dist;
+                    }
+                }
+                //Deal damage
+                if (target != -1)
+                    exThreats[target].DealDamage(3, 2, ExDmgSource.rocket);
+            }
+        }
+
+        void InternalTurnEnd()
+        {
+            inThreats[internal_turn_end_i].ProcessTurnEnd();
+        }
+
+        void CleanupInternal()
+        {
+            for (int i = inThreats.Count - 1; i >= 0; i--)
+            {
+                //Threat is gone
+                if (inThreats[i].beaten)
+                {
+                    if (inThreats[i].alive)
+                    {
+                        score += inThreats[i].scoreLose;
+                        inSurvived++;
+                    }
+                    else
+                    {
+                        score += inThreats[i].scoreWin;
+                        inSlain++;
+                    }
+                    inThreats.RemoveAt(i);
+                }
+            }
+        }
+
+        void ExternalDamage()
+        {
+            exThreats[external_damage_i].ProcessDamage();
+        }
+
+        void CleanupExternal()
+        {
+            for (int i = exThreats.Count - 1; i >= 0; i--)
+            {
+                //Threat is gone
+                if (exThreats[i].beaten)
+                {
+                    if (exThreats[i].alive)
+                    {
+                        score += exThreats[i].scoreLose;
+                        exSurvived++;
+                    }
+                    else
+                    {
+                        score += exThreats[i].scoreWin;
+                        exSlain++;
+                    }
+                    exThreats.RemoveAt(i);
+                }
+            }
+        }
+
+        void MoveThreats()
+        {
+            if (move_threats_iIn == inThreats.Count)
+            {
+                exThreats[move_threats_iEx].Move();
+                move_threats_iEx++;
+            }
+            else if (move_threats_iEx == exThreats.Count)
+            {
+                inThreats[move_threats_iIn].Move();
+                move_threats_iIn++;
+            }
+            else if (exThreats[move_threats_iEx].time < inThreats[move_threats_iIn].time)
+            {
+                exThreats[move_threats_iEx].Move();
+                move_threats_iEx++;
+            }
+            else
+            {
+                inThreats[move_threats_iIn].Move();
+                move_threats_iIn++;
+            }
+        }
+
+        void TurnCleanup()
+        {
+            //Move rocket
+            if (ship.rocketFired)
+            {
+                ship.rocketReady = true;
+                ship.rocketFired = false;
             }
 
+            //Calculate observation bonus
+            observation[phase] = Math.Max(observation[phase], obsBonus[observationCount]);
+
+            //Check if gameover
+            for (int i = 0; i < 3; i++)
+            {
+                if (ship.damage[i] >= 7)
+                    gameover = true;
+            }
+        }
+
+        double CalculateScore()
+        {
             //Count damage
             int highestDamage = 0;
             for (int i = 0; i < 3; i++)
@@ -182,117 +755,72 @@ namespace SpaceAlertSolver
             if (gameover)
                 score = score - 200 + turn;
 
-            return score;
+            scores.Add((int)score);
+
+            return scoreMultiplier * score + scoreAddition;
         }
 
-        //Moves threats in order
-        void MoveThreats()
+        /**
+         * <summary>Branches the execution for the two possibilities of the defect</summary>
+         * <remarks>Adds a defect to the ship</remarks>
+         * <param name="zone">The zone in which the defect is</param>
+         * <param name="defect">The defect type</param>
+         */
+        void Branch(int zone, Defects defect)
         {
-            int iEx = 0, iIn = 0;
-            while (iEx < exThreats.Count || iIn < inThreats.Count)
+            Debug.Assert(zone >= 0 && zone < 3
+                && ship.defectStates[zone][(int)defect] == DefectState.undetermined);
+
+            double chanceOfBreaking = ship.ChanceOfDefect(zone);
+            if (chanceOfBreaking < 1.0)
             {
-                if(iIn == inThreats.Count)
-                {
-                    exThreats[iEx].Move();
-                    iEx++;
-                }
-                else if(iEx == exThreats.Count)
-                {
-                    inThreats[iIn].Move();
-                    iIn++;
-                }
-                else if(exThreats[iEx]. time < inThreats[iIn].time)
-                {
-                    exThreats[iEx].Move();
-                    iEx++;
-                }
-                else
-                {
-                    inThreats[iIn].Move();
-                    iIn++;
-                }
+                Game branch = new Game(this);
+                branch.ship.NotDefect(zone, defect);
+
+                scoreAddition += branch.Simulate() * (1.0 - chanceOfBreaking) * scoreMultiplier;
+                scoreMultiplier *= chanceOfBreaking;
+            }
+            ship.AddDefect(zone, defect);
+        }
+
+        /**
+         * <summary>Branches the execution if the defect is undetermined</summary>
+         * <remarks>Adds a defect to the ship</remarks>
+         * <param name="zone">The zone in which the defect is</param>
+         * <param name="defect">The defect type</param>
+         */
+        public void BranchConditional(int zone, Defects defect)
+        {
+            Debug.Assert(zone >= 0 && zone < 3);
+
+            if (ship.defectStates[zone][(int)defect] == DefectState.undetermined)
+            {
+                Branch(zone, defect);
             }
         }
 
-        //Resolve damage against internal threats
-        void ResolveInDamage()
+        public void BranchReactorFull(int zone)
         {
-            for (int i = 0; i < inThreats.Count; i++)
-                inThreats[i].ProcessTurnEnd();
-            for (int i = inThreats.Count - 1; i >= 0; i--)
+            Debug.Assert(zone >= 0 && zone < 3);
+
+            if (ship.reactors[zone] == ship.reactorsCap[zone])
             {
-                //Threat is gone
-                if (inThreats[i].beaten)
-                {
-                    if (inThreats[i].alive)
-                    {
-                        score += inThreats[i].scoreLose;
-                        inSurvived++;
-                    }
-                    else
-                    {
-                        score += inThreats[i].scoreWin;
-                        inSlain++;
-                    }
-                    inThreats.RemoveAt(i);
-                }
+                BranchConditional(zone, Defects.reactor);
             }
         }
 
-        //Resolve damage against external threats
-        void ResolveExDamage()
+        public void BranchShieldFull(int zone)
         {
-            //Process damage
-            for (int i = 0; i < exThreats.Count; i++)
-                exThreats[i].ProcessDamage();
+            Debug.Assert(zone >= 0 && zone < 3);
 
-            //Cleanup dead
-            for (int i = exThreats.Count - 1; i >= 0; i--)
+            if (ship.shields[zone] == ship.shieldsCap[zone])
             {
-                //Threat is gone
-                if (exThreats[i].beaten)
-                {
-                    if (exThreats[i].alive)
-                    {
-                        score += exThreats[i].scoreLose;
-                        exSurvived++;
-                    }
-                    else
-                    {
-                        score += exThreats[i].scoreWin;
-                        exSlain++;
-                    }
-                    exThreats.RemoveAt(i);
-                }
-            }
-        }
-
-        //Set rocket target and damage
-        void RocketFire()
-        {
-            if (ship.rocketReady)
-            {
-                ship.rocketReady = false;
-                int distance = 99;
-                int target = -1;
-                for (int i = 0; i < exThreats.Count; i++)
-                {
-                    ExThreat et = exThreats[i];
-                    int dist = et.GetDistance(2, ExDmgSource.rocket);
-                    if (dist < distance)
-                    {
-                        target = i;
-                        distance = dist;
-                    }
-                }
-                //Deal damage
-                if (target != -1)
-                    exThreats[target].DealDamage(3, 2, ExDmgSource.rocket);
+                BranchConditional(zone, Defects.shield);
             }
         }
 
         //Spawn a threat
-        bool SpawnThreat(int eventIdx)
+        bool SpawnThreat(int turn, int eventIdx)
         {
             if (eventIdx < events.Length && events[eventIdx].turn == turn)
             {
@@ -309,241 +837,6 @@ namespace SpaceAlertSolver
                 return true;
             }
             return false;
-        }
-
-        //All players perform actions
-        void PlayerActions(int t)
-        {
-            //Loop over players
-            for (int i = 0; i < players.Length; i++)
-            {
-                Player p = players[i];
-                p.lastAction = t;
-                Act a = p.actions[t];
-                int z = p.position % 3;
-                int bm;
-
-                //Exit if dead
-                if (!p.alive)
-                    continue;
-
-                //Check interceptor controls
-                if (p.inIntercept)
-                {
-                    if(a == Act.fight)
-                    {
-                        //Keep fighting
-                        InterceptorDamage();
-                        return;
-                    }
-                    else
-                    {
-                        //Return
-                        p.inIntercept = false;
-                        ship.interceptorReady = true;
-                        p.Move(0);
-                        p.Delay(t);
-                        return;
-                    }
-                }
-
-                //Perform action
-                switch (a)
-                {
-                    //Movement
-                    case Act.left:
-                        if (p.position != 0 && p.position != 3)
-                            p.Move(p.position - 1);
-                        ApplyStatusEffect(p);
-                        break;
-                    case Act.right:
-                        if (p.position != 2 && p.position != 5)
-                            p.Move(p.position + 1);
-                        ApplyStatusEffect(p);
-                        break;
-                    case Act.lift:
-                        //Check if elevator was used
-                        bm = 1 << z;
-                        if ( (ship.liftUsed & bm) == bm)
-                            p.Delay(t + 1);
-                        ship.liftUsed |= bm;
-                        //Move
-                        if (p.position < 3)
-                            p.Move(p.position + 3);
-                        else
-                            p.Move(p.position - 3);
-                        ApplyStatusEffect(p);
-                        break;
-
-                    //Actions
-                    case Act.A:
-                        //Check if can fire
-                        bm = 1 << p.position; 
-                        if ( (ship.cannonFired & bm) == bm)
-                            break;
-                        ship.cannonFired |= bm;
-
-                        if (p.position < 3)
-                        {
-                            //Main guns
-                            //Drain energy
-                            if (ship.reactors[z] == 0)
-                                break;
-                            ship.reactors[z]--;
-                            //Find target
-                            int target = GetTargetEx(z, 3, ExDmgSource.laser);
-                            //Deal damage
-                            if (target != -1)
-                                exThreats[target].DealDamage(ship.laserDamage[z], 3, ExDmgSource.laser);
-                        }
-                        else
-                        {
-                            //Secondary guns
-                            //Impulse cannon
-                            if (z == 1)
-                            {
-                                //Drain energy
-                                if (ship.reactors[z] == 0)
-                                    break;
-                                ship.reactors[z]--;
-                                //Hit all enemies
-                                foreach (ExThreat et in exThreats)
-                                    et.DealDamage(1, ship.plasmaDamage[z], ExDmgSource.impulse);
-                            }
-                            //Plasma cannon
-                            else
-                            {
-                                //Find target
-                                int target = GetTargetEx(z, 3, ExDmgSource.plasma);
-                                //Deal damage
-                                if (target != -1)
-                                    exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.plasma);
-                            }
-                        }
-                        break;
-
-                    case Act.B:
-                        //Check for a defect
-                        if(ship.BDefect[p.position] > 0)
-                        {
-                            AttackInternal(p.position, InDmgSource.B);
-                            break;
-                        }
-
-                        //Refill shield
-                        if (p.position < 3)
-                        {
-                            int deficit = ship.shieldsCap[z] - ship.shields[z];
-                            deficit = Math.Min(ship.reactors[z], deficit);
-                            ship.shields[z] += deficit;
-                            ship.reactors[z] -= deficit;
-                        }
-                        //Reactors
-                        else
-                        {
-                            //Main
-                            if (z == 1)
-                            {
-                                //Fill main
-                                if (ship.capsules > 0)
-                                {
-                                    ship.reactors[z] = ship.reactorsCap[z];
-                                    ship.capsules--;
-                                }
-                            }
-                            //Secondary
-                            else
-                            {
-                                //Pump over energy
-                                int deficit = ship.reactorsCap[z] - ship.reactors[z];
-                                deficit = Math.Min(ship.reactors[1], deficit);
-                                ship.reactors[z] += deficit;
-                                ship.reactors[1] -= deficit;
-                            }
-                        }
-                        break;
-                    case Act.C:
-                        //Check for a defect
-                        if (ship.CDefect[p.position] > 0)
-                        {
-                            AttackInternal(p.position, InDmgSource.C);
-                            break;
-                        }
-
-                        switch (p.position)
-                        {
-                            //Interceptors
-                            case 0:
-                                //Check if requirements met
-                                if(p.team != null && p.team.alive && ship.interceptorReady)
-                                {
-                                    p.inIntercept = true;
-                                    ship.interceptorReady = false;
-                                    p.Move(6);
-                                    InterceptorDamage();
-                                }
-                                break;
-
-                            //Computer
-                            case 1:
-                                phaseComputer[phase] = true;
-                                break;
-
-                            //Androids
-                            case 2:
-                                //Take androids
-                                if (!ship.androids[0].active)
-                                {
-                                    ship.androids[0].active = true;
-                                    p.team = ship.androids[0];
-                                }
-                                //Repair androids
-                                else if (p.team != null)
-                                    p.team.alive = true;
-                                break;
-
-                            //Androids
-                            case 3:
-                                //Take androids
-                                if (!ship.androids[1].active)
-                                {
-                                    ship.androids[1].active = true;
-                                    p.team = ship.androids[1];
-                                }
-                                else if (p.team != null)
-                                    p.team.alive = true;
-                                break;
-
-                            //Observation
-                            case 4:
-                                observationCount++;
-                                break;
-
-                            //Fire rocket
-                            case 5:
-                                if (ship.rockets > 0)
-                                    ship.rocketFired = true;
-                                ship.rockets--;
-                                break;
-                        }
-                        break;
-
-                    //Empty for now
-                    case Act.fight:
-                        if(p.team != null && p.team.alive)
-                        {
-                            InThreat thrt = AttackInternal(p.position, InDmgSource.android);
-                            if(thrt != null)
-                            {
-                                if (thrt.fightBack)
-                                    p.team.alive = false;
-                            }
-                        }
-                        break;
-                    case Act.empty:
-                        break;
-                }
-            }
         }
 
         //Attack internal threat
@@ -668,6 +961,24 @@ namespace SpaceAlertSolver
                     return "";
             }
         }
+    }
+
+    public enum SimulationPhase
+    {
+        SimulationPrep,
+        TurnPrep,
+        Actions,
+        RocketFire,
+        InternalTurnEnd,
+        CleanupInternal,
+        ExternalDamage,
+        CleanupExternal,
+        MoveThreats,
+        TurnCleanup,
+        FinalExternalDamage,
+        FinalCleanup,
+        FinalMoveThreats,
+        FinalScoring
     }
 
     public enum Act
