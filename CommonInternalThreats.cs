@@ -20,6 +20,15 @@ namespace SpaceAlertSolver
             vulnerability = InDmgSource.android;
         }
 
+        public SaboteurRed() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            SaboteurRed clone = new SaboteurRed();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             if (position > 3)
@@ -31,7 +40,10 @@ namespace SpaceAlertSolver
             if (ship.reactors[z] == 0)
                 ship.DealDamageIntern(z, 1);
             else
+            {
+                ship.game.BranchReactorFull(z);
                 ship.reactors[z]--;
+            }
         }
         public override void ActZ()
         {
@@ -52,6 +64,15 @@ namespace SpaceAlertSolver
             vulnerability = InDmgSource.android;
         }
 
+        public SaboteurBlue() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            SaboteurBlue clone = new SaboteurBlue();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             if (position < 5)
@@ -63,7 +84,10 @@ namespace SpaceAlertSolver
             if (ship.reactors[z] == 0)
                 ship.DealDamageIntern(z, 1);
             else
+            {
+                ship.game.BranchReactorFull(z);
                 ship.reactors[z]--;
+            }
         }
         public override void ActZ()
         {
@@ -83,6 +107,15 @@ namespace SpaceAlertSolver
             scoreWin = 4;
             vulnerability = InDmgSource.android;
             fightBack = true;
+        }
+
+        public SkirmisherRed() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            SkirmisherRed clone = new SkirmisherRed();
+            clone.CloneThreat(this, ship);
+            return clone;
         }
 
         public override void ActX()
@@ -117,6 +150,15 @@ namespace SpaceAlertSolver
             fightBack = true;
         }
 
+        public SkirmisherBlue() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            SkirmisherBlue clone = new SkirmisherBlue();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             if (position != 0 && position != 3)
@@ -147,6 +189,15 @@ namespace SpaceAlertSolver
             scoreWin = 6;
             vulnerability = InDmgSource.android;
             fightBack = true;
+        }
+
+        public SoldiersRed() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            SoldiersRed clone = new SoldiersRed();
+            clone.CloneThreat(this, ship);
+            return clone;
         }
 
         public override void ActX()
@@ -182,6 +233,15 @@ namespace SpaceAlertSolver
             fightBack = true;
         }
 
+        public SoldiersBlue() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            SoldiersBlue clone = new SoldiersBlue();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             if (position < 3)
@@ -215,6 +275,15 @@ namespace SpaceAlertSolver
             vulnerability = InDmgSource.C;
         }
 
+        public Virus() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            Virus clone = new Virus();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void OnClear()
         {
             ship.CDefect[1]--;
@@ -222,6 +291,10 @@ namespace SpaceAlertSolver
 
         public override void ActX()
         {
+            ship.game.BranchReactorFull(0);
+            ship.game.BranchReactorFull(1);
+            ship.game.BranchReactorFull(2);
+
             if (ship.reactors[0] > 0)
                 ship.reactors[0]--;
             if (ship.reactors[1] > 0)
@@ -259,6 +332,15 @@ namespace SpaceAlertSolver
             vulnerability = InDmgSource.B;
         }
 
+        public HackedShieldsRed() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            HackedShieldsRed clone = new HackedShieldsRed();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void OnClear()
         {
             ship.BDefect[0]--;
@@ -290,6 +372,15 @@ namespace SpaceAlertSolver
             scoreLose = 2;
             scoreWin = 4;
             vulnerability = InDmgSource.B;
+        }
+
+        public HackedShieldsBlue() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            HackedShieldsBlue clone = new HackedShieldsBlue();
+            clone.CloneThreat(this, ship);
+            return clone;
         }
 
         public override void OnClear()
@@ -325,6 +416,15 @@ namespace SpaceAlertSolver
             vulnerability = InDmgSource.B;
         }
 
+        public OverheatedReactor() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            OverheatedReactor clone = new OverheatedReactor();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void OnClear()
         {
             ship.BDefect[4]--;
@@ -332,8 +432,8 @@ namespace SpaceAlertSolver
 
         public override void ActX()
         {
+            ship.game.BranchReactorFull(1);
             ship.DealDamageIntern(1, ship.reactors[1]);
-
         }
         public override void ActY()
         {
@@ -378,6 +478,15 @@ namespace SpaceAlertSolver
                 beaten = true;
                 alive = false;
             }
+        }
+
+        public UnstableWarheads() { }
+
+        public override InThreat Clone(Ship ship)
+        {
+            UnstableWarheads clone = new UnstableWarheads();
+            clone.CloneThreat(this, ship);
+            return clone;
         }
 
         public override void OnClear()

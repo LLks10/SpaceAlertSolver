@@ -15,6 +15,10 @@ namespace SpaceAlertSolver
         public Ship ship;
         public int damage;
 
+        bool started_move = false;
+        int distance_moved;
+        int current_speed;
+
         public ExThreat(Ship ship, Trajectory traj, int zone, int time)
         {
             this.ship = ship;
@@ -33,6 +37,34 @@ namespace SpaceAlertSolver
                 distanceRange = 2;
             else
                 distanceRange = 3;
+        }
+
+        public ExThreat() { }
+
+        public abstract ExThreat Clone(Ship ship);
+
+        protected virtual void CloneThreat(ExThreat other, Ship ship)
+        {
+            health = other.health;
+            shield = other.shield;
+            speed = other.speed;
+            distance = other.distance;
+            distanceRange = other.distanceRange;
+            scoreWin = other.scoreWin;
+            scoreLose = other.scoreLose;
+            zone = other.zone;
+            time = other.time;
+            trajectory = other.trajectory;
+            rocketImmune = other.rocketImmune;
+            alive = other.alive;
+            beaten = other.beaten;
+            damage = other.damage;
+
+            started_move = other.started_move;
+            distance_moved = other.distance_moved;
+            current_speed = other.current_speed;
+
+            this.ship = ship;
         }
 
         public virtual int GetDistance(int range, ExDmgSource source)
@@ -64,47 +96,37 @@ namespace SpaceAlertSolver
 
         public virtual void Move()
         {
-            //Play actions
-            int curSpd = speed;
-            for(int i = distance-1; i >= distance-curSpd && i >= 0; i--)
-            {
-                if (trajectory.actions[i] == 1)
-                    ActX();
-                else if (trajectory.actions[i] == 2)
-                    ActY();
-                else if (trajectory.actions[i] == 3)
-                    ActZ();
-            }
-
-            //Set new position
-            distance -= curSpd;
-            if (distance <= 0)
-                beaten = true;
-
-            //Set new distance range
-            if (distance <= trajectory.dist1)
-                distanceRange = 1;
-            else if (distance <= trajectory.dist2)
-                distanceRange = 2;
-            else
-                distanceRange = 3;
+            Move(speed);
         }
 
         public virtual void Move(int mSpd)
         {
-            //Play actions
-            for (int i = distance - 1; i >= distance - mSpd && i >= 0; i--)
+            if (!started_move)
             {
-                if (trajectory.actions[i] == 1)
-                    ActX();
-                else if (trajectory.actions[i] == 2)
-                    ActY();
-                else if (trajectory.actions[i] == 3)
-                    ActZ();
+                current_speed = mSpd;
+                distance_moved = 0;
+                started_move = true;
             }
+            while (distance_moved < current_speed && distance - distance_moved > 0)
+            {
+                switch (trajectory.actions[distance - distance_moved - 1])
+                {
+                    case 1:
+                        ActX();
+                        break;
+                    case 2:
+                        ActY();
+                        break;
+                    case 3:
+                        ActZ();
+                        break;
+                }
+                distance_moved++;
+            }
+            started_move = false;
 
             //Set new position
-            distance -= mSpd;
+            distance -= current_speed;
             if (distance <= 0)
                 beaten = true;
 

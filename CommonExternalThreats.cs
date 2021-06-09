@@ -21,8 +21,19 @@ namespace SpaceAlertSolver
             scoreWin = 4;
         }
 
+        public ArmoredCatcher() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            ArmoredCatcher clone = new ArmoredCatcher();
+            clone.CloneThreat(this, ship);
+            clone.maxHealth = maxHealth;
+            return clone;
+        }
+
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 1);
         }
         public override void ActY()
@@ -31,6 +42,7 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 4);
         }
     }
@@ -50,6 +62,16 @@ namespace SpaceAlertSolver
             rocketImmune = true;
         }
 
+        public Amoebe() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Amoebe clone = new Amoebe();
+            clone.CloneThreat(this, ship);
+            clone.maxHealth = maxHealth;
+            return clone;
+        }
+
         public override void ActX()
         {
             health = Math.Min(health + 2, maxHealth);
@@ -60,6 +82,7 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 4);
         }
     }
@@ -76,16 +99,28 @@ namespace SpaceAlertSolver
             scoreWin = 4;
         }
 
+        public Battleship() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Battleship clone = new Battleship();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 3);
         }
     }
@@ -102,16 +137,28 @@ namespace SpaceAlertSolver
             scoreWin = 4;
         }
 
+        public Hunter() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Hunter clone = new Hunter();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 1);
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 3);
         }
     }
@@ -130,16 +177,29 @@ namespace SpaceAlertSolver
             hasShield = true;
         }
 
+        public GyroHunter() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            GyroHunter clone = new GyroHunter();
+            clone.CloneThreat(this, ship);
+            clone.hasShield = hasShield;
+            return clone;
+        }
+
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 1);
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override bool ProcessDamage()
@@ -170,6 +230,16 @@ namespace SpaceAlertSolver
             scoreWin = 4;
         }
 
+        public EnergyCloud() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            EnergyCloud clone = new EnergyCloud();
+            clone.CloneThreat(this, ship);
+            clone.baseShield = baseShield;
+            return clone;
+        }
+
         public override void ActX()
         {
             ship.shields[0] = 0;
@@ -178,6 +248,12 @@ namespace SpaceAlertSolver
         }
         public override void ActY()
         {
+            for (int i = 0; i < 3; i++)
+            {
+                if (zone != i)
+                    ship.game.BranchShieldFull(i);
+            }
+
             for(int i = 0; i < 3; i++)
             {
                 if (zone != i)
@@ -186,6 +262,12 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            for (int i = 0; i < 3; i++)
+            {
+                if (zone != i)
+                    ship.game.BranchShieldFull(i);
+            }
+
             for (int i = 0; i < 3; i++)
             {
                 if (zone != i)
@@ -218,8 +300,18 @@ namespace SpaceAlertSolver
             scoreWin = 4;
             rocketImmune = true;
         }
+
+        public Meteorite() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Meteorite clone = new Meteorite();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, health);
         }
     }
@@ -235,20 +327,39 @@ namespace SpaceAlertSolver
             scoreLose = 2;
             scoreWin = 4;
         }
+
+        public ImpulseBall() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            ImpulseBall clone = new ImpulseBall();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 1);
             ship.DealDamage(1, 1);
             ship.DealDamage(2, 1);
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 1);
             ship.DealDamage(1, 1);
             ship.DealDamage(2, 1);
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 2);
             ship.DealDamage(1, 2);
             ship.DealDamage(2, 2);
@@ -266,8 +377,18 @@ namespace SpaceAlertSolver
             scoreLose = 2;
             scoreWin = 4;
         }
+
+        public SpaceCruiser() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            SpaceCruiser clone = new SpaceCruiser();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             if (ship.shields[zone] == 0)
                 ship.DealDamage(zone, 2);
             else
@@ -275,6 +396,8 @@ namespace SpaceAlertSolver
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
+
             int dmg = 2;
             int bonus = 2 - ship.shields[zone];
             if (bonus > 0)
@@ -300,12 +423,23 @@ namespace SpaceAlertSolver
             scoreLose = 2;
             scoreWin = 4;
         }
+
+        public StealthHunter() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            StealthHunter clone = new StealthHunter();
+            clone.CloneThreat(this, ship);
+            clone.visible = visible;
+            return clone;
+        }
         public override void ActX()
         {
             visible = true;
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override void ActZ()
@@ -345,8 +479,22 @@ namespace SpaceAlertSolver
             scoreWin = 6;
             rocketImmune = true;
         }
+
+        public JellyFish() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            JellyFish clone = new JellyFish();
+            clone.CloneThreat(this, ship);
+            clone.baseHealth = baseHealth;
+            return clone;
+        }
+
         public override void ActX()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 1);
             ship.DealDamage(1, 1);
             ship.DealDamage(2, 1);
@@ -359,6 +507,9 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             ship.DealDamage(0, 2);
             ship.DealDamage(1, 2);
             ship.DealDamage(2, 2);
@@ -385,6 +536,17 @@ namespace SpaceAlertSolver
             scoreWin = 6;
             rocketImmune = true;
         }
+
+        public SmallAsteroid() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            SmallAsteroid clone = new SmallAsteroid();
+            clone.CloneThreat(this, ship);
+            clone.revenge = revenge;
+            return clone;
+        }
+
         public override void ActX()
         {
             revenge++;
@@ -395,10 +557,16 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, health);
         }
         public override bool ProcessDamage()
         {
+            if (health + shield - damage <= 0) // if we will die, branch
+            {
+                ship.game.BranchShieldFull(zone);
+            }
+
             health = health - Math.Max(0, (damage - shield));
             damage = 0;
 
@@ -425,6 +593,16 @@ namespace SpaceAlertSolver
             scoreLose = 3;
             scoreWin = 6;
         }
+
+        public Kamikaze() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Kamikaze clone = new Kamikaze();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
             speed += 1;
@@ -437,6 +615,7 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 6);
         }
     }
@@ -453,13 +632,27 @@ namespace SpaceAlertSolver
             scoreWin = 6;
             rocketImmune = true;
         }
+
+        public Swarm() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Swarm clone = new Swarm();
+            clone.CloneThreat(this, ship);
+            return clone;
+        }
+
         public override void ActX()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 1);
         }
         public override void ActY()
         {
-            for(int i = 0; i < 3; i++)
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
+            for (int i = 0; i < 3; i++)
             {
                 if (i == zone)
                     ship.DealDamage(i, 2);
@@ -469,6 +662,9 @@ namespace SpaceAlertSolver
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(0);
+            ship.game.BranchShieldFull(1);
+            ship.game.BranchShieldFull(2);
             for (int i = 0; i < 3; i++)
             {
                 if (i == zone)
@@ -495,16 +691,28 @@ namespace SpaceAlertSolver
             scoreLose = 3;
             scoreWin = 6;
         }
+
+        public GhostHunter() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            GhostHunter clone = new GhostHunter();
+            clone.CloneThreat(this, ship);
+            clone.visible = visible;
+            return clone;
+        }
         public override void ActX()
         {
             visible = true;
         }
         public override void ActY()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 2);
         }
         public override void ActZ()
         {
+            ship.game.BranchShieldFull(zone);
             ship.DealDamage(zone, 3);
         }
         public override int GetDistance(int range, ExDmgSource source)
@@ -526,6 +734,8 @@ namespace SpaceAlertSolver
     //ID: 15
     class Scout : ExThreat
     {
+        int act_y_i = 0;
+
         public Scout(Ship ship, Trajectory traj, int zone, int time) : base(ship, traj, zone, time)
         {
             health = 3;
@@ -534,6 +744,16 @@ namespace SpaceAlertSolver
             scoreLose = 3;
             scoreWin = 6;
         }
+
+        public Scout() { }
+
+        public override ExThreat Clone(Ship ship)
+        {
+            Scout clone = new Scout();
+            clone.CloneThreat(this, ship);
+            clone.act_y_i = act_y_i;
+            return clone;
+        }
         public override void ActX()
         {
             ship.scoutBonus = 1;
@@ -541,15 +761,19 @@ namespace SpaceAlertSolver
         public override void ActY()
         {
             List<ExThreat> trts = ship.game.exThreats;
-            for(int i = 0; i < trts.Count; i++)
+
+            while (act_y_i < trts.Count)
             {
-                if (!(trts[i] is Scout) && !trts[i].beaten)
-                    trts[i].Move(1);
+                if (trts[act_y_i] is Scout || trts[act_y_i].beaten)
+                    continue;
+                trts[act_y_i].Move(1);
             }
+
+            act_y_i = 0;
         }
         public override void ActZ()
         {
-            ship.DealDamage(zone, 3);
+            ship.DealDamageIntern(zone, 3);
         }
         public override int GetDistance(int range, ExDmgSource source)
         {
