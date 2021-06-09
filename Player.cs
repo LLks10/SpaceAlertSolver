@@ -48,6 +48,14 @@ namespace SpaceAlertSolver
             position = 1;
         }
 
+        public Player(Act[] actions)
+        {
+            alive = true;
+            team = null;
+            position = 1;
+            this.actions = actions;
+        }
+
         public void Move(int pos)
         {
             position = pos;

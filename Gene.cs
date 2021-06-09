@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace SpaceAlertSolver
 {
@@ -7,7 +8,7 @@ namespace SpaceAlertSolver
         private int[] gene;
         public int players, blanks;
         double score;
-        private static string[] playerColours = new string[] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
+        private static string[] playerColours = new string[10] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };
         public string debug;
 
         private static Func<Gene, Random, Gene>[] operators
@@ -16,6 +17,8 @@ namespace SpaceAlertSolver
 
         public Gene(int players)
         {
+            Debug.Assert(players >= 0 && players < 10);
+
             this.players = players;
 
             Random random = new Random(Program.SEED);
@@ -28,6 +31,9 @@ namespace SpaceAlertSolver
 
         public Gene(int[] gene, int players)
         {
+            Debug.Assert(players >= 0 && players < 10
+                && gene.Length == players * 12);
+
             this.gene = gene;
             this.players = players;
         }
@@ -49,6 +55,8 @@ namespace SpaceAlertSolver
          */
         public Gene RandomNeighbour(Random rng, Trajectory[] trajs, Event[] evts)
         {
+            Debug.Assert(op_chances.Length == operators.Length);
+
             int r = rng.Next(op_chances[op_chances.Length-1]);
             int bs = Array.BinarySearch(op_chances, r);
             int op_i;

@@ -397,27 +397,27 @@ namespace SpaceAlertSolver
             int bm = 1 << p.position;
             if ((ship.cannonFired & bm) == bm)
                 return;
-            ship.cannonFired |= bm;
 
             if (p.position < 3)
             {
                 //Main guns
                 //Drain energy
-                if (ship.reactors[z] == 0)
-                    return;
-                BranchReactorFull(z);
-
-                //Find target
-                int target = GetTargetEx(z, 3, ExDmgSource.laser);
-
-                if (target != -1)
+                if (ship.reactors[z] > 0)
                 {
-                    BranchConditional(z, Defects.weapontop);
+                    BranchReactorFull(z);
 
-                    exThreats[target].DealDamage(ship.laserDamage[z], 3, ExDmgSource.laser);
+                    //Find target
+                    int target = GetTargetEx(z, 3, ExDmgSource.laser);
+
+                    if (target != -1)
+                    {
+                        BranchConditional(z, Defects.weapontop);
+
+                        exThreats[target].DealDamage(ship.laserDamage[z], 3, ExDmgSource.laser);
+                    }
+
+                    ship.reactors[z]--;
                 }
-
-                ship.reactors[z]--;
             }
             else
             {
@@ -426,14 +426,15 @@ namespace SpaceAlertSolver
                 if (z == 1)
                 {
                     //Drain energy
-                    if (ship.reactors[z] == 0)
-                        return;
-                    BranchReactorFull(z);
-                    BranchConditional(z, Defects.weaponbot);
+                    if (ship.reactors[z] > 0)
+                    {
+                        BranchReactorFull(z);
+                        BranchConditional(z, Defects.weaponbot);
 
-                    ship.reactors[z]--;
-                    foreach (ExThreat et in exThreats)
-                        et.DealDamage(1, ship.plasmaDamage[z], ExDmgSource.impulse);
+                        ship.reactors[z]--;
+                        foreach (ExThreat et in exThreats)
+                            et.DealDamage(1, ship.plasmaDamage[z], ExDmgSource.impulse);
+                    }
                 }
                 //Plasma cannon
                 else
@@ -441,14 +442,15 @@ namespace SpaceAlertSolver
                     //Find target
                     int target = GetTargetEx(z, 3, ExDmgSource.plasma);
                     //Deal damage
-                    if (target == -1)
-                        return;
-
-                    BranchConditional(z, Defects.weaponbot);
-
-                    exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.laser);
+                    if (target != -1)
+                    {
+                        BranchConditional(z, Defects.weaponbot);
+                        exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.laser);
+                    }
                 }
             }
+
+            ship.cannonFired |= bm;
         }
 
         void PlayerActionB(Player p)
