@@ -765,8 +765,12 @@ namespace SpaceAlertSolver
             while (act_y_i < trts.Count)
             {
                 if (trts[act_y_i] is Scout || trts[act_y_i].beaten)
+                {
+                    act_y_i++;
                     continue;
+                }
                 trts[act_y_i].Move(1);
+                act_y_i++;
             }
 
             act_y_i = 0;
