@@ -9,7 +9,7 @@ namespace SpaceAlertSolver
     //Create threats
     public static class ThreatFactory
     {
-        const int sevInStart = 11;
+        const int sevInStart = 13;
         //External threat
         public static ExThreat SummonEx(int number, Trajectory traj, int zone, Ship ship, int time)
         {
@@ -170,6 +170,10 @@ namespace SpaceAlertSolver
                     return new OverheatedReactor(ship, traj, time);
                 case 10:
                     return new UnstableWarheads(ship, traj, time);
+                case 11:
+                    return new SlimeBlue(ship, traj, time);
+                case 12:
+                    return new SlimeRed(ship, traj, time);
 
                 case sevInStart:
                     return new CommandosRed(ship, traj, time);
@@ -223,6 +227,10 @@ namespace SpaceAlertSolver
                     return "Overheated Reactor";
                 case 10:
                     return "Unstable Warheads";
+                case 11:
+                    return "Blue Slime";
+                case 12:
+                    return "Red Slime";
 
                 case sevInStart:
                     return "Red Commandos";
