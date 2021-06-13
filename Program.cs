@@ -80,7 +80,7 @@ namespace SpaceAlertSolver
             List<int> sevExThreats = new List<int>();
             for (int i = 0; i < sevExThreatCount; i++)
                 sevExThreats.Add(i + comExThreatCount);
-            int comInThreatCount = 11;
+            int comInThreatCount = 13;
             List<int> comInThreats = new List<int>();
             for (int i = 0; i < comInThreatCount; i++)
                 comInThreats.Add(i);

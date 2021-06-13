@@ -66,7 +66,7 @@ namespace SpaceAlertSolver
             }
             trajectories = other.trajectories;
             events = other.events;
-            
+
             exThreats = new List<ExThreat>();
             for (int i = 0; i < other.exThreats.Count; i++)
             {
@@ -309,6 +309,7 @@ namespace SpaceAlertSolver
                     p.inIntercept = false;
                     ship.interceptorReady = true;
                     p.Move(0);
+                    ApplyStatusEffect(p, t);
                     p.Delay(t);
                     return;
                 }
@@ -318,10 +319,10 @@ namespace SpaceAlertSolver
             switch (a)
             {
                 case Act.left:
-                    PlayerActionMove(p, true);
+                    PlayerActionMove(p, t, true);
                     break;
                 case Act.right:
-                    PlayerActionMove(p, false);
+                    PlayerActionMove(p, t, false);
                     break;
                 case Act.lift:
                     PlayerActionLift(p);
@@ -344,7 +345,7 @@ namespace SpaceAlertSolver
             }
         }
 
-        void PlayerActionMove(Player p, bool left)
+        void PlayerActionMove(Player p, int t, bool left)
         {
             Debug.Assert(true);
 
@@ -358,7 +359,7 @@ namespace SpaceAlertSolver
                 if (p.position != 2 && p.position != 5)
                     p.Move(p.position + 1);
             }
-            ApplyStatusEffect(p);
+            ApplyStatusEffect(p, t);
         }
 
         void PlayerActionLift(Player p)
@@ -384,7 +385,7 @@ namespace SpaceAlertSolver
                 p.Move(p.position + 3);
             else
                 p.Move(p.position - 3);
-            ApplyStatusEffect(p);
+            ApplyStatusEffect(p, t);
         }
 
         void PlayerActionA(Player p)
@@ -859,13 +860,13 @@ namespace SpaceAlertSolver
         {
             int distance = 99;
             int target = -1;
-            for(int i = 0; i < exThreats.Count; i++)
+            for (int i = 0; i < exThreats.Count; i++)
             {
                 ExThreat et = exThreats[i];
                 if (et.zone == zone)
                 {
                     int dist = et.GetDistance(range, source);
-                    if(dist < distance)
+                    if (dist < distance)
                     {
                         target = i;
                         distance = dist;
@@ -880,7 +881,7 @@ namespace SpaceAlertSolver
         void InterceptorDamage()
         {
             //Attack internal threat
-            if(ship.CDefect[6] > 0)
+            if (ship.CDefect[6] > 0)
             {
                 AttackInternal(6, InDmgSource.C);
                 return;
@@ -888,9 +889,9 @@ namespace SpaceAlertSolver
 
             //Attack external threat
             int target = -1;
-            for(int i = 0; i < exThreats.Count; i++)
+            for (int i = 0; i < exThreats.Count; i++)
             {
-                if(exThreats[i].distanceRange == 1)
+                if (exThreats[i].distanceRange == 1)
                 {
                     //Get first enemy
                     if (target == -1)
@@ -898,7 +899,7 @@ namespace SpaceAlertSolver
                     //Deal damage to all in range
                     else
                     {
-                        if(target >= 0)
+                        if (target >= 0)
                             exThreats[target].DealDamage(1, 1, ExDmgSource.intercept);
                         target = -2;
                         exThreats[i].DealDamage(1, 1, ExDmgSource.intercept);
@@ -910,14 +911,17 @@ namespace SpaceAlertSolver
                 exThreats[target].DealDamage(3, 1, ExDmgSource.intercept);
         }
 
-        void ApplyStatusEffect(Player p)
+        void ApplyStatusEffect(Player p, int turn)
         {
             //Check status effect
             if (ship.stationStatus[p.position] != 0)
             {
-                if ((ship.stationStatus[p.position] & 2) == 2)
+                // Delay
+                if ((ship.stationStatus[p.position] & 1) == 1)
+                    p.Delay(turn + 1);
+                // Kill
+                else if ((ship.stationStatus[p.position] & 2) == 2)
                     p.Kill();
-                //Check delay
             }
         }
 
@@ -927,7 +931,7 @@ namespace SpaceAlertSolver
             output.AppendFormat("DMG: {0} {1} {2}\n", ship.damage[0], ship.damage[1], ship.damage[2]);
             output.AppendFormat("OBS: {0} {1} {2}\n", observation[0], observation[1], observation[2]);
             output.AppendFormat("P Pos: {0} {1} {2} {3} {4}\n", players[0].position, players[1].position, players[2].position, players[3].position, players[4].position);
-            output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", ActToString(players[0].actions[11]), ActToString(players[1].actions[11]), ActToString(players[2].actions[11]), ActToString(players[3].actions[11]), ActToString(players[4].actions[11]) );
+            output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", ActToString(players[0].actions[11]), ActToString(players[1].actions[11]), ActToString(players[2].actions[11]), ActToString(players[3].actions[11]), ActToString(players[4].actions[11]));
             output.AppendFormat("Alive: {0} {1} {2} {3} {4}\n", players[0].alive, players[1].alive, players[2].alive, players[3].alive, players[4].alive);
             output.AppendFormat("ExKill: {0} | ExSurv: {1} | InKill: {2} | InSurv: {3}\n", exSlain, exSurvived, inSlain, inSurvived);
             output.AppendFormat("Reactors: {0} {1} {2}\n", ship.reactors[0], ship.reactors[1], ship.reactors[2]);
@@ -990,7 +994,16 @@ namespace SpaceAlertSolver
         B,
         C,
         fight,
-        empty
+        empty,
+        tl,
+        tm,
+        tr,
+        dl,
+        dm,
+        dr,
+        hA,
+        hB,
+        hFight
     }
 
     //Event
