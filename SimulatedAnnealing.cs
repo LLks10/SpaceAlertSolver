@@ -53,10 +53,13 @@ namespace SpaceAlertSolver
                     _highestBlanks = _currentState.getBlanks();
                     _bestState = _currentState;
 
-                    Console.WriteLine(_currentState.Rep() +
-                        "Iteration: " + (iteration + 1) + 
-                        " / " + maxIterations +
-                        "\nScore: " + _currentState.getScore());
+                    if (Program.PRINT_DEBUG)
+                    {
+                        Console.WriteLine(_currentState.Rep() +
+                            "Iteration: " + (iteration + 1) + 
+                            " / " + maxIterations +
+                            "\nScore: " + _currentState.getScore());
+                    }
                 }
                 else if (_currentState.getScore() == _highestScore && _currentState.getBlanks() > _highestBlanks)
                 {

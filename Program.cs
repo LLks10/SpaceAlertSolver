@@ -11,12 +11,13 @@ namespace SpaceAlertSolver
     class Program
     {
         public static int SEED = 8;
+        public static bool PRINT_DEBUG = true;
 
         static void Main(string[] args)
         {
-            //Run(SEED);
+            Run(SEED);
 
-            int seed_start = 10;
+            /*int seed_start = 10;
             int seed_end = 20;
 
             double[] scores = new double[10];
@@ -27,7 +28,7 @@ namespace SpaceAlertSolver
             for (int i = 0; i < scores.Length; i++)
             {
                 Console.WriteLine($"{i + seed_start}: {scores[i]}");
-            }
+            }*/
 
             Console.ReadLine();
         }
@@ -226,10 +227,18 @@ namespace SpaceAlertSolver
 
             SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
             sa.Run(5000000, trajectories, evArr, seed);
-            Console.WriteLine(sa.getBestGene().Rep() + sa.getBestGene().getScore());
-            Console.WriteLine("-----FINAL-----");
-            PrintStats(sa.getBestStats());
-            //Console.WriteLine(sa.getBestGene().Rep());
+            if (PRINT_DEBUG)
+            {
+                Console.WriteLine(sa.getBestGene().Rep() + sa.getBestGene().getScore());
+                Console.WriteLine("-----FINAL-----");
+                PrintStats(sa.getBestStats());
+            }
+            else
+            {
+                Console.WriteLine(sa.getBestGene().Rep());
+                Console.WriteLine("-----FINAL-----");
+            }
+
             return sa.getBestGene();
         }
     }
