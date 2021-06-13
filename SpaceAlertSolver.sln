@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2003
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceAlertSolver", "SpaceAlertSolver.csproj", "{95F59843-54DD-452A-996D-626A56714B5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceAlertSolverTests", "SpaceAlertSolverTests\SpaceAlertSolverTests.csproj", "{EAEDA3BF-2A01-470C-92D1-9AB287D4104F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{95F59843-54DD-452A-996D-626A56714B5C} = {95F59843-54DD-452A-996D-626A56714B5C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{95F59843-54DD-452A-996D-626A56714B5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95F59843-54DD-452A-996D-626A56714B5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95F59843-54DD-452A-996D-626A56714B5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAEDA3BF-2A01-470C-92D1-9AB287D4104F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAEDA3BF-2A01-470C-92D1-9AB287D4104F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAEDA3BF-2A01-470C-92D1-9AB287D4104F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAEDA3BF-2A01-470C-92D1-9AB287D4104F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

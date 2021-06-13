@@ -10,32 +10,64 @@ namespace SpaceAlertSolver
 {
     class Program
     {
+        public static int SEED = 8;
+        public static bool PRINT_DEBUG = true;
+
         static void Main(string[] args)
+        {
+            Run(SEED);
+
+            /*int seed_start = 10;
+            int seed_end = 20;
+
+            double[] scores = new double[10];
+            for (int seed = seed_start; seed < seed_end; seed++)
+            {
+                scores[seed-seed_start] = Run(seed).getScore();
+            }
+            for (int i = 0; i < scores.Length; i++)
+            {
+                Console.WriteLine($"{i + seed_start}: {scores[i]}");
+            }*/
+
+            Console.ReadLine();
+        }
+
+        public static void PrintStats(List<int> stats)
+        {
+            stats.Sort();
+            int winStart = stats.BinarySearch(-40);
+            if (winStart < 0)
+                winStart = ~winStart;
+            else
+                winStart++;
+
+            double average = 0;
+            for (int i = 0; i < stats.Count; i++)
+            {
+                average += (double)stats[i] / stats.Count;
+            }
+
+            double median;
+            if (stats.Count % 2 == 0)
+            {
+                median = stats[stats.Count / 2] / 2.0 + stats[stats.Count / 2 - 1] / 2.0;
+            }
+            else
+            {
+                median = stats[stats.Count / 2];
+            }
+
+            Console.WriteLine($"Wins: {stats.Count - winStart} | Losses: {winStart}");
+            Console.WriteLine($"Max: {stats[stats.Count-1]} | Min: {stats[0]}");
+            Console.WriteLine($"Mean: {average} | Median: {median}");
+        }
+
+        static Gene Run(int seed)
         {
             //Extension.InitKeys(5, 8, 1 << 25);
             //Create damage order
-            Extension.doRandomDefect = true;
-
-            if (!Extension.doRandomDefect)
-            {
-                Extension.ShuffleDefects();
-                Defects[] dfcts = Extension.defectOrder;
-                Console.WriteLine("Damage order (Red/White/Blue)");
-                string dfctOrder = "";
-                for (int i = 0; i < 18; i++)
-                {
-                    if (i != 0 && i % 6 == 0)
-                        dfctOrder += "\n";
-                    dfctOrder += dfcts[i].ToString() + " ";
-                }
-                Console.WriteLine(dfctOrder);
-            }
-            else
-                Console.WriteLine("Random defects");
-            
-            Console.WriteLine("-------");
-            
-            Random r = new Random();
+            Random r = new Random(seed);
             List<Event> events = new List<Event>();
             Player[] players = new Player[5];
 
@@ -60,7 +92,7 @@ namespace SpaceAlertSolver
             //Load trajectories
             Trajectory[] trajectories = new Trajectory[4];
             int[] ts = new int[] { 0, 1, 2, 3, 4, 5, 6 };
-            
+
             Console.WriteLine("'r' for random trajectories or xxxx to manually set");
             string resp = Console.ReadLine();
             if (resp == "r" || resp == "R")
@@ -76,14 +108,14 @@ namespace SpaceAlertSolver
             }
             else
             {
-                for(int i = 0; i < 4; i++)
-                    trajectories[i] = new Trajectory(int.Parse(resp[i].ToString())-1);
+                for (int i = 0; i < 4; i++)
+                    trajectories[i] = new Trajectory(int.Parse(resp[i].ToString()) - 1);
             }
 
             Console.WriteLine("Trajectories:");
             Console.WriteLine("Lt{0} Mt{1} Rt{2} It{3}", trajectories[0].number + 1, trajectories[1].number + 1, trajectories[2].number + 1, trajectories[3].number + 1);
             Console.WriteLine();
-            Console.WriteLine("Add events: 'type 1..4 ec es ic is' 'turn 1...12' 'zone 0,1,2' | Type 'start' to start simulation");
+            Console.WriteLine("Add events: 'turn 1...12' 'zone 0,1,2,3' ('name' | 'r' 'severity 0,1') | Type 'start' to start simulation");
             string[] zoneStr = new string[] { "Red", "White", "Blue", "Internal" };
             while (true)
             {
@@ -93,36 +125,21 @@ namespace SpaceAlertSolver
                 //Get threat
                 else
                 {
-                    string[] strsplit = str.Split();
-                    int type = int.Parse(strsplit[0]);
-                    int t = int.Parse(strsplit[1]);
-                    //External
-                    if(type <= 2)
+                    string[] strsplit = str.Split(' ');
+                    int t = int.Parse(strsplit[0]);
+                    int z = int.Parse(strsplit[1]);
+                    
+                    // name given
+                    if (strsplit[2] == "r")
                     {
-                        int z = int.Parse(strsplit[2]);
                         int thrt;
-                        //Common
-                        if(type == 1)
+                        if (z < 3)
                         {
-                            if(strsplit.Length > 3)
-                            {
-                                thrt = int.Parse(strsplit[3]);
-                                comExThreats.Remove(thrt);
-                            }
-                            else
+                            if(strsplit[3] == "0")
                             {
                                 int thrtIdx = r.Next(comExThreats.Count);
                                 thrt = comExThreats[thrtIdx];
                                 comExThreats.RemoveAt(thrtIdx);
-                            }
-                        }
-                        //Severe
-                        else
-                        {
-                            if (strsplit.Length > 3)
-                            {
-                                thrt = int.Parse(strsplit[3]);
-                                sevExThreats.Remove(thrt);
                             }
                             else
                             {
@@ -131,34 +148,13 @@ namespace SpaceAlertSolver
                                 sevExThreats.RemoveAt(thrtIdx);
                             }
                         }
-
-                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", ThreatFactory.ExName(thrt), t, zoneStr[z], thrt);
-                        events.Add(new Event(true, t, z, thrt));
-                    }
-                    //Internal
-                    else
-                    {
-                        int thrt;
-                        if (type == 3)
+                        else
                         {
-                            if (strsplit.Length > 2)
-                            {
-                                thrt = int.Parse(strsplit[2]);
-                                comInThreats.Remove(thrt);
-                            }
-                            else
+                            if (strsplit[3] == "0")
                             {
                                 int thrtIdx = r.Next(comInThreats.Count);
                                 thrt = comInThreats[thrtIdx];
                                 comInThreats.RemoveAt(thrtIdx);
-                            }
-                        }
-                        else
-                        {
-                            if (strsplit.Length > 2)
-                            {
-                                thrt = int.Parse(strsplit[2]);
-                                sevInThreats.Remove(thrt);
                             }
                             else
                             {
@@ -167,15 +163,38 @@ namespace SpaceAlertSolver
                                 sevInThreats.RemoveAt(thrtIdx);
                             }
                         }
-                        Console.WriteLine("Loaded {0} on turn {1} ({2})", ThreatFactory.InName(thrt), t, thrt);
-                        events.Add(new Event(false, t, 3, thrt));
+
+                        events.Add(new Event(z < 3, t, z, thrt));
+                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", ThreatFactory.ExName(thrt), t, zoneStr[z], thrt);
+                    }
+                    else
+                    {
+                        string name = strsplit[2];
+                        for (int i = 3; i < strsplit.Length; i++)
+                        {
+                            name += ' ' + strsplit[i];
+                        }
+
+                        ThreatName tn;
+                        // external
+                        if (z < 3)
+                        {
+                            tn = ThreatParser.ParseExThreat(name);
+                        }
+                        else
+                        {
+                            tn = ThreatParser.ParseInThreat(name);
+                        }
+
+                        events.Add(new Event(tn.external, t, z, tn.id));
+                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", tn.name, t, zoneStr[z], tn.id);
                     }
                 }
             }
             Event[] evArr = events.ToArray();
 
             //Random simulations
-            Genetic genetic = new Genetic(400, 5, trajectories, evArr);
+            /*Genetic genetic = new Genetic(400, 5, trajectories, evArr);
             while (true)
             {
                 int sims = 0;
@@ -191,7 +210,23 @@ namespace SpaceAlertSolver
                 if (ans == "R" || ans == "r")
                     genetic = new Genetic(400, 5, trajectories, evArr);
             }
-            Console.ReadLine();
+            Console.ReadLine();*/
+
+            SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
+            sa.Run(5000000, trajectories, evArr, seed);
+            if (PRINT_DEBUG)
+            {
+                Console.WriteLine(sa.getBestGene().Rep() + sa.getBestGene().getScore());
+                Console.WriteLine("-----FINAL-----");
+                PrintStats(sa.getBestStats());
+            }
+            else
+            {
+                Console.WriteLine(sa.getBestGene().Rep());
+                Console.WriteLine("-----FINAL-----");
+            }
+
+            return sa.getBestGene();
         }
     }
 
@@ -203,11 +238,18 @@ namespace SpaceAlertSolver
         public static ulong[] hash;
         public static ulong hashSize;
 
-        public static Random rng = new Random();
+        public static Random rng = new Random(Program.SEED);
         public static bool doRandomDefect;
-        public static Defects[] defectOrder = new Defects[] {Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
-                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop,
-                    Defects.lift,Defects.reactor,Defects.shield,Defects.structure,Defects.weaponbot,Defects.weapontop};
+
+        public static T[] CopyArray<T>(T[] a)
+        {
+            T[] ret = new T[a.Length];
+            for (int i = 0; i < ret.Length; i++)
+            {
+                ret[i] = a[i];
+            }
+            return ret;
+        }
 
         public static void Shuffle<T>(this IList<T> list, int bot, int range)
         {
@@ -220,13 +262,6 @@ namespace SpaceAlertSolver
                 list[k] = list[n+bot];
                 list[n+bot] = value;
             }
-        }
-
-        public static void ShuffleDefects()
-        {
-            defectOrder.Shuffle(0, 6);
-            defectOrder.Shuffle(6, 6);
-            defectOrder.Shuffle(12, 6);
         }
 
         public static void InitKeys(int pCount, int actCount, ulong hashSize)
