@@ -133,6 +133,7 @@ namespace SpaceAlertSolver
                     if (strsplit[2] == "r")
                     {
                         int thrt;
+                        string name;
                         if (z < 3)
                         {
                             if(strsplit[3] == "0")
@@ -147,6 +148,8 @@ namespace SpaceAlertSolver
                                 thrt = sevExThreats[thrtIdx];
                                 sevExThreats.RemoveAt(thrtIdx);
                             }
+
+                            name = ThreatFactory.ExName(thrt);
                         }
                         else
                         {
@@ -162,10 +165,12 @@ namespace SpaceAlertSolver
                                 thrt = sevInThreats[thrtIdx];
                                 sevInThreats.RemoveAt(thrtIdx);
                             }
+
+                            name = ThreatFactory.InName(thrt);
                         }
 
                         events.Add(new Event(z < 3, t, z, thrt));
-                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", ThreatFactory.ExName(thrt), t, zoneStr[z], thrt);
+                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", name, t, zoneStr[z], thrt);
                     }
                     else
                     {
