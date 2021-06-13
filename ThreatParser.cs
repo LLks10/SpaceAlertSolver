@@ -19,6 +19,7 @@ namespace SpaceAlertSolver
             new ThreatName("Meteorite", true, 6),
             new ThreatName("Pulse Ball", true, 7),
             new ThreatName("Destroyer", true, 8),
+            new ThreatName("Spacecruiser", true, 8),
             new ThreatName("Stealth Fighter", true, 9),
             new ThreatName("Jellyfish", true, 10),
             new ThreatName("Minor Asteroid", true, 11),
@@ -38,7 +39,31 @@ namespace SpaceAlertSolver
             new ThreatName("Psionic Satellite", true, 25),
             new ThreatName("Major Asteroid", true, 26),
             new ThreatName("Moloch", true, 27),
-            new ThreatName("Behemoth", true, 28)
+            new ThreatName("Behemoth", true, 28),
+
+            new ThreatName("Gepanserde Grijper", true, 0),
+            new ThreatName("Slagschip", true, 2),
+            new ThreatName("Jager", true, 3),
+            new ThreatName("Cryoschild Jager", true, 4),
+            new ThreatName("Energiewolk", true, 5),
+            new ThreatName("Meteoroïde", true, 6),
+            new ThreatName("Impulsbal", true, 7),
+            new ThreatName("Ruimtekruiser", true, 8),
+            new ThreatName("Stealth Jager", true, 9),
+            new ThreatName("Kwal", true, 10),
+            new ThreatName("Kleine Asteroïde", true, 11),
+            new ThreatName("Zwerm", true, 13),
+            new ThreatName("Spookjager", true, 14),
+            new ThreatName("Verkenner", true, 15),
+            new ThreatName("Cryoschild Fregat", true, 17),
+            new ThreatName("Oorlogsbodem", true, 18),
+            new ThreatName("Interstellaire Octopus", true, 19),
+            new ThreatName("Maalstroom", true, 20),
+            new ThreatName("Asteroïde", true, 21),
+            new ThreatName("Impulssatelliet", true, 22),
+            new ThreatName("Nevelkrab", true, 24),
+            new ThreatName("Psionische Satelliet", true, 25),
+            new ThreatName("Grote Asteroïde", true, 26),
         };
         static ThreatName[] in_threats = new ThreatName[]
         {
@@ -63,7 +88,28 @@ namespace SpaceAlertSolver
             new ThreatName("Crossed Wire", false, 18),
             new ThreatName("Power System Overload", false, 19),
             new ThreatName("Fissure", false, 20),
-            new ThreatName("Contamination", false, 21)
+            new ThreatName("Contamination", false, 21),
+
+            new ThreatName("Rode Saboteur", false, 0),
+            new ThreatName("Blauwe Saboteur", false, 1),
+            new ThreatName("Rode Tirailleurs", false, 2),
+            new ThreatName("Blauwe Tirailleurs", false, 3),
+            new ThreatName("Rode Soldaten", false, 4),
+            new ThreatName("Blauwe Soldaten", false, 5),
+            new ThreatName("Virus", false, 6),
+            new ThreatName("Rode Gehackte Schilden", false, 7),
+            new ThreatName("Blauwe Gehackte Schilden", false, 8),
+            new ThreatName("Oververhitte Reactor", false, 9),
+            new ThreatName("Onstabiele Kernkoppen", false, 10),
+            new ThreatName("Rode Commandos", false, 11),
+            new ThreatName("Blauwe Commandos", false, 12),
+            new ThreatName("Zoekrobot", false, 15),
+            new ThreatName("Atoombom", false, 16),
+            new ThreatName("Rebellerende Robots", false, 17),
+            new ThreatName("Verwisselde Kabels", false, 18),
+            new ThreatName("Overbelast Energienet", false, 19),
+            new ThreatName("Scheur", false, 20),
+            new ThreatName("Besmetting", false, 21)
         };
 
         // https://gist.github.com/Davidblkx/e12ab0bb2aff7fd8072632b396538560 Thanks!
@@ -118,7 +164,7 @@ namespace SpaceAlertSolver
             ThreatName most_likely_threat = ex_threats[0];
             foreach (ThreatName tn in ex_threats)
             {
-                int lev_dist = LevenshteinDistance(tn.name, input);
+                int lev_dist = LevenshteinDistance(tn.name.ToLower(), input.ToLower());
                 if (lev_dist < min_lev_dist)
                 {
                     min_lev_dist = lev_dist;
@@ -142,7 +188,7 @@ namespace SpaceAlertSolver
             ThreatName most_likely_threat = in_threats[0];
             foreach (ThreatName tn in in_threats)
             {
-                int lev_dist = LevenshteinDistance(tn.name, input);
+                int lev_dist = LevenshteinDistance(tn.name.ToLower(), input.ToLower());
                 if (lev_dist < min_lev_dist)
                 {
                     min_lev_dist = lev_dist;
