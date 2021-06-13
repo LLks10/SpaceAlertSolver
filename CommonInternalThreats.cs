@@ -389,5 +389,215 @@ namespace SpaceAlertSolver
             ship.DealDamageIntern(2, ship.rockets*3);
         }
     }
+
+    //ID: 11
+    class SlimeBlue : InThreat
+    {
+        bool[] positions;
+        int[] healths;
+        public SlimeBlue(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 2;
+            speed = 2;
+            scoreLose = 3;
+            scoreWin = 6;
+            vulnerability = InDmgSource.android;
+
+            // Apply station based health and position
+            healths = new int[] { 0, 0, 0, 0, 0, 2, 0 };
+            positions = new bool[] { false, false, false, false, false, true, false };
+            // Apply delay to ship
+            ship.stationStatus[5] |= 1;
+        }
+        
+        // Destroy a rocket
+        public override void ActX()
+        {
+            if (ship.rockets > 0)
+            {
+                ship.rockets--;
+                // Check if Cdefect is active
+                if (ship.CDefect[5] > 0)
+                {
+                    // Search for unstable warheads and deal damage
+                    for (int i = 0; i < ship.game.inThreats.Count; i++)
+                    {
+                        if (ship.game.inThreats[i] is UnstableWarheads)
+                        {
+                            ship.game.inThreats[i].DealDamage(i, InDmgSource.C);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void ActY()
+        {
+            // Check if slime exists in lower white
+            if (positions[4])
+            {
+                // Check if red lower area doesn't already have slime effect
+                if((ship.stationStatus[3] & 1) != 1)
+                {
+                    // Spread
+                    positions[3] = true;
+                    healths[3] = 1;
+                    health++;
+                    ship.stationStatus[3] |= 1;
+                }
+            }
+            // Check if slime exists in lower blue
+            if (positions[5])
+            {
+                // Check if white lower area doesn't already have slime effect
+                if ((ship.stationStatus[4] & 1) != 1)
+                {
+                    // Spread
+                    positions[4] = true;
+                    healths[4] = 1;
+                    health++;
+                    ship.stationStatus[4] |= 1;
+                }
+            }
+        }
+        public override void ActZ()
+        {
+            if (positions[3])
+                ship.DealDamageIntern(0, 2);
+            if (positions[4])
+                ship.DealDamageIntern(1, 2);
+            if (positions[5])
+                ship.DealDamageIntern(2, 2);
+        }
+
+        public override bool DealDamage(int position, InDmgSource source)
+        {
+            if (source == vulnerability && AtPosition(position))
+            {
+                //Local damage
+                healths[position]--;
+                if (healths[position] <= 0)
+                {
+                    // Remove slime from position
+                    ship.stationStatus[position] &= ~1;
+                    positions[position] = false;
+                }
+
+                //Full damage
+                health--;
+                if (health <= 0)
+                {
+                    alive = false;
+                    beaten = true;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public override bool AtPosition(int position)
+        {
+            return positions[position];
+        }
+    }
+
+    //ID: 12
+    class SlimeRed : InThreat
+    {
+        bool[] positions;
+        int[] healths;
+        public SlimeRed(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+        {
+            health = 2;
+            speed = 2;
+            scoreLose = 3;
+            scoreWin = 6;
+            vulnerability = InDmgSource.android;
+
+            // Apply station based health and position
+            healths = new int[] { 0, 0, 0, 2, 0, 0, 0 };
+            positions = new bool[] { false, false, false, true, false, false, false };
+            // Apply delay to ship
+            ship.stationStatus[3] |= 1;
+        }
+
+        // Disable inactive androids
+        public override void ActX()
+        {
+            if (!ship.androids[1].active)
+                ship.androids[1].alive = false;
+        }
+        
+        public override void ActY()
+        {
+            // Check if slime exists in lower white
+            if (positions[4])
+            {
+                // Check if blue lower area doesn't already have slime effect
+                if ((ship.stationStatus[5] & 1) != 1)
+                {
+                    // Spread
+                    positions[5] = true;
+                    healths[5] = 1;
+                    health++;
+                    ship.stationStatus[5] |= 1;
+                }
+            }
+            // Check if slime exists in lower red
+            if (positions[3])
+            {
+                // Check if white lower area doesn't already have slime effect
+                if ((ship.stationStatus[4] & 1) != 1)
+                {
+                    // Spread
+                    positions[4] = true;
+                    healths[4] = 1;
+                    health++;
+                    ship.stationStatus[4] |= 1;
+                }
+            }
+        }
+        public override void ActZ()
+        {
+            if (positions[3])
+                ship.DealDamageIntern(0, 2);
+            if (positions[4])
+                ship.DealDamageIntern(1, 2);
+            if (positions[5])
+                ship.DealDamageIntern(2, 2);
+        }
+
+        public override bool DealDamage(int position, InDmgSource source)
+        {
+            if (source == vulnerability && AtPosition(position))
+            {
+                //Local damage
+                healths[position]--;
+                if (healths[position] <= 0)
+                {
+                    // Remove slime from position
+                    ship.stationStatus[position] &= ~1;
+                    positions[position] = false;
+                }
+
+                //Full damage
+                health--;
+                if (health <= 0)
+                {
+                    alive = false;
+                    beaten = true;
+                    OnClear();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public override bool AtPosition(int position)
+        {
+            return positions[position];
+        }
+    }
     #endregion
 }

@@ -342,6 +342,7 @@ namespace SpaceAlertSolver
                         p.inIntercept = false;
                         ship.interceptorReady = true;
                         p.Move(0);
+                        ApplyStatusEffect(p, t);
                         p.Delay(t);
                         return;
                     }
@@ -354,12 +355,12 @@ namespace SpaceAlertSolver
                     case Act.left:
                         if (p.position != 0 && p.position != 3)
                             p.Move(p.position - 1);
-                        ApplyStatusEffect(p);
+                        ApplyStatusEffect(p, t);
                         break;
                     case Act.right:
                         if (p.position != 2 && p.position != 5)
                             p.Move(p.position + 1);
-                        ApplyStatusEffect(p);
+                        ApplyStatusEffect(p, t);
                         break;
                     case Act.lift:
                         //Check if elevator was used
@@ -372,7 +373,7 @@ namespace SpaceAlertSolver
                             p.Move(p.position + 3);
                         else
                             p.Move(p.position - 3);
-                        ApplyStatusEffect(p);
+                        ApplyStatusEffect(p, t);
                         break;
 
                     //Actions
@@ -617,14 +618,17 @@ namespace SpaceAlertSolver
                 exThreats[target].DealDamage(3, 1, ExDmgSource.intercept);
         }
 
-        void ApplyStatusEffect(Player p)
+        void ApplyStatusEffect(Player p, int turn)
         {
             //Check status effect
             if (ship.stationStatus[p.position] != 0)
             {
-                if ((ship.stationStatus[p.position] & 2) == 2)
+                // Delay
+                if ((ship.stationStatus[p.position] & 1) == 1)
+                    p.Delay(turn + 1);
+                // Kill
+                else if ((ship.stationStatus[p.position] & 2) == 2)
                     p.Kill();
-                //Check delay
             }
         }
 
@@ -679,7 +683,16 @@ namespace SpaceAlertSolver
         B,
         C,
         fight,
-        empty
+        empty,
+        tl,
+        tm,
+        tr,
+        dl,
+        dm,
+        dr,
+        hA,
+        hB,
+        hFight
     }
 
     //Event
