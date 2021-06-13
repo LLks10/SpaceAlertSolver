@@ -5,6 +5,10 @@ namespace SpaceAlertSolver
 {
     public class Gene
     {
+        private static Act[][] user_actions = new Act[][] {
+            // ParseActions("abcf erd")
+        };
+
         private int[] gene;
         public int players, blanks;
         double score;
@@ -44,6 +48,55 @@ namespace SpaceAlertSolver
             this.gene = new int[other.gene.Length];
             other.gene.CopyTo(this.gene, 0);
             this.players = other.players;
+        }
+
+        /**
+         * <summary>Parses a string to an action array</summary>
+         * <returns>Act array of length 12</returns>
+         * <param name="actions">The action string to parse, should have length 12</param>
+         */
+        private static Act[] ParseActions(string actions)
+        {
+            if (actions.Length != 12)
+            {
+                throw new ArgumentException("The action string must be 12 characters long");
+            }
+
+            Act[] ret = new Act[12];
+            for (int i = 0; i < 12; i++)
+            {
+                switch (actions[i])
+                {
+                    case 'a':
+                        ret[i] = Act.A;
+                        break;
+                    case 'b':
+                        ret[i] = Act.B;
+                        break;
+                    case 'c':
+                        ret[i] = Act.C;
+                        break;
+                    case 'd':
+                        ret[i] = Act.lift;
+                        break;
+                    case 'f':
+                        ret[i] = Act.fight;
+                        break;
+                    case 'r':
+                        ret[i] = Act.right;
+                        break;
+                    case 'e':
+                        ret[i] = Act.left;
+                        break;
+                    case ' ':
+                        ret[i] = Act.empty;
+                        break;
+                    default:
+                        throw new FormatException($"Invalid character <{actions[i]}>");
+                }
+            }
+
+            return ret;
         }
 
         /**
@@ -235,12 +288,19 @@ namespace SpaceAlertSolver
 
         private double Evaluate(int[] gene, Trajectory[] trajs, Event[] evts)
         {
-            Player[] ps = new Player[players];
-            for (int i = 0; i < players; i++)
+            Player[] ps = new Player[user_actions.Length + players];
+            for (int i = user_actions.Length; i < players + user_actions.Length; i++)
                 ps[i] = new Player();
 
+            // initialize user players
+            for (int i = 0; i < user_actions.Length; i++)
+            {
+                ps[i] = new Player(user_actions[i]);
+            }
+
+            // initialize random players
             int idx = 0;
-            for (int i = 0; i < players; i++)
+            for (int i = user_actions.Length; i < players + user_actions.Length; i++)
             {
                 ps[i].actions = new Act[12];
                 for (int j = 0; j < 12; j++)
