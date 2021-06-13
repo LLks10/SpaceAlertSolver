@@ -58,6 +58,7 @@
     <Compile Include="Ship.cs" />
     <Compile Include="SimulatedAnnealing.cs" />
     <Compile Include="ThreatFactory.cs" />
+    <Compile Include="ThreatParser.cs" />
     <Compile Include="Trajectory.cs" />
   </ItemGroup>
   <ItemGroup>

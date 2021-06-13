@@ -115,7 +115,7 @@ namespace SpaceAlertSolver
             Console.WriteLine("Trajectories:");
             Console.WriteLine("Lt{0} Mt{1} Rt{2} It{3}", trajectories[0].number + 1, trajectories[1].number + 1, trajectories[2].number + 1, trajectories[3].number + 1);
             Console.WriteLine();
-            Console.WriteLine("Add events: 'type 1..4 ec es ic is' 'turn 1...12' 'zone 0,1,2' | Type 'start' to start simulation");
+            Console.WriteLine("Add events: 'turn 1...12' 'zone 0,1,2,3' ('name' | 'r' 'severity 0,1') | Type 'start' to start simulation");
             string[] zoneStr = new string[] { "Red", "White", "Blue", "Internal" };
             while (true)
             {
@@ -125,36 +125,21 @@ namespace SpaceAlertSolver
                 //Get threat
                 else
                 {
-                    string[] strsplit = str.Split();
-                    int type = int.Parse(strsplit[0]);
-                    int t = int.Parse(strsplit[1]);
-                    //External
-                    if (type <= 2)
+                    string[] strsplit = str.Split(' ');
+                    int t = int.Parse(strsplit[0]);
+                    int z = int.Parse(strsplit[1]);
+                    
+                    // name given
+                    if (strsplit[2] == "r")
                     {
-                        int z = int.Parse(strsplit[2]);
                         int thrt;
-                        //Common
-                        if (type == 1)
+                        if (z < 3)
                         {
-                            if (strsplit.Length > 3)
-                            {
-                                thrt = int.Parse(strsplit[3]);
-                                comExThreats.Remove(thrt);
-                            }
-                            else
+                            if(strsplit[3] == "0")
                             {
                                 int thrtIdx = r.Next(comExThreats.Count);
                                 thrt = comExThreats[thrtIdx];
                                 comExThreats.RemoveAt(thrtIdx);
-                            }
-                        }
-                        //Severe
-                        else
-                        {
-                            if (strsplit.Length > 3)
-                            {
-                                thrt = int.Parse(strsplit[3]);
-                                sevExThreats.Remove(thrt);
                             }
                             else
                             {
@@ -163,34 +148,13 @@ namespace SpaceAlertSolver
                                 sevExThreats.RemoveAt(thrtIdx);
                             }
                         }
-
-                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", ThreatFactory.ExName(thrt), t, zoneStr[z], thrt);
-                        events.Add(new Event(true, t, z, thrt));
-                    }
-                    //Internal
-                    else
-                    {
-                        int thrt;
-                        if (type == 3)
+                        else
                         {
-                            if (strsplit.Length > 2)
-                            {
-                                thrt = int.Parse(strsplit[2]);
-                                comInThreats.Remove(thrt);
-                            }
-                            else
+                            if (strsplit[3] == "0")
                             {
                                 int thrtIdx = r.Next(comInThreats.Count);
                                 thrt = comInThreats[thrtIdx];
                                 comInThreats.RemoveAt(thrtIdx);
-                            }
-                        }
-                        else
-                        {
-                            if (strsplit.Length > 2)
-                            {
-                                thrt = int.Parse(strsplit[2]);
-                                sevInThreats.Remove(thrt);
                             }
                             else
                             {
@@ -199,8 +163,31 @@ namespace SpaceAlertSolver
                                 sevInThreats.RemoveAt(thrtIdx);
                             }
                         }
-                        Console.WriteLine("Loaded {0} on turn {1} ({2})", ThreatFactory.InName(thrt), t, thrt);
-                        events.Add(new Event(false, t, 3, thrt));
+
+                        events.Add(new Event(z < 3, t, z, thrt));
+                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", ThreatFactory.ExName(thrt), t, zoneStr[z], thrt);
+                    }
+                    else
+                    {
+                        string name = strsplit[2];
+                        for (int i = 3; i < strsplit.Length; i++)
+                        {
+                            name += ' ' + strsplit[i];
+                        }
+
+                        ThreatName tn;
+                        // external
+                        if (z < 3)
+                        {
+                            tn = ThreatParser.ParseExThreat(name);
+                        }
+                        else
+                        {
+                            tn = ThreatParser.ParseInThreat(name);
+                        }
+
+                        events.Add(new Event(tn.external, t, z, tn.id));
+                        Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", tn.name, t, zoneStr[z], tn.id);
                     }
                 }
             }
