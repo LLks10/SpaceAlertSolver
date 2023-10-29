@@ -81,19 +81,19 @@ public class Gene
                     ret[i] = Act.C;
                     break;
                 case 'd':
-                    ret[i] = Act.lift;
+                    ret[i] = Act.Lift;
                     break;
                 case 'f':
-                    ret[i] = Act.fight;
+                    ret[i] = Act.Fight;
                     break;
                 case 'r':
-                    ret[i] = Act.right;
+                    ret[i] = Act.Right;
                     break;
                 case 'e':
-                    ret[i] = Act.left;
+                    ret[i] = Act.Left;
                     break;
                 case ' ':
-                    ret[i] = Act.empty;
+                    ret[i] = Act.Empty;
                     break;
                 default:
                     throw new FormatException($"Invalid character <{actions[i]}>");
@@ -242,33 +242,8 @@ public class Gene
             output += playerColours[j] + " | ";
             for (int i = 0; i < 12; i++)
             {
-                switch (this.gene[i + j * 12])
-                {
-                    case 0:
-                        output += "blank ";
-                        break;
-                    case 1:
-                        output += " blue ";
-                        break;
-                    case 2:
-                        output += " red  ";
-                        break;
-                    case 3:
-                        output += " lift ";
-                        break;
-                    case 4:
-                        output += "  A   ";
-                        break;
-                    case 5:
-                        output += "  B   ";
-                        break;
-                    case 6:
-                        output += "  C   ";
-                        break;
-                    case 7:
-                        output += "robot ";
-                        break;
-                }
+                Act a = (Act)gene[i + j * 12];
+                output += a.ToStr().Pad(6);
             }
             output += "\n";
         }
@@ -312,16 +287,16 @@ public class Gene
                 switch (gene[idx])
                 {
                     case 0:
-                        ps[i].actions[j] = Act.empty;
+                        ps[i].actions[j] = Act.Empty;
                         break;
                     case 1:
-                        ps[i].actions[j] = Act.right;
+                        ps[i].actions[j] = Act.Right;
                         break;
                     case 2:
-                        ps[i].actions[j] = Act.left;
+                        ps[i].actions[j] = Act.Left;
                         break;
                     case 3:
-                        ps[i].actions[j] = Act.lift;
+                        ps[i].actions[j] = Act.Lift;
                         break;
                     case 4:
                         ps[i].actions[j] = Act.A;
@@ -333,7 +308,7 @@ public class Gene
                         ps[i].actions[j] = Act.C;
                         break;
                     case 7:
-                        ps[i].actions[j] = Act.fight;
+                        ps[i].actions[j] = Act.Fight;
                         break;
                 }
                 idx++;

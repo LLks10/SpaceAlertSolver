@@ -295,7 +295,7 @@ public class Game
         //Check interceptor controls
         if (p.inIntercept)
         {
-            if (a == Act.fight)
+            if (a == Act.Fight)
             {
                 //Keep fighting
                 InterceptorDamage();
@@ -316,13 +316,13 @@ public class Game
         //Perform action
         switch (a)
         {
-            case Act.left:
+            case Act.Left:
                 PlayerActionMove(p, t, true);
                 break;
-            case Act.right:
+            case Act.Right:
                 PlayerActionMove(p, t, false);
                 break;
-            case Act.lift:
+            case Act.Lift:
                 PlayerActionLift(p);
                 break;
             case Act.A:
@@ -335,10 +335,10 @@ public class Game
                 PlayerActionC(p);
                 break;
             //Empty for now
-            case Act.fight:
+            case Act.Fight:
                 PlayerActionFight(p);
                 break;
-            case Act.empty:
+            case Act.Empty:
                 break;
         }
     }
@@ -368,7 +368,7 @@ public class Game
         int z = p.position % 3;
 
         // branching
-        if (t < 11 && p.actions[t + 1] != Act.empty) // no branching needed if nothing to be delayed
+        if (t < 11 && p.actions[t + 1] != Act.Empty) // no branching needed if nothing to be delayed
         {
             BranchConditional(z, Defects.lift);
         }
@@ -929,7 +929,7 @@ public class Game
         output.AppendFormat("DMG: {0} {1} {2}\n", ship.damage[0], ship.damage[1], ship.damage[2]);
         output.AppendFormat("OBS: {0} {1} {2}\n", observation[0], observation[1], observation[2]);
         output.AppendFormat("P Pos: {0} {1} {2} {3} {4}\n", players[0].position, players[1].position, players[2].position, players[3].position, players[4].position);
-        output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", ActToString(players[0].actions[11]), ActToString(players[1].actions[11]), ActToString(players[2].actions[11]), ActToString(players[3].actions[11]), ActToString(players[4].actions[11]));
+        output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", players[0].actions[11].ToStr(), players[1].actions[11].ToStr(), players[2].actions[11].ToStr(), players[3].actions[11].ToStr(), players[4].actions[11].ToStr());
         output.AppendFormat("Alive: {0} {1} {2} {3} {4}\n", players[0].alive, players[1].alive, players[2].alive, players[3].alive, players[4].alive);
         output.AppendFormat("ExKill: {0} | ExSurv: {1} | InKill: {2} | InSurv: {3}\n", exSlain, exSurvived, inSlain, inSurvived);
         output.AppendFormat("Reactors: {0} {1} {2}\n", ship.reactors[0], ship.reactors[1], ship.reactors[2]);
@@ -939,69 +939,77 @@ public class Game
         return output.ToString();
     }
 
-    string ActToString(Act a)
+    private enum SimulationPhase
     {
-        switch (a)
-        {
-            case Act.A:
-                return "A";
-            case Act.B:
-                return "B";
-            case Act.C:
-                return "C";
-            case Act.empty:
-                return "-";
-            case Act.fight:
-                return "Robot";
-            case Act.left:
-                return "Red";
-            case Act.right:
-                return "Blue";
-            case Act.lift:
-                return "Lift";
-            default:
-                return "";
-        }
+        SimulationPrep,
+        TurnPrep,
+        Actions,
+        RocketFire,
+        InternalTurnEnd,
+        CleanupInternal,
+        ExternalDamage,
+        CleanupExternal,
+        MoveThreats,
+        TurnCleanup,
+        FinalExternalDamage,
+        FinalCleanup,
+        FinalMoveThreats,
+        FinalScoring
     }
-}
-
-public enum SimulationPhase
-{
-    SimulationPrep,
-    TurnPrep,
-    Actions,
-    RocketFire,
-    InternalTurnEnd,
-    CleanupInternal,
-    ExternalDamage,
-    CleanupExternal,
-    MoveThreats,
-    TurnCleanup,
-    FinalExternalDamage,
-    FinalCleanup,
-    FinalMoveThreats,
-    FinalScoring
 }
 
 public enum Act
 {
-    left,
-    right,
-    lift,
+    Left,
+    Right,
+    Lift,
     A,
     B,
     C,
-    fight,
-    empty,
-    tl,
-    tm,
-    tr,
-    dl,
-    dm,
-    dr,
-    hA,
-    hB,
-    hFight
+    Fight,
+    Empty,
+    HeroicTopLeft,
+    HeroicTopMiddle,
+    HeroicTopRight,
+    HeroicDownLeft,
+    HeroicDownMiddle,
+    HeroicDownRight,
+    HeroicA,
+    HeroicB,
+    HeroicFight
+}
+
+public static class ActExtensions
+{
+    public static string ToStr(this Act a) => a switch
+    {
+        Act.Left => "Red",
+        Act.Right => "Blue",
+        Act.Lift => "Lift",
+        Act.A => "A",
+        Act.B => "B",
+        Act.C => "C",
+        Act.Fight => "Robot",
+        Act.Empty => "-",
+        Act.HeroicTopLeft => "HTRed",
+        Act.HeroicTopMiddle => "HTWht",
+        Act.HeroicTopRight => "HTBlu",
+        Act.HeroicDownLeft => "HDRed",
+        Act.HeroicDownMiddle => "HDWht",
+        Act.HeroicDownRight => "HDBlu",
+        Act.HeroicA => "HA",
+        Act.HeroicB => "HB",
+        Act.HeroicFight => "HRbt",
+        _ => throw new UnreachableException("Whole enum should be covered"),
+    };
+
+    public static string Pad(this string str, int length)
+    {
+        int missingLength = length - str.Length;
+        int numSpacesLeft = missingLength / 2;
+        
+        return str.PadLeft(numSpacesLeft + str.Length).PadRight(length);
+    }
 }
 
 //Event

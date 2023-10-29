@@ -306,7 +306,7 @@ public static class Extension
             switch (splt[idx])
             {
                 case "blank":
-                    acts[idx] = Act.empty;
+                    acts[idx] = Act.Empty;
                     idx++;
                     break;
                 case "A":
@@ -322,19 +322,19 @@ public static class Extension
                     idx++;
                     break;
                 case "blue":
-                    acts[idx] = Act.right;
+                    acts[idx] = Act.Right;
                     idx++;
                     break;
                 case "red":
-                    acts[idx] = Act.left;
+                    acts[idx] = Act.Left;
                     idx++;
                     break;
                 case "lift":
-                    acts[idx] = Act.lift;
+                    acts[idx] = Act.Lift;
                     idx++;
                     break;
                 case "robot":
-                    acts[idx] = Act.fight;
+                    acts[idx] = Act.Fight;
                     idx++;
                     break;
             }

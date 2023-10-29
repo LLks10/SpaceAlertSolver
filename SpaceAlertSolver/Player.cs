@@ -66,20 +66,20 @@ public class Player
 
     public void Delay(int action)
     {
-        if (action >= 11 || actions[action] == Act.empty)
+        if (action >= 11 || actions[action] == Act.Empty)
         {
             if(action < 12)
-                actions[action] = Act.empty;
+                actions[action] = Act.Empty;
             return;
         }
 
         //Delay subsequent actions
-        if (actions[action + 1] != Act.empty)
+        if (actions[action + 1] != Act.Empty)
             Delay(action + 1);
 
         //Move action
         actions[action + 1] = actions[action];
-        actions[action] = Act.empty;
+        actions[action] = Act.Empty;
     }
 
     public void SetActions(int[] a)
@@ -90,13 +90,13 @@ public class Player
             switch (a[i])
             {
                 case 0:
-                    actions[i] = Act.left;
+                    actions[i] = Act.Left;
                     break;
                 case 1:
-                    actions[i] = Act.right;
+                    actions[i] = Act.Right;
                     break;
                 case 2:
-                    actions[i] = Act.lift;
+                    actions[i] = Act.Lift;
                     break;
                 case 3:
                     actions[i] = Act.A;
@@ -108,10 +108,10 @@ public class Player
                     actions[i] = Act.C;
                     break;
                 case 6:
-                    actions[i] = Act.fight;
+                    actions[i] = Act.Fight;
                     break;
                 case 7:
-                    actions[i] = Act.empty;
+                    actions[i] = Act.Empty;
                     break;
             }
         }

@@ -70,10 +70,10 @@ public class SimulationTest
         Player[] players = new Player[3] { GetEmptyPlayer(), GetEmptyPlayer(), GetEmptyPlayer() };
         players[0].actions[0] = Act.A;
         players[0].actions[1] = Act.A;
-        players[1].actions[0] = Act.lift;
+        players[1].actions[0] = Act.Lift;
         players[1].actions[1] = Act.A;
         players[2].actions[0] = Act.C;
-        players[2].actions[1] = Act.right;
+        players[2].actions[1] = Act.Right;
         players[2].actions[2] = Act.B;
         Trajectory[] trajectories = ConstructTrajectories(6, 1, 3, 4);
         Event[] events = new Event[]
@@ -90,7 +90,7 @@ public class SimulationTest
     private Player GetEmptyPlayer()
     {
         return new Player(new Act[12] {
-            Act.empty, Act.empty, Act.empty, Act.empty, Act.empty, Act.empty, Act.empty, Act.empty, Act.empty, Act.empty, Act.empty, Act.empty
+            Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty
         });
     }
 
