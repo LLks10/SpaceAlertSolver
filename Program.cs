@@ -209,7 +209,7 @@ namespace SpaceAlertSolver
                     }
                 }
             }
-            Event[] evArr = events.OrderBy(e => e.turn).ToArray();
+            Event[] evArr = events.OrderBy(e => e.Turn).ToArray();
 
             //Random simulations
             /*Genetic genetic = new Genetic(400, 5, trajectories, evArr);

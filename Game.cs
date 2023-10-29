@@ -823,17 +823,17 @@ namespace SpaceAlertSolver
         //Spawn a threat
         bool SpawnThreat(int turn, int eventIdx)
         {
-            if (eventIdx < events.Length && events[eventIdx].turn == turn)
+            if (eventIdx < events.Length && events[eventIdx].Turn == turn)
             {
                 //Summon threat
                 Event ev = events[eventIdx];
-                if (ev.external)
+                if (ev.IsExternal)
                 {
-                    exThreats.Add(ThreatFactory.SummonEx(ev.creature, trajectories[ev.zone], ev.zone, ship, turn));
+                    exThreats.Add(ThreatFactory.SummonEx(ev.CreatureId, trajectories[ev.Zone], ev.Zone, ship, turn));
                 }
                 else
                 {
-                    inThreats.Add(ThreatFactory.SummonIn(ev.creature, trajectories[3], ship, turn));
+                    inThreats.Add(ThreatFactory.SummonIn(ev.CreatureId, trajectories[3], ship, turn));
                 }
                 return true;
             }
@@ -1007,17 +1007,17 @@ namespace SpaceAlertSolver
     }
 
     //Event
-    public class Event
+    public readonly struct Event
     {
-        public bool external;
-        public int turn, zone, creature;
+        public readonly bool IsExternal;
+        public readonly int Turn, Zone, CreatureId;
 
-        public Event(bool ex, int turn, int zone, int creature)
+        public Event(bool isExternal, int turn, int zone, int creatureId)
         {
-            this.external = ex;
-            this.turn = turn;
-            this.zone = zone;
-            this.creature = creature;
+            IsExternal = isExternal;
+            Turn = turn;
+            Zone = zone;
+            CreatureId = creatureId;
         }
     }
 }
