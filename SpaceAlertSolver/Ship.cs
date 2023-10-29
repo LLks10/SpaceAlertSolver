@@ -8,14 +8,15 @@
 //8 16 32   64 Bitmasks stations
 
 //1  2  4  Bitmasks zone
-public class Ship
+public sealed class Ship
 {
     public static int NUM_DEFECTS = 6;
 
     public Game game;
 
     public Player[] players;
-    public Androids[] androids;
+    public AndroidState AndroidTopRight;
+    public AndroidState AndroidBottomLeft;
     public int[] shields;
     public int[] shieldsCap;
     public int[] reactors;
@@ -54,7 +55,8 @@ public class Ship
     {
         this.game = game;
         this.players = players;
-        androids = new Androids[2] { new Androids(other.androids[0]), new Androids(other.androids[1]) };
+        AndroidTopRight = other.AndroidTopRight;
+        AndroidBottomLeft = other.AndroidBottomLeft;
         shields = other.shields.ToArray();
         shieldsCap = other.shieldsCap.ToArray();
         reactors = other.reactors.ToArray();
@@ -100,7 +102,8 @@ public class Ship
         shieldsCap = new int[] { 2, 3, 2 };
         reactors = new int[] { 2, 3, 2 };
         reactorsCap = new int[] { 3, 5, 3 };
-        androids = new Androids[] { new Androids(2), new Androids(3) };
+        AndroidTopRight = AndroidState.Alive;
+        AndroidBottomLeft = AndroidState.Alive;
         laserDamage = new int[] { 4, 5, 4 };
         plasmaDamage = new int[] { 2, 2, 2 };
         stationStatus = new int[6];

@@ -1,4 +1,5 @@
 ﻿using SpaceAlertSolver;
+using System.Collections.Immutable;
 
 namespace SpaceAlertSolverTests;
 
@@ -20,8 +21,9 @@ public class SimulationTest
     [TestMethod]
     public void Test1Enemy0Damage()
     {
-        Player[] players = new Player[1] { GetEmptyPlayer() };
-        players[0].actions[0] = Act.A;
+        Act[] actions = GetEmptyActions();
+        actions[0] = Act.A;
+        Player[] players = new Player[1] { new(ImmutableArray.Create(actions)) };
         Trajectory[] trajectories = ConstructTrajectories(1, 2, 3, 4);
         Event[] events = new Event[]
         {
@@ -43,10 +45,11 @@ public class SimulationTest
         // score if cannon is broken = -6.0 with 1/6% chance
         // expected score = 2/3
 
-        Player[] players = new Player[1] { GetEmptyPlayer() };
-        players[0].actions[0] = Act.C;
-        players[0].actions[2] = Act.A;
-        players[0].actions[3] = Act.A;
+        Act[] actions = GetEmptyActions();
+        actions[0] = Act.C;
+        actions[2] = Act.A;
+        actions[3] = Act.A;
+        Player[] players = new Player[1] { new(ImmutableArray.Create(actions)) };
         Trajectory[] trajectories = ConstructTrajectories(1, 2, 3, 4);
         Event[] events = new Event[]
         {
@@ -67,14 +70,19 @@ public class SimulationTest
         // score shield not broken = 0.0 with 5/6% chance
         // score shield is broken = -194.0 with 1/6% chance
 
-        Player[] players = new Player[3] { GetEmptyPlayer(), GetEmptyPlayer(), GetEmptyPlayer() };
-        players[0].actions[0] = Act.A;
-        players[0].actions[1] = Act.A;
-        players[1].actions[0] = Act.Lift;
-        players[1].actions[1] = Act.A;
-        players[2].actions[0] = Act.C;
-        players[2].actions[1] = Act.Right;
-        players[2].actions[2] = Act.B;
+        Act[] actions0 = GetEmptyActions();
+        Act[] actions1 = GetEmptyActions();
+        Act[] actions2 = GetEmptyActions();
+
+        actions0[0] = Act.A;
+        actions0[1] = Act.A;
+        actions1[0] = Act.Lift;
+        actions1[1] = Act.A;
+        actions2[0] = Act.C;
+        actions2[1] = Act.Right;
+        actions2[2] = Act.B;
+
+        Player[] players = new Player[3] { new(ImmutableArray.Create(actions0)), new(ImmutableArray.Create(actions1)), new(ImmutableArray.Create(actions2)) };
         Trajectory[] trajectories = ConstructTrajectories(6, 1, 3, 4);
         Event[] events = new Event[]
         {
@@ -89,9 +97,14 @@ public class SimulationTest
 
     private Player GetEmptyPlayer()
     {
-        return new Player(new Act[12] {
-            Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty, Act.Empty
-        });
+        return new Player(ImmutableArray.Create(GetEmptyActions()));
+    }
+
+    private Act[] GetEmptyActions()
+    {
+        Act[] output = new Act[12];
+        Array.Fill(output, Act.Empty);
+        return output;
     }
 
     private Trajectory[] ConstructTrajectories(int l, int m, int r, int i)

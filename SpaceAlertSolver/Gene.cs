@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace SpaceAlertSolver;
 
@@ -268,51 +269,50 @@ public class Gene
     private double Evaluate(int[] gene, Trajectory[] trajs, Event[] evts)
     {
         Player[] ps = new Player[user_actions.Length + players];
-        for (int i = user_actions.Length; i < players + user_actions.Length; i++)
-            ps[i] = new Player();
 
         // initialize user players
         for (int i = 0; i < user_actions.Length; i++)
         {
-            ps[i] = new Player(user_actions[i]);
+            ps[i] = new(ImmutableArray.Create(user_actions[i]));
         }
 
         // initialize random players
         int idx = 0;
         for (int i = user_actions.Length; i < players + user_actions.Length; i++)
         {
-            ps[i].actions = new Act[12];
+            Act[] actions = new Act[12];
             for (int j = 0; j < 12; j++)
             {
                 switch (gene[idx])
                 {
                     case 0:
-                        ps[i].actions[j] = Act.Empty;
+                        actions[j] = Act.Empty;
                         break;
                     case 1:
-                        ps[i].actions[j] = Act.Right;
+                        actions[j] = Act.Right;
                         break;
                     case 2:
-                        ps[i].actions[j] = Act.Left;
+                        actions[j] = Act.Left;
                         break;
                     case 3:
-                        ps[i].actions[j] = Act.Lift;
+                        actions[j] = Act.Lift;
                         break;
                     case 4:
-                        ps[i].actions[j] = Act.A;
+                        actions[j] = Act.A;
                         break;
                     case 5:
-                        ps[i].actions[j] = Act.B;
+                        actions[j] = Act.B;
                         break;
                     case 6:
-                        ps[i].actions[j] = Act.C;
+                        actions[j] = Act.C;
                         break;
                     case 7:
-                        ps[i].actions[j] = Act.Fight;
+                        actions[j] = Act.Fight;
                         break;
                 }
                 idx++;
             }
+            ps[i] = new(ImmutableArray.Create(actions));
         }
 
         Game g = new Game(ps, trajs, evts);

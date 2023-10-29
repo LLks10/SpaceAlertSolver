@@ -51,7 +51,7 @@ class CommandosRed : InThreat
         ship.DealDamageIntern(z, 4);
         for(int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].position == position)
+            if (ship.players[i].Position == position)
                 ship.players[i].Kill();
         }
     }
@@ -106,7 +106,7 @@ class CommandosBlue : InThreat
         ship.DealDamageIntern(z, 4);
         for (int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].position == position)
+            if (ship.players[i].Position == position)
                 ship.players[i].Kill();
         }
     }
@@ -146,7 +146,7 @@ class Alien : InThreat
         int c = 0;
         for(int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].position == position)
+            if (ship.players[i].Position == position)
                 c++;
         }
         ship.DealDamageIntern(position % 3, c);
@@ -205,7 +205,7 @@ class Eliminator : InThreat
         int z = position % 3;
         for(int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].position % 3 == z && ship.players[i].position < 6 && (ship.players[i].team == null || ship.players[i].team.alive == false))
+            if (ship.players[i].Position % 3 == z && ship.players[i].Position < 6 && ship.players[i].AndroidState != AndroidState.Alive)
                 ship.players[i].Kill();
         }
     }
@@ -245,7 +245,7 @@ class SearchRobot : InThreat
         ship.DealDamageIntern(position % 3, 5);
         for(int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].position == position)
+            if (ship.players[i].Position == position)
                 ship.players[i].Kill();
         }
     }
@@ -263,10 +263,10 @@ class SearchRobot : InThreat
                 //Find player that did most recent action
                 for(int i = 0; i < ship.players.Length; i++)
                 {
-                    if(ship.players[i].lastAction >= score)
+                    if(ship.players[i].LastActionIndex >= score)
                     {
                         highestAct = i;
-                        score = ship.players[i].lastAction;
+                        score = ship.players[i].LastActionIndex;
                     }
                 }
                 ship.players[highestAct].Kill();
@@ -313,7 +313,7 @@ class SearchRobot : InThreat
             //Count players
             for(int j = 0; j < ps.Length; j++)
             {
-                if (ps[j].position == nearbyStation[i])
+                if (ps[j].Position == nearbyStation[i])
                     c++;
             }
             if (c > score)
@@ -426,7 +426,7 @@ class RebelliousRobots : InThreat
     {
         for(int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].team != null && ship.players[i].team.alive)
+            if (ship.players[i].AndroidState == AndroidState.Alive)
                 ship.players[i].Kill();
         }
     }
@@ -434,7 +434,7 @@ class RebelliousRobots : InThreat
     {
         for (int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].position == 2 || ship.players[i].position == 3)
+            if (ship.players[i].Position == 2 || ship.players[i].Position == 3)
                 ship.players[i].Kill();
         }
     }
@@ -442,7 +442,7 @@ class RebelliousRobots : InThreat
     {
         for (int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].position != 1)
+            if (ship.players[i].Position != 1)
                 ship.players[i].Kill();
         }
     }
@@ -713,8 +713,8 @@ class Infection : InThreat
     {
         for(int i = 0; i < ship.players.Length; i++)
         {
-            if (isActive[ship.players[i].position])
-                ship.players[i].Delay(ship.players[i].lastAction + 1);
+            if (isActive[ship.players[i].Position])
+                ship.players[i].Delay(ship.players[i].LastActionIndex + 1);
         }
     }
     public override void ActY()
@@ -729,7 +729,7 @@ class Infection : InThreat
     {
         for (int i = 0; i < ship.players.Length; i++)
         {
-            if (isActive[ship.players[i].position])
+            if (isActive[ship.players[i].Position])
                 ship.players[i].Kill();
         }
         for(int i = 0; i < 6; i++)

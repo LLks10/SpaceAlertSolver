@@ -60,7 +60,7 @@ public class Game
         ship = new Ship(other.ship, this, players);
         for (int i = 0; i < players.Length; i++)
         {
-            players[i] = new Player(other.players[i], other.ship.androids, ship.androids);
+            players[i] = new Player(other.players[i]);
         }
         trajectories = other.trajectories;
         events = other.events;
@@ -105,7 +105,7 @@ public class Game
     {
         this.players = new Player[players.Length];
         for (int i = 0; i < players.Length; i++)
-            this.players[i] = players[i].Copy();
+            this.players[i] = new(players[i]);
 
         this.trajectories = trajectories;
         this.events = events;
@@ -271,10 +271,10 @@ public class Game
             //Delay actions if computer failed
             if (!phaseComputer[phase])
             {
-                foreach (Player p in players)
+                for (int i = 0; i < players.Length; i++)
                 {
-                    if (p.position < 6)
-                        p.Delay(turn - 1);
+                    if (players[i].Position < 6)
+                        players[i].Delay(turn - 1);
                 }
             }
         }
@@ -288,16 +288,15 @@ public class Game
     {
         int t = turn - 1;
 
-        Player p = players[actions_player_i];
-        p.lastAction = t;
-        Act a = p.actions[t];
+        ref Player p = ref players[actions_player_i];
+        Act a = p.GetAction(t);
 
         //Exit if dead
-        if (!p.alive)
+        if (!p.Alive)
             return;
 
         //Check interceptor controls
-        if (p.inIntercept)
+        if (p.InIntercept)
         {
             if (a == Act.Fight)
             {
@@ -308,10 +307,10 @@ public class Game
             else
             {
                 //Return
-                p.inIntercept = false;
+                p.InIntercept = false;
                 ship.interceptorReady = true;
-                p.Move(0);
-                ApplyStatusEffect(p, t);
+                p.Position = 0;
+                ApplyStatusEffect(ref p, t);
                 p.Delay(t);
                 return;
             }
@@ -321,58 +320,54 @@ public class Game
         switch (a)
         {
             case Act.Left:
-                PlayerActionMove(p, t, true);
+                PlayerActionMove(ref p, t, true);
                 break;
             case Act.Right:
-                PlayerActionMove(p, t, false);
+                PlayerActionMove(ref p, t, false);
                 break;
             case Act.Lift:
-                PlayerActionLift(p);
+                PlayerActionLift(ref p);
                 break;
             case Act.A:
-                PlayerActionA(p);
+                PlayerActionA(ref p);
                 break;
             case Act.B:
-                PlayerActionB(p);
+                PlayerActionB(ref p);
                 break;
             case Act.C:
-                PlayerActionC(p);
+                PlayerActionC(ref p);
                 break;
             //Empty for now
             case Act.Fight:
-                PlayerActionFight(p);
+                PlayerActionFight(ref p);
                 break;
             case Act.Empty:
                 break;
         }
     }
 
-    void PlayerActionMove(Player p, int t, bool left)
+    void PlayerActionMove(ref Player p, int t, bool left)
     {
-        Debug.Assert(true);
-
         if (left)
         {
-            if (p.position != 0 && p.position != 3)
-                p.Move(p.position - 1);
+            if (p.Position != 0 && p.Position != 3)
+                p.Position--;
         }
         else
         {
-            if (p.position != 2 && p.position != 5)
-                p.Move(p.position + 1);
+            if (p.Position != 2 && p.Position != 5)
+                p.Position++;
         }
-        ApplyStatusEffect(p, t);
+        ApplyStatusEffect(ref p, t);
     }
 
-    void PlayerActionLift(Player p)
+    void PlayerActionLift(ref Player p)
     {
-        Debug.Assert(true);
-
         int t = turn - 1;
-        int z = p.position % 3;
+        int z = p.Position % 3;
 
         // branching
-        if (t < 11 && p.actions[t + 1] != Act.Empty) // no branching needed if nothing to be delayed
+        if (t < 11 && p.PeekAction(t + 1) != Act.Empty) // no branching needed if nothing to be delayed
         {
             BranchConditional(z, Defects.lift);
         }
@@ -383,25 +378,23 @@ public class Game
             p.Delay(t + 1);
         ship.liftUsed |= bm;
         //Move
-        if (p.position < 3)
-            p.Move(p.position + 3);
+        if (p.Position < 3)
+            p.Position += 3;
         else
-            p.Move(p.position - 3);
-        ApplyStatusEffect(p, t);
+            p.Position -= 3;
+        ApplyStatusEffect(ref p, t);
     }
 
-    void PlayerActionA(Player p)
+    void PlayerActionA(ref Player p)
     {
-        Debug.Assert(true);
-
-        int z = p.position % 3;
+        int z = p.Position % 3;
 
         //Check if can fire
-        int bm = 1 << p.position;
+        int bm = 1 << p.Position;
         if ((ship.cannonFired & bm) == bm)
             return;
 
-        if (p.position < 3)
+        if (p.Position < 3)
         {
             //Main guns
             //Drain energy
@@ -456,21 +449,21 @@ public class Game
         ship.cannonFired |= bm;
     }
 
-    void PlayerActionB(Player p)
+    void PlayerActionB(ref Player p)
     {
         Debug.Assert(true);
 
-        int z = p.position % 3;
+        int z = p.Position % 3;
 
         //Check for a defect
-        if (ship.BDefect[p.position] > 0)
+        if (ship.BDefect[p.Position] > 0)
         {
-            AttackInternal(p.position, InDmgSource.B);
+            AttackInternal(p.Position, InDmgSource.B);
             return;
         }
 
         //Refill shield
-        if (p.position < 3)
+        if (p.Position < 3)
         {
             if (ship.reactors[z] == 0 || ship.shields[z] == ship.shieldsCap[z]) // nothing happens regardless
                 return;
@@ -526,25 +519,25 @@ public class Game
         }
     }
 
-    void PlayerActionC(Player p)
+    void PlayerActionC(ref Player p)
     {
         //Check for a defect
-        if (ship.CDefect[p.position] > 0)
+        if (ship.CDefect[p.Position] > 0)
         {
-            AttackInternal(p.position, InDmgSource.C);
+            AttackInternal(p.Position, InDmgSource.C);
             return;
         }
 
-        switch (p.position)
+        switch (p.Position)
         {
             //Interceptors
             case 0:
                 //Check if requirements met
-                if (p.team != null && p.team.alive && ship.interceptorReady)
+                if (p.AndroidState == AndroidState.Alive && ship.interceptorReady)
                 {
-                    p.inIntercept = true;
+                    p.InIntercept = true;
                     ship.interceptorReady = false;
-                    p.Move(6);
+                    p.Position = 6;
                     InterceptorDamage();
                 }
                 break;
@@ -556,27 +549,28 @@ public class Game
 
             //Androids
             case 2:
-                //Take androids
-                if (!ship.androids[0].active)
+                if (p.AndroidState == AndroidState.None)
                 {
-                    ship.androids[0].active = true;
-                    p.team = ship.androids[0];
+                    p.AndroidState = ship.AndroidTopRight;
+                    ship.AndroidTopRight = AndroidState.None;
                 }
-                //Repair androids
-                else if (p.team != null)
-                    p.team.alive = true;
+                else
+                {
+                    p.AndroidState = AndroidState.Alive;
+                }
                 break;
 
             //Androids
             case 3:
-                //Take androids
-                if (!ship.androids[1].active)
+                if (p.AndroidState == AndroidState.None)
                 {
-                    ship.androids[1].active = true;
-                    p.team = ship.androids[1];
+                    p.AndroidState = ship.AndroidBottomLeft;
+                    ship.AndroidBottomLeft = AndroidState.None;
                 }
-                else if (p.team != null)
-                    p.team.alive = true;
+                else
+                {
+                    p.AndroidState = AndroidState.Alive;
+                }
                 break;
 
             //Observation
@@ -586,22 +580,24 @@ public class Game
 
             //Fire rocket
             case 5:
-                if (ship.rockets > 0)
+                if (!ship.rocketFired && ship.rockets > 0)
+                {
                     ship.rocketFired = true;
-                ship.rockets--;
+                    ship.rockets--;
+                }
                 break;
         }
     }
 
-    void PlayerActionFight(Player p)
+    void PlayerActionFight(ref Player p)
     {
-        if (p.team != null && p.team.alive)
+        if (p.AndroidState == AndroidState.Alive)
         {
-            InThreat thrt = AttackInternal(p.position, InDmgSource.android);
+            InThreat thrt = AttackInternal(p.Position, InDmgSource.android);
             if (thrt != null)
             {
                 if (thrt.fightBack)
-                    p.team.alive = false;
+                    p.AndroidState = AndroidState.Disabled;
             }
         }
     }
@@ -739,15 +735,20 @@ public class Game
         score -= highestDamage;
 
         //Count dead crew
-        foreach (Player p in players)
+        for (int i = 0; i < players.Length; i++)
         {
-            if (!p.alive)
+            if (!players[i].Alive)
                 score -= 2;
         }
         //Count dead androids
-        if (!ship.androids[0].alive)
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i].AndroidState == AndroidState.Disabled)
+                score--;
+        }
+        if (ship.AndroidTopRight == AndroidState.Disabled)
             score--;
-        if (!ship.androids[1].alive)
+        if (ship.AndroidBottomLeft == AndroidState.Disabled)
             score--;
 
         //Observation bonus
@@ -913,16 +914,16 @@ public class Game
             exThreats[target].DealDamage(3, 1, ExDmgSource.intercept);
     }
 
-    void ApplyStatusEffect(Player p, int turn)
+    void ApplyStatusEffect(ref Player p, int turn)
     {
         //Check status effect
-        if (ship.stationStatus[p.position] != 0)
+        if (ship.stationStatus[p.Position] != 0)
         {
             // Delay
-            if ((ship.stationStatus[p.position] & 1) == 1)
+            if ((ship.stationStatus[p.Position] & 1) == 1)
                 p.Delay(turn + 1);
             // Kill
-            else if ((ship.stationStatus[p.position] & 2) == 2)
+            else if ((ship.stationStatus[p.Position] & 2) == 2)
                 p.Kill();
         }
     }
@@ -932,9 +933,9 @@ public class Game
         StringBuilder output = new StringBuilder();
         output.AppendFormat("DMG: {0} {1} {2}\n", ship.damage[0], ship.damage[1], ship.damage[2]);
         output.AppendFormat("OBS: {0} {1} {2}\n", observation[0], observation[1], observation[2]);
-        output.AppendFormat("P Pos: {0} {1} {2} {3} {4}\n", players[0].position, players[1].position, players[2].position, players[3].position, players[4].position);
-        output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", players[0].actions[11].ToStr(), players[1].actions[11].ToStr(), players[2].actions[11].ToStr(), players[3].actions[11].ToStr(), players[4].actions[11].ToStr());
-        output.AppendFormat("Alive: {0} {1} {2} {3} {4}\n", players[0].alive, players[1].alive, players[2].alive, players[3].alive, players[4].alive);
+        output.AppendFormat("P Pos: {0} {1} {2} {3} {4}\n", players[0].Position, players[1].Position, players[2].Position, players[3].Position, players[4].Position);
+        output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", players[0].PeekAction(11).ToStr(), players[1].PeekAction(11).ToStr(), players[2].PeekAction(11).ToStr(), players[3].PeekAction(11).ToStr(), players[4].PeekAction(11).ToStr());
+        output.AppendFormat("Alive: {0} {1} {2} {3} {4}\n", players[0].Alive, players[1].Alive, players[2].Alive, players[3].Alive, players[4].Alive);
         output.AppendFormat("ExKill: {0} | ExSurv: {1} | InKill: {2} | InSurv: {3}\n", exSlain, exSurvived, inSlain, inSurvived);
         output.AppendFormat("Reactors: {0} {1} {2}\n", ship.reactors[0], ship.reactors[1], ship.reactors[2]);
         output.AppendFormat("Shields: {0} {1} {2}\n", ship.shields[0], ship.shields[1], ship.shields[2]);

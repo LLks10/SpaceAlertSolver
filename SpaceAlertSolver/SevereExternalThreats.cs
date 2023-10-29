@@ -500,26 +500,26 @@ class PsionicSatellite : ExThreat
     {
         for(int i = 0; i < ship.players.Length; i++)
         {
-            Player p = ship.players[i];
-            if (p.position % 3 == zone && p.position < 6)
-                p.Delay(p.lastAction + 1);
+            ref Player p = ref ship.players[i];
+            if (p.Position % 3 == zone && p.Position < 6)
+                p.Delay(p.LastActionIndex + 1);
         }
     }
     public override void ActY()
     {
         for (int i = 0; i < ship.players.Length; i++)
         { 
-            Player p = ship.players[i];
-            if(p.position < 6)
-                p.Delay(p.lastAction + 1);
+            ref Player p = ref ship.players[i];
+            if(p.Position < 6)
+                p.Delay(p.LastActionIndex + 1);
         }
     }
     public override void ActZ()
     {
         for (int i = 0; i < ship.players.Length; i++)
         {
-            Player p = ship.players[i];
-            if (p.position < 6)
+            ref Player p = ref ship.players[i];
+            if (p.Position < 6)
                 p.Kill();
         }
     }
@@ -709,7 +709,7 @@ class Behemoth : ExThreat
             Player[] ps = ship.players;
             for(int i = 0; i < ps.Length; i++)
             {
-                if (ps[i].inIntercept)
+                if (ps[i].InIntercept)
                 {
                     ps[i].Kill();
                     break;

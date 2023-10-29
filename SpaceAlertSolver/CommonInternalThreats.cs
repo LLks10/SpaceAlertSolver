@@ -301,8 +301,8 @@ class Virus : InThreat
     {
         for(int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].position < 6)
-                ship.players[i].Delay(ship.players[i].lastAction + 1);
+            if (ship.players[i].Position < 6)
+                ship.players[i].Delay(ship.players[i].LastActionIndex + 1);
         }
     }
     public override void ActZ()
@@ -446,7 +446,7 @@ class OverheatedReactor : InThreat
         {
             for(int i = 0; i < ship.players.Length; i++)
             {
-                if (ship.players[i].position == 3 || ship.players[i].position == 5)
+                if (ship.players[i].Position == 3 || ship.players[i].Position == 5)
                     ship.players[i].Kill();
             }
         }
@@ -650,8 +650,8 @@ class SlimeRed : InThreat
     // Disable inactive androids
     public override void ActX()
     {
-        if (!ship.androids[1].active)
-            ship.androids[1].alive = false;
+        if (ship.AndroidBottomLeft == AndroidState.Alive)
+            ship.AndroidBottomLeft = AndroidState.Disabled;
     }
     
     public override void ActY()
