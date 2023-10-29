@@ -1,6 +1,6 @@
 ﻿namespace SpaceAlertSolver;
 
-class SimulatedAnnealing
+public sealed class SimulatedAnnealing
 {
     private List<int> _statsOfBest = null;
 
@@ -22,7 +22,7 @@ class SimulatedAnnealing
      * <param name="evts">The events</param>
      * <param name="seed">[optional] The seed to use</param>
      */
-    public void Run(int maxIterations, Trajectory[] trajs, Event[] evts, int seed)
+    public void Run(int maxIterations, Trajectory[] trajs, Event[] evts, int seed, bool printDebug=Program.PRINT_DEBUG)
     {
         Random rng = new Random(seed);
 
@@ -47,7 +47,7 @@ class SimulatedAnnealing
                 _highestBlanks = _currentState.getBlanks();
                 _bestState = _currentState;
 
-                if (Program.PRINT_DEBUG)
+                if (printDebug)
                 {
                     Console.WriteLine(_currentState.Rep() +
                         "Iteration: " + (iteration + 1) + 
