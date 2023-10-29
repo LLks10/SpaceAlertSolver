@@ -22,7 +22,14 @@ namespace SpaceAlertSolver
 
         static void Main(string[] args)
         {
-            Run(SEED);
+            if (args.Length > 0 && int.TryParse(args[0], out int seed))
+            {
+                Run(seed);
+            }
+            else
+            {
+                Run(SEED);
+            }
 
             /*int seed_start = 10;
             int seed_end = 20;
