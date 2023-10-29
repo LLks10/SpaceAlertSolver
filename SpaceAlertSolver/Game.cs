@@ -79,8 +79,7 @@ public class Game
         phase = other.phase;
         score = other.score;
 
-        phaseComputer = new bool[other.phaseComputer.Length];
-        Array.Copy(other.phaseComputer, phaseComputer, phaseComputer.Length);
+        phaseComputer = other.phaseComputer.ToArray();
 
         gameover = other.gameover;
         eventIdx = other.eventIdx;
@@ -89,8 +88,7 @@ public class Game
         inSlain = other.inSlain;
         inSurvived = other.inSurvived;
 
-        observation = new int[other.observation.Length];
-        Array.Copy(other.observation, observation, observation.Length);
+        observation = other.observation.ToArray();
 
         observationCount = other.observationCount;
 

@@ -55,18 +55,18 @@ public class Ship
         this.game = game;
         this.players = players;
         androids = new Androids[2] { new Androids(other.androids[0]), new Androids(other.androids[1]) };
-        shields = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.shields);
-        shieldsCap = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.shieldsCap);
-        reactors = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.reactors);
-        reactorsCap = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.reactorsCap);
-        laserDamage = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.laserDamage);
-        plasmaDamage = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.plasmaDamage);
-        BDefect = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.BDefect);
-        CDefect = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.CDefect);
-        stationStatus = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.stationStatus);
+        shields = other.shields.ToArray();
+        shieldsCap = other.shieldsCap.ToArray();
+        reactors = other.reactors.ToArray();
+        reactorsCap = other.reactorsCap.ToArray();
+        laserDamage = other.laserDamage.ToArray();
+        plasmaDamage = other.plasmaDamage.ToArray();
+        BDefect = other.BDefect.ToArray();
+        CDefect = other.CDefect.ToArray();
+        stationStatus = other.stationStatus.ToArray();
         pulseRange = other.pulseRange;
-        damage = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.damage);
-        fissured = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.fissured);
+        damage = other.damage.ToArray();
+        fissured = other.fissured.ToArray();
 
         liftUsed = other.liftUsed;
         liftReset = other.liftReset;
@@ -78,8 +78,8 @@ public class Ship
         interceptorReady = other.interceptorReady;
         scoutBonus = other.scoutBonus;
 
-        numUndeterminedDefects = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.numUndeterminedDefects);
-        numDefectOptions = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.numDefectOptions);
+        numUndeterminedDefects = other.numUndeterminedDefects.ToArray();
+        numDefectOptions = other.numDefectOptions.ToArray();
         defectStates = new DefectState[other.defectStates.Length][];
         for (int i = 0; i < defectStates.Length; i++)
         {

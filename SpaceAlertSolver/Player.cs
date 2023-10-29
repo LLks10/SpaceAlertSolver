@@ -13,8 +13,7 @@ public class Player
         lastAction = other.lastAction;
         alive = other.alive;
         inIntercept = other.inIntercept;
-        actions = new Act[other.actions.Length];
-        Array.Copy(other.actions, actions, actions.Length);
+        actions = other.actions.ToArray();
         
         if (other.team == null)
         {
