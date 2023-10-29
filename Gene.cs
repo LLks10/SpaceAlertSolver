@@ -3,10 +3,15 @@ using System.Diagnostics;
 
 namespace SpaceAlertSolver
 {
+    /// <summary>
+    /// Change <see cref="user_actions"/> to set the actions of human players.
+    /// Human players move before ai players.
+    /// </summary>
     public class Gene
     {
         private static Act[][] user_actions = new Act[][] {
-            // ParseActions("abcf erd")
+            //ParseActions("craadcc ceb "),
+            //ParseActions("rc fcefdbaac"),
         };
 
         private int[] gene;

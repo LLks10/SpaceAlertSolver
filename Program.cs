@@ -6,12 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
+
 namespace SpaceAlertSolver
 {
+    /// <summary>
+    /// Set the number of players in this file by changing <see cref="NUM_AI_PLAYERS"/>.
+    /// Set the number of human players in the <see cref="Gene"/> file.
+    /// </summary>
     class Program
     {
-        public static int SEED = 8;
-        public static bool PRINT_DEBUG = true;
+        public const int SEED = 8;
+        public const bool PRINT_DEBUG = true;
+        public const int NUM_AI_PLAYERS = 4;
+        public const int NUM_SIMULATIONS = 5000000;
 
         static void Main(string[] args)
         {
@@ -69,7 +76,6 @@ namespace SpaceAlertSolver
             //Create damage order
             Random r = new Random(seed);
             List<Event> events = new List<Event>();
-            Player[] players = new Player[5];
 
             //Setup threat pool
             int comExThreatCount = 16;
@@ -217,8 +223,8 @@ namespace SpaceAlertSolver
             }
             Console.ReadLine();*/
 
-            SimulatedAnnealing sa = new SimulatedAnnealing(players.Length, trajectories, evArr);
-            sa.Run(5000000, trajectories, evArr, seed);
+            SimulatedAnnealing sa = new SimulatedAnnealing(NUM_AI_PLAYERS, trajectories, evArr);
+            sa.Run(NUM_SIMULATIONS, trajectories, evArr, seed);
             if (PRINT_DEBUG)
             {
                 Console.WriteLine(sa.getBestGene().Rep() + sa.getBestGene().getScore());
