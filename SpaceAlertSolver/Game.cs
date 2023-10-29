@@ -22,7 +22,7 @@ namespace SpaceAlertSolver;
 
 public class Game
 {
-    public static List<int> scores = new List<int>();
+    public static List<int> Scores = new();
 
     Ship ship;
     Player[] players;
@@ -78,14 +78,20 @@ public class Game
 
         phase = other.phase;
         score = other.score;
-        phaseComputer = Extension.CopyArray(other.phaseComputer);
+
+        phaseComputer = new bool[other.phaseComputer.Length];
+        Array.Copy(other.phaseComputer, phaseComputer, phaseComputer.Length);
+
         gameover = other.gameover;
         eventIdx = other.eventIdx;
         exSlain = other.exSlain;
         exSurvived = other.exSurvived;
         inSlain = other.inSlain;
         inSurvived = other.inSurvived;
-        observation = Extension.CopyArray(other.observation);
+
+        observation = new int[other.observation.Length];
+        Array.Copy(other.observation, observation, observation.Length);
+
         observationCount = other.observationCount;
 
         sp = other.sp;
@@ -754,7 +760,7 @@ public class Game
         if (gameover)
             score = score - 200 + turn;
 
-        scores.Add((int)score);
+        Scores.Add((int)score);
 
         return scoreMultiplier * score + scoreAddition;
     }
@@ -960,14 +966,14 @@ public class Game
 
 public enum Act
 {
-    Left,
+    Empty,
     Right,
+    Left,
     Lift,
     A,
     B,
     C,
     Fight,
-    Empty,
     HeroicTopLeft,
     HeroicTopMiddle,
     HeroicTopRight,

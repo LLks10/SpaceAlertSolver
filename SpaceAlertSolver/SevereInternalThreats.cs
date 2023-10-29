@@ -414,7 +414,7 @@ class RebelliousRobots : InThreat
         RebelliousRobots clone = new RebelliousRobots();
         clone.CloneThreat(this, ship);
         clone.tookExtraDamage = tookExtraDamage;
-        clone.hits = Extension.CopyArray(hits);
+        clone.hits = TroepBaggerOngeloofelijkeRotzooi.CopyArray(hits);
         return clone;
     }
     public override void OnClear()
@@ -571,7 +571,7 @@ class OverstrainedEnergyNet : InThreat
         OverstrainedEnergyNet clone = new OverstrainedEnergyNet();
         clone.CloneThreat(this, ship);
         clone.tookExtraDamage = tookExtraDamage;
-        clone.hits = Extension.CopyArray(hits);
+        clone.hits = TroepBaggerOngeloofelijkeRotzooi.CopyArray(hits);
         return clone;
     }
     public override void OnClear()
@@ -705,7 +705,7 @@ class Infection : InThreat
     {
         Infection clone = new Infection();
         clone.CloneThreat(this, ship);
-        clone.isActive = Extension.CopyArray(isActive);
+        clone.isActive = TroepBaggerOngeloofelijkeRotzooi.CopyArray(isActive);
         return clone;
     }
 

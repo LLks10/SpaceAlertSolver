@@ -519,8 +519,8 @@ class SlimeBlue : InThreat
     {
         SlimeBlue clone = new SlimeBlue();
         clone.CloneThreat(this, ship);
-        clone.positions = Extension.CopyArray(positions);
-        clone.healths = Extension.CopyArray(healths);
+        clone.positions = TroepBaggerOngeloofelijkeRotzooi.CopyArray(positions);
+        clone.healths = TroepBaggerOngeloofelijkeRotzooi.CopyArray(healths);
         return clone;
     }
 
@@ -642,8 +642,8 @@ class SlimeRed : InThreat
     {
         SlimeRed clone = new SlimeRed();
         clone.CloneThreat(this, ship);
-        clone.positions = Extension.CopyArray(positions);
-        clone.healths = Extension.CopyArray(healths);
+        clone.positions = TroepBaggerOngeloofelijkeRotzooi.CopyArray(positions);
+        clone.healths = TroepBaggerOngeloofelijkeRotzooi.CopyArray(healths);
         return clone;
     }
 

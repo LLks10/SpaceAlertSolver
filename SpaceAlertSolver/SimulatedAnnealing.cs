@@ -28,7 +28,7 @@ class SimulatedAnnealing
 
         for (int iteration = 0; iteration < maxIterations; iteration++)
         {
-            Game.scores.Clear();
+            Game.Scores.Clear();
 
             Gene newState = _currentState.RandomNeighbour(rng, trajs, evts);
             if (P(_currentState, newState,
@@ -40,8 +40,8 @@ class SimulatedAnnealing
             // print new best score
             if (_currentState.getScore() > _highestScore)
             {
-                _statsOfBest = Game.scores;
-                Game.scores = new List<int>();
+                _statsOfBest = Game.Scores;
+                Game.Scores = new List<int>();
 
                 _highestScore = _currentState.getScore();
                 _highestBlanks = _currentState.getBlanks();

@@ -55,18 +55,18 @@ public class Ship
         this.game = game;
         this.players = players;
         androids = new Androids[2] { new Androids(other.androids[0]), new Androids(other.androids[1]) };
-        shields = Extension.CopyArray(other.shields);
-        shieldsCap = Extension.CopyArray(other.shieldsCap);
-        reactors = Extension.CopyArray(other.reactors);
-        reactorsCap = Extension.CopyArray(other.reactorsCap);
-        laserDamage = Extension.CopyArray(other.laserDamage);
-        plasmaDamage = Extension.CopyArray(other.plasmaDamage);
-        BDefect = Extension.CopyArray(other.BDefect);
-        CDefect = Extension.CopyArray(other.CDefect);
-        stationStatus = Extension.CopyArray(other.stationStatus);
+        shields = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.shields);
+        shieldsCap = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.shieldsCap);
+        reactors = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.reactors);
+        reactorsCap = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.reactorsCap);
+        laserDamage = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.laserDamage);
+        plasmaDamage = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.plasmaDamage);
+        BDefect = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.BDefect);
+        CDefect = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.CDefect);
+        stationStatus = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.stationStatus);
         pulseRange = other.pulseRange;
-        damage = Extension.CopyArray(other.damage);
-        fissured = Extension.CopyArray(other.fissured);
+        damage = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.damage);
+        fissured = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.fissured);
 
         liftUsed = other.liftUsed;
         liftReset = other.liftReset;
@@ -78,8 +78,8 @@ public class Ship
         interceptorReady = other.interceptorReady;
         scoutBonus = other.scoutBonus;
 
-        numUndeterminedDefects = Extension.CopyArray(other.numUndeterminedDefects);
-        numDefectOptions = Extension.CopyArray(other.numDefectOptions);
+        numUndeterminedDefects = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.numUndeterminedDefects);
+        numDefectOptions = TroepBaggerOngeloofelijkeRotzooi.CopyArray(other.numDefectOptions);
         defectStates = new DefectState[other.defectStates.Length][];
         for (int i = 0; i < defectStates.Length; i++)
         {
