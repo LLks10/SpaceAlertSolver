@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace SpaceAlertSolver;
+﻿namespace SpaceAlertSolver;
 
 /// <summary>
 /// Set the number of players in this file by changing <see cref="NUM_AI_PLAYERS"/>.
