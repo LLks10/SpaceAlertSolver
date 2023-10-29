@@ -1018,17 +1018,4 @@ public static class ActExtensions
     }
 }
 
-//Event
-public readonly struct Event
-{
-    public readonly bool IsExternal;
-    public readonly int Turn, Zone, CreatureId;
-
-    public Event(bool isExternal, int turn, int zone, int creatureId)
-    {
-        IsExternal = isExternal;
-        Turn = turn;
-        Zone = zone;
-        CreatureId = creatureId;
-    }
-}
+public readonly record struct Event(bool IsExternal, int Turn, int Zone, int CreatureId);
