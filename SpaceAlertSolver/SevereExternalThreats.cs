@@ -502,7 +502,7 @@ class PsionicSatellite : ExThreat
         {
             ref Player p = ref ship.players[i];
             if (p.Position % 3 == zone && p.Position < 6)
-                p.Delay(p.LastActionIndex + 1);
+                p.DelayNext();
         }
     }
     public override void ActY()
@@ -511,7 +511,7 @@ class PsionicSatellite : ExThreat
         { 
             ref Player p = ref ship.players[i];
             if(p.Position < 6)
-                p.Delay(p.LastActionIndex + 1);
+                p.DelayNext();
         }
     }
     public override void ActZ()

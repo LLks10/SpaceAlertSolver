@@ -5,7 +5,7 @@ public abstract class InThreat
 {
     public int health, speed, distance, position, scoreWin, scoreLose, time;
     public Trajectory trajectory;
-    public InDmgSource vulnerability;
+    private protected InternalDamageType vulnerability;
     public bool alive, beaten, fightBack;
     public Ship ship;
 
@@ -49,9 +49,9 @@ public abstract class InThreat
         this.ship = ship;
     }
 
-    public virtual bool DealDamage(int position, InDmgSource source)
+    internal virtual bool DealDamage(int position, InternalDamageType damageType)
     {
-        if(source == vulnerability && AtPosition(position))
+        if(damageType == vulnerability && AtPosition(position))
         {
             health--;
             if(health <= 0)
@@ -119,10 +119,9 @@ public abstract class InThreat
     public virtual void ActZ() { }
 }
 
-//Damage sources
-public enum InDmgSource
+internal enum InternalDamageType
 {
     B,
     C,
-    android,
+    Android,
 }

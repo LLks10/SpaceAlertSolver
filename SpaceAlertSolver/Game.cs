@@ -53,15 +53,12 @@ public class Game
     int external_damage_i;
     int move_threats_iEx;
     int move_threats_iIn;
+    Act action;
 
     public Game(Game other)
     {
-        players = new Player[other.players.Length];
+        players = other.players.ToArray();
         ship = new Ship(other.ship, this, players);
-        for (int i = 0; i < players.Length; i++)
-        {
-            players[i] = new Player(other.players[i]);
-        }
         trajectories = other.trajectories;
         events = other.events;
 
@@ -99,16 +96,19 @@ public class Game
         external_damage_i = other.external_damage_i;
         move_threats_iEx = other.move_threats_iEx;
         move_threats_iIn = other.move_threats_iIn;
+        action = other.action;
     }
 
     public Game(Player[] players, Trajectory[] trajectories, Event[] events)
     {
-        this.players = new Player[players.Length];
-        for (int i = 0; i < players.Length; i++)
-            this.players[i] = new(players[i]);
-
+        this.players = players.ToArray();
         this.trajectories = trajectories;
         this.events = events;
+    }
+
+    internal ref Player GetCurrentTurnPlayer()
+    {
+        return ref players[actions_player_i];
     }
 
     //Simulate the game
@@ -133,17 +133,23 @@ public class Game
                         break;
                     }
                     TurnPrep();
-                    sp = SimulationPhase.Actions;
+                    sp = SimulationPhase.ReadAction;
                     actions_player_i = 0;
                     break;
 
-                case SimulationPhase.Actions:
-                    if (actions_player_i == players.Length)
+                case SimulationPhase.ReadAction:
+                    if (actions_player_i >= players.Length)
                     {
                         sp = SimulationPhase.RocketFire;
                         break;
                     }
-                    PlayerActions();
+                    action = players[actions_player_i].GetNextAction();
+                    sp = SimulationPhase.PerformAction;
+                    break;
+
+                case SimulationPhase.PerformAction:
+                    PlayerActions(ref players[actions_player_i]);
+                    sp = SimulationPhase.ReadAction;
                     actions_player_i++;
                     break;
 
@@ -274,7 +280,7 @@ public class Game
                 for (int i = 0; i < players.Length; i++)
                 {
                     if (players[i].Position < 6)
-                        players[i].Delay(turn - 1);
+                        players[i].DelayNext();
                 }
             }
         }
@@ -284,12 +290,9 @@ public class Game
             eventIdx++;
     }
 
-    void PlayerActions()
+    void PlayerActions(ref Player p)
     {
         int t = turn - 1;
-
-        ref Player p = ref players[actions_player_i];
-        Act a = p.GetAction(t);
 
         //Exit if dead
         if (!p.Alive)
@@ -298,26 +301,24 @@ public class Game
         //Check interceptor controls
         if (p.InIntercept)
         {
-            if (a == Act.Fight)
+            if (action == Act.Fight)
             {
                 //Keep fighting
-                InterceptorDamage();
+                InterceptorDamage(ref p);
                 return;
             }
-            else
-            {
-                //Return
-                p.InIntercept = false;
-                ship.interceptorReady = true;
-                p.Position = 0;
-                ApplyStatusEffect(ref p, t);
-                p.Delay(t);
-                return;
-            }
+
+            //Return
+            p.InIntercept = false;
+            ship.interceptorReady = true;
+            p.Position = 0;
+            ApplyStatusEffect(ref p, t);
+            p.DelayCurrent();
+            return;
         }
 
         //Perform action
-        switch (a)
+        switch (action)
         {
             case Act.Left:
                 PlayerActionMove(ref p, t, true);
@@ -367,7 +368,7 @@ public class Game
         int z = p.Position % 3;
 
         // branching
-        if (t < 11 && p.PeekAction(t + 1) != Act.Empty) // no branching needed if nothing to be delayed
+        if (t < 11 && p.PeekNextAction() != Act.Empty) // no branching needed if nothing to be delayed
         {
             BranchConditional(z, Defects.lift);
         }
@@ -375,7 +376,7 @@ public class Game
         //Check if elevator was used
         int bm = 1 << z;
         if ((ship.liftUsed & bm) == bm)
-            p.Delay(t + 1);
+            p.DelayNext();
         ship.liftUsed |= bm;
         //Move
         if (p.Position < 3)
@@ -451,14 +452,12 @@ public class Game
 
     void PlayerActionB(ref Player p)
     {
-        Debug.Assert(true);
-
         int z = p.Position % 3;
 
         //Check for a defect
         if (ship.BDefect[p.Position] > 0)
         {
-            AttackInternal(p.Position, InDmgSource.B);
+            AttackInternal(p.Position, InternalDamageType.B);
             return;
         }
 
@@ -524,7 +523,7 @@ public class Game
         //Check for a defect
         if (ship.CDefect[p.Position] > 0)
         {
-            AttackInternal(p.Position, InDmgSource.C);
+            AttackInternal(p.Position, InternalDamageType.C);
             return;
         }
 
@@ -538,7 +537,7 @@ public class Game
                     p.InIntercept = true;
                     ship.interceptorReady = false;
                     p.Position = 6;
-                    InterceptorDamage();
+                    InterceptorDamage(ref p);
                 }
                 break;
 
@@ -593,7 +592,7 @@ public class Game
     {
         if (p.AndroidState == AndroidState.Alive)
         {
-            InThreat thrt = AttackInternal(p.Position, InDmgSource.android);
+            InThreat thrt = AttackInternal(p.Position, InternalDamageType.Android);
             if (thrt != null)
             {
                 if (thrt.fightBack)
@@ -844,14 +843,14 @@ public class Game
     }
 
     //Attack internal threat
-    InThreat AttackInternal(int position, InDmgSource source)
+    InThreat AttackInternal(int position, InternalDamageType damageType)
     {
         //Find internal threat to attack
         for (int j = 0; j < inThreats.Count; j++)
         {
             if (!inThreats[j].beaten)
             {
-                if (inThreats[j].DealDamage(position, source))
+                if (inThreats[j].DealDamage(position, damageType))
                     return inThreats[j];
             }
         }
@@ -881,12 +880,12 @@ public class Game
     }
 
     //Deal damage with interceptors
-    void InterceptorDamage()
+    void InterceptorDamage(ref Player p)
     {
         //Attack internal threat
         if (ship.CDefect[6] > 0)
         {
-            AttackInternal(6, InDmgSource.C);
+            AttackInternal(6, InternalDamageType.C);
             return;
         }
 
@@ -921,34 +920,19 @@ public class Game
         {
             // Delay
             if ((ship.stationStatus[p.Position] & 1) == 1)
-                p.Delay(turn + 1);
+                p.DelayNext();
             // Kill
             else if ((ship.stationStatus[p.Position] & 2) == 2)
                 p.Kill();
         }
     }
 
-    public string GetDebug()
-    {
-        StringBuilder output = new StringBuilder();
-        output.AppendFormat("DMG: {0} {1} {2}\n", ship.damage[0], ship.damage[1], ship.damage[2]);
-        output.AppendFormat("OBS: {0} {1} {2}\n", observation[0], observation[1], observation[2]);
-        output.AppendFormat("P Pos: {0} {1} {2} {3} {4}\n", players[0].Position, players[1].Position, players[2].Position, players[3].Position, players[4].Position);
-        output.AppendFormat("LastAct: {0} {1} {2} {3} {4}\n", players[0].PeekAction(11).ToStr(), players[1].PeekAction(11).ToStr(), players[2].PeekAction(11).ToStr(), players[3].PeekAction(11).ToStr(), players[4].PeekAction(11).ToStr());
-        output.AppendFormat("Alive: {0} {1} {2} {3} {4}\n", players[0].Alive, players[1].Alive, players[2].Alive, players[3].Alive, players[4].Alive);
-        output.AppendFormat("ExKill: {0} | ExSurv: {1} | InKill: {2} | InSurv: {3}\n", exSlain, exSurvived, inSlain, inSurvived);
-        output.AppendFormat("Reactors: {0} {1} {2}\n", ship.reactors[0], ship.reactors[1], ship.reactors[2]);
-        output.AppendFormat("Shields: {0} {1} {2}\n", ship.shields[0], ship.shields[1], ship.shields[2]);
-        output.AppendFormat("Caps: {0} | Rockets: {1}", ship.capsules, ship.rockets);
-
-        return output.ToString();
-    }
-
     private enum SimulationPhase
     {
         SimulationPrep,
         TurnPrep,
-        Actions,
+        ReadAction,
+        PerformAction,
         RocketFire,
         InternalTurnEnd,
         CleanupInternal,

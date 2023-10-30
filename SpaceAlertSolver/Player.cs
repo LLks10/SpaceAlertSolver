@@ -5,47 +5,58 @@ namespace SpaceAlertSolver;
 public struct Player
 {
     public int Position;
-    public int LastActionIndex { get; private set; }
     public bool Alive { get; private set; }
     public bool InIntercept;
     public AndroidState AndroidState;
 
-    private readonly Act[] _actions;
+    private readonly ImmutableArray<Act> _actions;
+    private int _nextActionIndex;
     private int _delayAmount;
-
-    public Player(Player other)
-    {
-        Position = other.Position;
-        LastActionIndex = other.LastActionIndex;
-        Alive = other.Alive;
-        InIntercept = other.InIntercept;
-        AndroidState = other.AndroidState;
-
-        _actions = other._actions.ToArray();
-        _delayAmount = other._delayAmount;
-    }
+    private bool _delayed;
 
     public Player(ImmutableArray<Act> actions)
     {
         Position = 1;
-        LastActionIndex = -1;
         Alive = true;
         InIntercept = false;
         AndroidState = AndroidState.None;
 
-        _actions = actions.ToArray();
+        _actions = actions;
+        _nextActionIndex = 0;
         _delayAmount = 0;
+        _delayed = false;
     }
 
-    public Act GetAction(int index)
+    public Act GetNextAction()
     {
-        LastActionIndex = index;
-        return _actions[index];
+        if (_delayed)
+        {
+            _nextActionIndex++;
+            _delayAmount++;
+            _delayed = false;
+            return Act.Empty;
+        }
+
+        Act act = PeekNextAction();
+        _nextActionIndex++;
+        return act;
     }
 
-    public Act PeekAction(int index)
+    public Act PeekNextAction()
     {
-        return _actions[index];
+        if (_delayed)
+        {
+            return Act.Empty;
+        }
+
+        Act act = _actions[_nextActionIndex - _delayAmount];
+        while (_delayAmount > 0 && act == Act.Empty)
+        {
+            _delayAmount--;
+            act = _actions[_nextActionIndex - _delayAmount];
+        }
+
+        return act;
     }
 
     public void Kill()
@@ -55,22 +66,14 @@ public struct Player
             AndroidState = AndroidState.Disabled;
     }
 
-    public void Delay(int action)
+    public void DelayNext()
     {
-        if (action >= 11 || _actions[action] == Act.Empty)
-        {
-            if(action < 12)
-                _actions[action] = Act.Empty;
-            return;
-        }
+        _delayed = true;
+    }
 
-        //Delay subsequent actions
-        if (_actions[action + 1] != Act.Empty)
-            Delay(action + 1);
-
-        //Move action
-        _actions[action + 1] = _actions[action];
-        _actions[action] = Act.Empty;
+    public void DelayCurrent()
+    {
+        _delayAmount++;
     }
 }
 

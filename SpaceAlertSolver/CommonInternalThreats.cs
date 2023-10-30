@@ -11,7 +11,7 @@ class SaboteurRed : InThreat
         speed = 4;
         scoreLose = 2;
         scoreWin = 4;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
     }
 
     public SaboteurRed() { }
@@ -55,7 +55,7 @@ class SaboteurBlue : InThreat
         speed = 4;
         scoreLose = 2;
         scoreWin = 4;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
     }
 
     public SaboteurBlue() { }
@@ -99,7 +99,7 @@ class SkirmisherRed : InThreat
         speed = 3;
         scoreLose = 2;
         scoreWin = 4;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
         fightBack = true;
     }
 
@@ -140,7 +140,7 @@ class SkirmisherBlue : InThreat
         speed = 3;
         scoreLose = 2;
         scoreWin = 4;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
         fightBack = true;
     }
 
@@ -181,7 +181,7 @@ class SoldiersRed : InThreat
         speed = 2;
         scoreLose = 3;
         scoreWin = 6;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
         fightBack = true;
     }
 
@@ -223,7 +223,7 @@ class SoldiersBlue : InThreat
         speed = 2;
         scoreLose = 3;
         scoreWin = 6;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
         fightBack = true;
     }
 
@@ -266,7 +266,7 @@ class Virus : InThreat
         speed = 3;
         scoreLose = 3;
         scoreWin = 6;
-        vulnerability = InDmgSource.C;
+        vulnerability = InternalDamageType.C;
     }
 
     public Virus() { }
@@ -302,7 +302,7 @@ class Virus : InThreat
         for(int i = 0; i < ship.players.Length; i++)
         {
             if (ship.players[i].Position < 6)
-                ship.players[i].Delay(ship.players[i].LastActionIndex + 1);
+                ship.players[i].DelayNext();
         }
     }
     public override void ActZ()
@@ -323,7 +323,7 @@ class HackedShieldsRed : InThreat
         speed = 2;
         scoreLose = 2;
         scoreWin = 4;
-        vulnerability = InDmgSource.B;
+        vulnerability = InternalDamageType.B;
     }
 
     public HackedShieldsRed() { }
@@ -365,7 +365,7 @@ class HackedShieldsBlue : InThreat
         speed = 2;
         scoreLose = 2;
         scoreWin = 4;
-        vulnerability = InDmgSource.B;
+        vulnerability = InternalDamageType.B;
     }
 
     public HackedShieldsBlue() { }
@@ -407,7 +407,7 @@ class OverheatedReactor : InThreat
         speed = 2;
         scoreLose = 3;
         scoreWin = 6;
-        vulnerability = InDmgSource.B;
+        vulnerability = InternalDamageType.B;
     }
 
     public OverheatedReactor() { }
@@ -438,9 +438,9 @@ class OverheatedReactor : InThreat
     {
         ship.DealDamageIntern(1, 2);
     }
-    public override bool DealDamage(int position, InDmgSource source)
+    internal override bool DealDamage(int position, InternalDamageType damageType)
     {
-        bool r = base.DealDamage(position, source);
+        bool r = base.DealDamage(position, damageType);
 
         if (r)
         {
@@ -464,7 +464,7 @@ class UnstableWarheads : InThreat
         speed = 3;
         scoreLose = 2;
         scoreWin = 4;
-        vulnerability = InDmgSource.C;
+        vulnerability = InternalDamageType.C;
         if(health > 0)
             ship.CDefect[5]++;
         else
@@ -504,7 +504,7 @@ class SlimeBlue : InThreat
         speed = 2;
         scoreLose = 3;
         scoreWin = 6;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
 
         // Apply station based health and position
         healths = new int[] { 0, 0, 0, 0, 0, 2, 0 };
@@ -538,7 +538,7 @@ class SlimeBlue : InThreat
                 {
                     if (ship.game.inThreats[i] is UnstableWarheads)
                     {
-                        ship.game.inThreats[i].DealDamage(i, InDmgSource.C);
+                        ship.game.inThreats[i].DealDamage(i, InternalDamageType.C);
                         break;
                     }
                 }
@@ -585,9 +585,9 @@ class SlimeBlue : InThreat
             ship.DealDamageIntern(2, 2);
     }
 
-    public override bool DealDamage(int position, InDmgSource source)
+    internal override bool DealDamage(int position, InternalDamageType damageType)
     {
-        if (source == vulnerability && AtPosition(position))
+        if (damageType == vulnerability && AtPosition(position))
         {
             //Local damage
             healths[position]--;
@@ -627,7 +627,7 @@ class SlimeRed : InThreat
         speed = 2;
         scoreLose = 3;
         scoreWin = 6;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
 
         // Apply station based health and position
         healths = new int[] { 0, 0, 0, 2, 0, 0, 0 };
@@ -693,9 +693,9 @@ class SlimeRed : InThreat
             ship.DealDamageIntern(2, 2);
     }
 
-    public override bool DealDamage(int position, InDmgSource source)
+    internal override bool DealDamage(int position, InternalDamageType damageType)
     {
-        if (source == vulnerability && AtPosition(position))
+        if (damageType == vulnerability && AtPosition(position))
         {
             //Local damage
             healths[position]--;

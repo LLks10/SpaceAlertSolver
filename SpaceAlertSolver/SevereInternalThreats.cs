@@ -1,4 +1,6 @@
-﻿namespace SpaceAlertSolver;
+﻿using System.Diagnostics;
+
+namespace SpaceAlertSolver;
 
 //count: 5
 
@@ -11,7 +13,7 @@ class CommandosRed : InThreat
         speed = 2;
         scoreLose = 4;
         scoreWin = 8;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
         fightBack = true;
     }
 
@@ -66,7 +68,7 @@ class CommandosBlue : InThreat
         speed = 2;
         scoreLose = 4;
         scoreWin = 8;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
         fightBack = true;
     }
 
@@ -121,7 +123,7 @@ class Alien : InThreat
         speed = 2;
         scoreLose = 0;
         scoreWin = 8;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
     }
 
     public Alien() { }
@@ -168,7 +170,7 @@ class Eliminator : InThreat
         speed = 2;
         scoreLose = 6;
         scoreWin = 12;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
         fightBack = true;
     }
 
@@ -220,7 +222,7 @@ class SearchRobot : InThreat
         speed = 2;
         scoreLose = 6;
         scoreWin = 15;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
     }
 
     public SearchRobot() { }
@@ -250,26 +252,14 @@ class SearchRobot : InThreat
         }
     }
 
-    public override bool DealDamage(int position, InDmgSource source)
+    internal override bool DealDamage(int position, InternalDamageType damageType)
     {
-        if (source == vulnerability && AtPosition(position))
+        if (damageType == vulnerability && AtPosition(position))
         {
             health--;
             if (health <= 0)
             {
-                //Kill killing player
-                int highestAct = -1;
-                int score = int.MinValue;
-                //Find player that did most recent action
-                for(int i = 0; i < ship.players.Length; i++)
-                {
-                    if(ship.players[i].LastActionIndex >= score)
-                    {
-                        highestAct = i;
-                        score = ship.players[i].LastActionIndex;
-                    }
-                }
-                ship.players[highestAct].Kill();
+                ship.GetCurrentTurnPlayer().Kill();
 
                 alive = false;
                 beaten = true;
@@ -341,7 +331,7 @@ class AtomicBomb : InThreat
         speed = 4;
         scoreLose = 0;
         scoreWin = 12;
-        vulnerability = InDmgSource.C;
+        vulnerability = InternalDamageType.C;
     }
 
     public AtomicBomb() { }
@@ -367,9 +357,9 @@ class AtomicBomb : InThreat
         ship.damage[1] = 7;
         ship.damage[2] = 7;
     }
-    public override bool DealDamage(int position, InDmgSource source)
+    internal override bool DealDamage(int position, InternalDamageType damageType)
     {
-        if (source == vulnerability && AtPosition(position))
+        if (damageType == vulnerability && AtPosition(position))
         {
             damage++;
             if(damage >= 3)
@@ -404,7 +394,7 @@ class RebelliousRobots : InThreat
         speed = 2;
         scoreLose = 4;
         scoreWin = 8;
-        vulnerability = InDmgSource.C;
+        vulnerability = InternalDamageType.C;
     }
 
     public RebelliousRobots() { }
@@ -446,9 +436,9 @@ class RebelliousRobots : InThreat
                 ship.players[i].Kill();
         }
     }
-    public override bool DealDamage(int position, InDmgSource source)
+    internal override bool DealDamage(int position, InternalDamageType damageType)
     {
-        if (source == vulnerability)
+        if (damageType == vulnerability)
         {
             //Check if at any of the two positions
             if(position == 2 || position == 3)
@@ -497,7 +487,7 @@ class SwitchedCables : InThreat
         speed = 3;
         scoreLose = 4;
         scoreWin = 8;
-        vulnerability = InDmgSource.B;
+        vulnerability = InternalDamageType.B;
     }
 
     public SwitchedCables() { }
@@ -561,7 +551,7 @@ class OverstrainedEnergyNet : InThreat
         speed = 3;
         scoreLose = 6;
         scoreWin = 12;
-        vulnerability = InDmgSource.B;
+        vulnerability = InternalDamageType.B;
     }
 
     public OverstrainedEnergyNet() { }
@@ -599,9 +589,9 @@ class OverstrainedEnergyNet : InThreat
         ship.DealDamageIntern(1, 3);
         ship.DealDamageIntern(2, 3);
     }
-    public override bool DealDamage(int position, InDmgSource source)
+    internal override bool DealDamage(int position, InternalDamageType damageType)
     {
-        if (source == vulnerability)
+        if (damageType == vulnerability)
         {
             //Check if at any of the two positions
             if (position == 3 || position == 4 || position == 5)
@@ -651,7 +641,7 @@ class Fissure : InThreat
         speed = 2;
         scoreLose = 0;
         scoreWin = 8;
-        vulnerability = InDmgSource.C;
+        vulnerability = InternalDamageType.C;
     }
 
     public Fissure() { }
@@ -696,7 +686,7 @@ class Infection : InThreat
         speed = 2;
         scoreLose = 6;
         scoreWin = 12;
-        vulnerability = InDmgSource.android;
+        vulnerability = InternalDamageType.Android;
     }
 
     public Infection() { }
@@ -714,7 +704,7 @@ class Infection : InThreat
         for(int i = 0; i < ship.players.Length; i++)
         {
             if (isActive[ship.players[i].Position])
-                ship.players[i].Delay(ship.players[i].LastActionIndex + 1);
+                ship.players[i].DelayNext();
         }
     }
     public override void ActY()
@@ -738,9 +728,9 @@ class Infection : InThreat
                 ship.stationStatus[i] |= 2;
         }
     }
-    public override bool DealDamage(int position, InDmgSource source)
+    internal override bool DealDamage(int position, InternalDamageType damageType)
     {
-        if (source == vulnerability && isActive[position])
+        if (damageType == vulnerability && isActive[position])
         {
             isActive[position] = false;
             health--;
