@@ -1,6 +1,6 @@
 ﻿namespace SpaceAlertSolver;
 
-static class ThreatParser
+public static class ThreatParser
 {
     static ThreatName[] ex_threats = new ThreatName[]
     {
@@ -200,7 +200,7 @@ static class ThreatParser
     }
 }
 
-struct ThreatName
+public struct ThreatName
 {
     public string name;
     public bool external;

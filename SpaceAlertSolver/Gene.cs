@@ -56,55 +56,6 @@ public class Gene
     }
 
     /**
-     * <summary>Parses a string to an action array</summary>
-     * <returns>Act array of length 12</returns>
-     * <param name="actions">The action string to parse, should have length 12</param>
-     */
-    private static Act[] ParseActions(string actions)
-    {
-        if (actions.Length != 12)
-        {
-            throw new ArgumentException("The action string must be 12 characters long");
-        }
-
-        Act[] ret = new Act[12];
-        for (int i = 0; i < 12; i++)
-        {
-            switch (actions[i])
-            {
-                case 'a':
-                    ret[i] = Act.A;
-                    break;
-                case 'b':
-                    ret[i] = Act.B;
-                    break;
-                case 'c':
-                    ret[i] = Act.C;
-                    break;
-                case 'd':
-                    ret[i] = Act.Lift;
-                    break;
-                case 'f':
-                    ret[i] = Act.Fight;
-                    break;
-                case 'r':
-                    ret[i] = Act.Right;
-                    break;
-                case 'e':
-                    ret[i] = Act.Left;
-                    break;
-                case ' ':
-                    ret[i] = Act.Empty;
-                    break;
-                default:
-                    throw new FormatException($"Invalid character <{actions[i]}>");
-            }
-        }
-
-        return ret;
-    }
-
-    /**
      * <summary>Returns a random neighbour of this gene/state</summary>
      * <remarks>The returned gene might be weighted to better suit simulated annealing</remarks>
      * <returns>A gene that is similar to this gene</returns>
