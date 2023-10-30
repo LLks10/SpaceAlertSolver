@@ -9,12 +9,12 @@ namespace SpaceAlertSolver;
 /// </summary>
 public class Gene
 {
-    private static Act[][] user_actions = new Act[][] {
+    public static Act[][] user_actions = new Act[][] {
         //ParseActions("craadcc ceb "),
         //ParseActions("rc fcefdbaac"),
     };
 
-    private int[] gene;
+    public int[] gene;
     public int players, blanks;
     double score;
     private static string[] playerColours = new string[10] { "P", "R", "Y", "G", "B", "1", "2", "3", "4", "5" };

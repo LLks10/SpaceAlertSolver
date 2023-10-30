@@ -1,4 +1,7 @@
-﻿namespace SpaceAlertSolver;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace SpaceAlertSolver;
 
 /// <summary>
 /// Set the number of players in this file by changing <see cref="NUM_AI_PLAYERS"/>.
@@ -235,6 +238,26 @@ class Program
             Console.WriteLine("-----FINAL-----");
         }
 
-        return sa.getBestGene();
+        var bestGene = sa.getBestGene();
+        Task.Run(async () => await UploadToResolver(trajectories, evArr, bestGene)).Wait();
+        return bestGene;
     }
+
+    private static async Task UploadToResolver(Trajectory[] trajectories, Event[] events, Gene gene)
+    {
+        var model = gene.ToResolverModel(trajectories, events);
+
+		using var http = new HttpClient();
+        var json = JsonSerializer.Serialize(model);
+        using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+        try
+        {
+			var resp = await http.PostAsync("http://localhost:5000/LoadGame", content);
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+	}
 }
