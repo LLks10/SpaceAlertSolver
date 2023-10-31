@@ -266,8 +266,11 @@ public class Gene
             ps[i] = new(ImmutableArray.Create(actions));
         }
 
-        Game g = new Game(ps, trajs, evts);
-        return g.Simulate();
+        Game g = GamePool.GetGame();
+        g.Init(ps, ImmutableArray.Create(trajs), ImmutableArray.Create(evts));
+        double score = g.Simulate();
+        GamePool.FreeGame(g);
+        return score;
     }
 
     public double getScore()

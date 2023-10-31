@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 
 namespace SpaceAlertSolver;
@@ -23,30 +24,31 @@ namespace SpaceAlertSolver;
 public class Game
 {
     public static List<int> Scores = new();
+    static int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
+    public const int NUM_PHASES = 3;
 
-    Ship ship;
-    Player[] players;
-    Trajectory[] trajectories;
-    Event[] events;
-    public List<ExThreat> exThreats;
-    public List<InThreat> inThreats;
+    public readonly Ship ship;
+    public Player[] players = null!;
+    public ImmutableArray<Trajectory> trajectories;
+    public ImmutableArray<Event> events;
+    public readonly List<ExThreat> exThreats = new();
+    public readonly List<InThreat> inThreats = new();
     int phase;
     double score;
-    bool[] phaseComputer;
+    readonly bool[] phaseComputer = new bool[NUM_PHASES];
     bool gameover;
     int eventIdx;
 
     int exSlain, exSurvived, inSlain, inSurvived;
 
-    int[] observation;
+    readonly int[] observation = new int[NUM_PHASES];
     int observationCount;
-    static int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
 
-    double scoreMultiplier = 1.0;
-    double scoreAddition = 0.0;
+    double scoreMultiplier;
+    double scoreAddition;
 
     // simulation phase
-    SimulationPhase sp = SimulationPhase.SimulationPrep;
+    SimulationPhase sp;
     int turn;
     int actions_player_i;
     int internal_turn_end_i;
@@ -55,29 +57,25 @@ public class Game
     int move_threats_iIn;
     Act action;
 
-    public Game(Game other)
+    public Game()
     {
-        players = other.players.ToArray();
-        ship = new Ship(other.ship, this, players);
+        ship = new(this);
+    }
+
+    public void Init(Game other)
+    {
+        ship.Init(other.ship);
+        InitPlayers(other.players);
         trajectories = other.trajectories;
         events = other.events;
-
-        exThreats = new List<ExThreat>();
-        for (int i = 0; i < other.exThreats.Count; i++)
-        {
-            exThreats.Add(other.exThreats[i].Clone(ship));
-        }
-        inThreats = new List<InThreat>();
-        for (int i = 0; i < other.inThreats.Count; i++)
-        {
-            inThreats.Add(other.inThreats[i].Clone(ship));
-        }
+        exThreats.Clear();
+        exThreats.AddRange(other.exThreats.Select(t => t.Clone(ship)));
+        inThreats.Clear();
+        inThreats.AddRange(other.inThreats.Select(t => t.Clone(ship)));
 
         phase = other.phase;
         score = other.score;
-
-        phaseComputer = other.phaseComputer.ToArray();
-
+        other.phaseComputer.CopyTo(phaseComputer, 0);
         gameover = other.gameover;
         eventIdx = other.eventIdx;
         exSlain = other.exSlain;
@@ -85,9 +83,11 @@ public class Game
         inSlain = other.inSlain;
         inSurvived = other.inSurvived;
 
-        observation = other.observation.ToArray();
-
+        other.observation.CopyTo(observation, 0);
         observationCount = other.observationCount;
+
+        scoreMultiplier = 1.0;
+        scoreAddition = 0.0;
 
         sp = other.sp;
         turn = other.turn;
@@ -99,11 +99,43 @@ public class Game
         action = other.action;
     }
 
-    public Game(Player[] players, Trajectory[] trajectories, Event[] events)
+    public void Init(Player[] players, ImmutableArray<Trajectory> trajectories, ImmutableArray<Event> events)
     {
-        this.players = players.ToArray();
+        ship.Init();
+        InitPlayers(players);
         this.trajectories = trajectories;
         this.events = events;
+        exThreats.Clear();
+        inThreats.Clear();
+        phase = 0;
+        score = 0.0;
+        Array.Fill(phaseComputer, false);
+        gameover = false;
+        eventIdx = 0;
+        exSlain = 0;
+        inSlain = 0;
+        exSurvived = 0;
+        inSurvived = 0;
+        Array.Fill(observation, 0);
+        observationCount = 0;
+        scoreMultiplier = 1.0;
+        scoreAddition = 0.0;
+        sp = SimulationPhase.TurnPrep;
+        turn = 1;
+        actions_player_i = 0;
+        internal_turn_end_i = 0;
+        external_damage_i = 0;
+        move_threats_iEx = 0;
+        move_threats_iIn = 0;
+        action = Act.Empty;
+    }
+
+    private void InitPlayers(Player[] other)
+    {
+        if (players == null || players.Length != other.Length)
+            players = new Player[other.Length];
+
+        other.CopyTo(players, 0);
     }
 
     internal ref Player GetCurrentTurnPlayer()
@@ -118,12 +150,6 @@ public class Game
         {
             switch (sp)
             {
-                case SimulationPhase.SimulationPrep:
-                    SimulationPrep();
-                    sp = SimulationPhase.TurnPrep;
-                    turn = 1;
-                    break;
-
                 case SimulationPhase.TurnPrep:
                     if (turn > 12 || gameover)
                     {
@@ -242,18 +268,6 @@ public class Game
                     return CalculateScore();
             }
         }
-    }
-
-    void SimulationPrep()
-    {
-        gameover = false;
-        eventIdx = 0;
-        ship = new Ship(this, players);
-        exThreats = new List<ExThreat>();
-        inThreats = new List<InThreat>();
-
-        observation = new int[3];
-        phaseComputer = new bool[3];
     }
 
     void TurnPrep()
@@ -772,16 +786,18 @@ public class Game
     void Branch(int zone, Defects defect)
     {
         Debug.Assert(zone >= 0 && zone < 3
-            && ship.defectStates[zone][(int)defect] == DefectState.undetermined);
+            && ship.defectStates[zone,(int)defect] == DefectState.undetermined);
 
         double chanceOfBreaking = ship.ChanceOfDefect(zone);
         if (chanceOfBreaking < 1.0)
         {
-            Game branch = new Game(this);
+            Game branch = GamePool.GetGame();
+            branch.Init(this);
             branch.ship.NotDefect(zone, defect);
 
             scoreAddition += branch.Simulate() * (1.0 - chanceOfBreaking) * scoreMultiplier;
             scoreMultiplier *= chanceOfBreaking;
+            GamePool.FreeGame(branch);
         }
         ship.AddDefect(zone, defect);
     }
@@ -796,7 +812,7 @@ public class Game
     {
         Debug.Assert(zone >= 0 && zone < 3);
 
-        if (ship.defectStates[zone][(int)defect] == DefectState.undetermined)
+        if (ship.defectStates[zone,(int)defect] == DefectState.undetermined)
         {
             Branch(zone, defect);
         }
@@ -929,7 +945,6 @@ public class Game
 
     private enum SimulationPhase
     {
-        SimulationPrep,
         TurnPrep,
         ReadAction,
         PerformAction,

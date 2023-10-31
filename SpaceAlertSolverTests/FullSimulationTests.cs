@@ -42,8 +42,10 @@ public class FullSimulationTests
             , ActUtils.ParseActionsFromString("r cfcfefadc ")
             };
 
-        Game game = new(actions.Select(a => new Player(ImmutableArray.Create(a))).ToArray(), trajectories, events);
+        Game game = GamePool.GetGame();
+        game.Init(actions.Select(a => new Player(ImmutableArray.Create(a))).ToArray(), ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
         double score = game.Simulate();
+        GamePool.FreeGame(game);
         
         Assert.AreEqual(41.0, score);
     }

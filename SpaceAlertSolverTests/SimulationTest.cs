@@ -13,8 +13,10 @@ public class SimulationTest
         Trajectory[] trajectories = ConstructTrajectories(1, 2, 3, 4);
         Event[] events = new Event[]{ };
 
-        Game g = new Game(players, trajectories, events);
+        Game g = GamePool.GetGame();
+        g.Init(players, ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
         double score = g.Simulate();
+        GamePool.FreeGame(g);
         Assert.AreEqual(0.0, score);
     }
 
@@ -30,8 +32,10 @@ public class SimulationTest
             new Event(true, 1, 1, 6) // meteorite will be oneshot
         };
 
-        Game g = new Game(players, trajectories, events);
+        Game g = GamePool.GetGame();
+        g.Init(players, ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
         double score = g.Simulate();
+        GamePool.FreeGame(g);
         Assert.AreEqual(4.0, score);
     }
 
@@ -56,8 +60,10 @@ public class SimulationTest
             new Event(true, 1, 1, 2)
         };
 
-        Game g = new Game(players, trajectories, events);
+        Game g = GamePool.GetGame();
+        g.Init(players, ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
         double score = g.Simulate();
+        GamePool.FreeGame(g);
         Assert.AreEqual(2.0 / 3.0, score, 0.000000001);
     }
 
@@ -90,8 +96,10 @@ public class SimulationTest
             new Event(true, 2, 2, 2)
         };
 
-        Game g = new Game(players, trajectories, events);
+        Game g = GamePool.GetGame();
+        g.Init(players, ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
         double score = g.Simulate();
+        GamePool.FreeGame(g);
         Assert.AreEqual(-194.0 / 6.0, score, 0.000000001);
     }
 
