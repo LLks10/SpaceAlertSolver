@@ -1,4 +1,6 @@
-﻿namespace SpaceAlertSolver;
+﻿using System.Collections.Immutable;
+
+namespace SpaceAlertSolver;
 
 public sealed class SimulatedAnnealing
 {
@@ -9,7 +11,7 @@ public sealed class SimulatedAnnealing
     private int _highestBlanks = int.MinValue;
     private Gene _bestState; // use for restarts
 
-    public SimulatedAnnealing(int players, Trajectory[] trajs, Event[] evts)
+    public SimulatedAnnealing(int players, ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts)
     {
         _currentState = new Gene(players);
         _currentState.setEval(trajs, evts);
@@ -22,7 +24,7 @@ public sealed class SimulatedAnnealing
      * <param name="evts">The events</param>
      * <param name="seed">[optional] The seed to use</param>
      */
-    public void Run(int maxIterations, Trajectory[] trajs, Event[] evts, int seed, bool printDebug=Program.PRINT_DEBUG)
+    public void Run(int maxIterations, ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts, int seed, bool printDebug=Program.PRINT_DEBUG)
     {
         Random rng = new Random(seed);
 
@@ -69,7 +71,7 @@ public sealed class SimulatedAnnealing
      * <param name="trajs">The trajectories</param>
      * <param name="evts">The events</param>
      */
-    public void Run(int maxIterations, Trajectory[] trajs, Event[] evts)
+    public void Run(int maxIterations, ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts)
     {
         Run(maxIterations, trajs, evts, Guid.NewGuid().GetHashCode());
     }

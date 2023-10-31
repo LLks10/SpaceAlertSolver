@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Immutable;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace SpaceAlertSolver;
@@ -97,27 +98,28 @@ class Program
             sevInThreats.Add(i + comInThreatCount);
 
         //Load trajectories
-        Trajectory[] trajectories = new Trajectory[4];
+        Trajectory[] trajectoriesArray = new Trajectory[4];
         int[] ts = new int[] { 0, 1, 2, 3, 4, 5, 6 };
 
         Console.WriteLine("'r' for random trajectories or xxxx to manually set");
         string resp = Console.ReadLine();
         if (resp == "r" || resp == "R")
         {
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < trajectoriesArray.Length; i++)
             {
                 int tsi = -1;
                 while (tsi == -1)
                     tsi = ts[r.Next(7)];
-                trajectories[i] = new Trajectory(tsi);
+                trajectoriesArray[i] = new Trajectory(tsi);
                 ts[tsi] = -1;
             }
         }
         else
         {
-            for (int i = 0; i < 4; i++)
-                trajectories[i] = new Trajectory(int.Parse(resp[i].ToString()) - 1);
+            for (int i = 0; i < trajectoriesArray.Length; i++)
+                trajectoriesArray[i] = new Trajectory(int.Parse(resp[i].ToString()) - 1);
         }
+        ImmutableArray<Trajectory> trajectories = ImmutableArray.Create(trajectoriesArray);
 
         Console.WriteLine("Trajectories:");
         Console.WriteLine("Lt{0} Mt{1} Rt{2} It{3}", trajectories[0].number + 1, trajectories[1].number + 1, trajectories[2].number + 1, trajectories[3].number + 1);
@@ -203,7 +205,7 @@ class Program
                 }
             }
         }
-        Event[] evArr = events.OrderBy(e => e.Turn).ToArray();
+        ImmutableArray<Event> evArr = events.OrderBy(e => e.Turn).ToImmutableArray();
 
         //Random simulations
         /*Genetic genetic = new Genetic(400, 5, trajectories, evArr);
@@ -243,7 +245,7 @@ class Program
         return bestGene;
     }
 
-    private static async Task UploadToResolver(Trajectory[] trajectories, Event[] events, Gene gene)
+    private static async Task UploadToResolver(ImmutableArray<Trajectory> trajectories, ImmutableArray<Event> events, Gene gene)
     {
         var model = gene.ToResolverModel(trajectories, events);
 

@@ -25,15 +25,15 @@ public class FullSimulationTests
          * G |  Blue   -     C   Robot   C   Robot  Red  Robot   A    Lift   C     -
         */
 
-        Trajectory[] trajectories = TestUtils.GetTrajectoriesFromString("7643");
-        Event[] events = new Event[]
-            { new(true, 1, 2, ThreatParser.ParseExThreat("amoebe").id)
+        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("7643");
+        ImmutableArray<Event> events = ImmutableArray.Create<Event>
+            ( new(true, 1, 2, ThreatParser.ParseExThreat("amoebe").id)
             , new(true, 3, 0, ThreatParser.ParseExThreat("psionische satelliet").id)
             , new(false, 4, 3, ThreatParser.ParseInThreat("elminator").id)
             , new(true, 5, 1, ThreatParser.ParseExThreat("cryoschild jager").id)
             , new(true, 7, 0, ThreatParser.ParseExThreat("impulsbal").id)
             , new(true, 8, 1, ThreatParser.ParseExThreat("verkenner").id)
-            };
+            );
 
         Act[][] actions = new Act[][]
             { ActUtils.ParseActionsFromString("dcbrccr ce c")
@@ -43,7 +43,7 @@ public class FullSimulationTests
             };
 
         Game game = GamePool.GetGame();
-        game.Init(actions.Select(a => new Player(ImmutableArray.Create(a))).ToArray(), ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
+        game.Init(actions.Select(a => new Player(ImmutableArray.Create(a))).ToArray(), trajectories, events);
         double score = game.Simulate();
         GamePool.FreeGame(game);
         

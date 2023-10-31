@@ -1,10 +1,11 @@
 ﻿using SpaceAlertSolver;
+using System.Collections.Immutable;
 
 namespace SpaceAlertSolverTests;
 
-internal static class TestUtils
+public static class TestUtils
 {
-    public static Trajectory[] GetTrajectoriesFromString(string str)
+    public static ImmutableArray<Trajectory> GetTrajectoriesFromString(string str)
     {
         const int NUM_TRAJECTORIES = 4;
 
@@ -14,6 +15,26 @@ internal static class TestUtils
             int n = str[i] - '1';
             ret[i] = new(n);
         }
-        return ret;
+        return ImmutableArray.Create(ret);
+    }
+
+    public static Player CreatePlayerFromActions(Act[] actions)
+    {
+        return new(ImmutableArray.Create(actions));
+    }
+
+    public static Player CreatePlayerFromActions(IEnumerable<Act> actions)
+    {
+        return new(actions.ToImmutableArray());
+    }
+
+    public static Player[] CreatePlayersFromActions(params Act[][] actions)
+    {
+        return actions.Select(CreatePlayerFromActions).ToArray();
+    }
+
+    public static Player[] CreatePlayersFromActions(IEnumerable<IEnumerable<Act>> actions)
+    {
+        return actions.Select(CreatePlayerFromActions).ToArray();
     }
 }

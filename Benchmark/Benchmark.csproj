@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SpaceAlertSolverTests\SpaceAlertSolverTests.csproj" />
     <ProjectReference Include="..\SpaceAlertSolver\SpaceAlertSolver.csproj" />
   </ItemGroup>
 

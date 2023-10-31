@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace SpaceAlertSolver;
@@ -8,7 +9,7 @@ internal static class ResolverModelMapper
 {
 	private static string[] colours = new string[] { "Purple", "Red", "Yellow", "Green", "Blue" };
 
-	public static ResolverModel ToResolverModel(this Gene gene, Trajectory[] trajectories, Event[] events)
+	public static ResolverModel ToResolverModel(this Gene gene, ImmutableArray<Trajectory> trajectories, ImmutableArray<Event> events)
 	{
 		Act[][] actions = new Act[Gene.user_actions.Length + gene.players][];
 		for (int i = 0; i < Gene.user_actions.Length; i++)

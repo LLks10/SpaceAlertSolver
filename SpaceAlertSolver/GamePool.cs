@@ -6,6 +6,11 @@ public static class GamePool
 {
     private static readonly List<Game> _freeGames = new();
 
+    public static void Clear()
+    {
+        _freeGames.Clear();
+    }
+
     public static Game GetGame()
     {
         if (_freeGames.Count <= 0)

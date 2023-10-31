@@ -9,12 +9,15 @@ public class SimulationTest
     [TestMethod]
     public void Test3pBlank()
     {
-        Player[] players = new Player[3]{ GetEmptyPlayer(), GetEmptyPlayer(), GetEmptyPlayer() };
-        Trajectory[] trajectories = ConstructTrajectories(1, 2, 3, 4);
-        Event[] events = new Event[]{ };
+        Player emptyPlayer = TestUtils.CreatePlayerFromActions(ActUtils.ParseActionsFromString("            "));
+        Player[] players = new Player[3];
+        Array.Fill(players, emptyPlayer);
+
+        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
+        ImmutableArray<Event> events = ImmutableArray<Event>.Empty;
 
         Game g = GamePool.GetGame();
-        g.Init(players, ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
+        g.Init(players, trajectories, events);
         double score = g.Simulate();
         GamePool.FreeGame(g);
         Assert.AreEqual(0.0, score);
@@ -23,17 +26,16 @@ public class SimulationTest
     [TestMethod]
     public void Test1Enemy0Damage()
     {
-        Act[] actions = GetEmptyActions();
-        actions[0] = Act.A;
-        Player[] players = new Player[1] { new(ImmutableArray.Create(actions)) };
-        Trajectory[] trajectories = ConstructTrajectories(1, 2, 3, 4);
-        Event[] events = new Event[]
-        {
+        Act[] actions = ActUtils.ParseActionsFromString("a           ");
+        Player[] players = new Player[1] { TestUtils.CreatePlayerFromActions(actions) };
+        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
+        ImmutableArray<Event> events = ImmutableArray.Create
+        (
             new Event(true, 1, 1, 6) // meteorite will be oneshot
-        };
+        );
 
         Game g = GamePool.GetGame();
-        g.Init(players, ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
+        g.Init(players, trajectories, events);
         double score = g.Simulate();
         GamePool.FreeGame(g);
         Assert.AreEqual(4.0, score);
@@ -49,19 +51,19 @@ public class SimulationTest
         // score if cannon is broken = -6.0 with 1/6% chance
         // expected score = 2/3
 
-        Act[] actions = GetEmptyActions();
+        Act[] actions = ActUtils.ParseActionsFromString("c aa        ");
         actions[0] = Act.C;
         actions[2] = Act.A;
         actions[3] = Act.A;
-        Player[] players = new Player[1] { new(ImmutableArray.Create(actions)) };
-        Trajectory[] trajectories = ConstructTrajectories(1, 2, 3, 4);
-        Event[] events = new Event[]
-        {
+        Player[] players = new Player[1] { TestUtils.CreatePlayerFromActions(actions) };
+        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
+        ImmutableArray<Event> events = ImmutableArray.Create
+        (
             new Event(true, 1, 1, 2)
-        };
+        );
 
         Game g = GamePool.GetGame();
-        g.Init(players, ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
+        g.Init(players, trajectories, events);
         double score = g.Simulate();
         GamePool.FreeGame(g);
         Assert.AreEqual(2.0 / 3.0, score, 0.000000001);
@@ -76,53 +78,22 @@ public class SimulationTest
         // score shield not broken = 0.0 with 5/6% chance
         // score shield is broken = -194.0 with 1/6% chance
 
-        Act[] actions0 = GetEmptyActions();
-        Act[] actions1 = GetEmptyActions();
-        Act[] actions2 = GetEmptyActions();
+        Act[] actions0 = ActUtils.ParseActionsFromString("aa          ");
+        Act[] actions1 = ActUtils.ParseActionsFromString("da          ");
+        Act[] actions2 = ActUtils.ParseActionsFromString("crb         ");
 
-        actions0[0] = Act.A;
-        actions0[1] = Act.A;
-        actions1[0] = Act.Lift;
-        actions1[1] = Act.A;
-        actions2[0] = Act.C;
-        actions2[1] = Act.Right;
-        actions2[2] = Act.B;
-
-        Player[] players = new Player[3] { new(ImmutableArray.Create(actions0)), new(ImmutableArray.Create(actions1)), new(ImmutableArray.Create(actions2)) };
-        Trajectory[] trajectories = ConstructTrajectories(6, 1, 3, 4);
-        Event[] events = new Event[]
-        {
+        Player[] players = TestUtils.CreatePlayersFromActions(actions0, actions1, actions2);
+        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("6134");
+        ImmutableArray<Event> events = ImmutableArray.Create
+        (
             new Event(true, 1, 1, 23),
             new Event(true, 2, 2, 2)
-        };
+        );
 
         Game g = GamePool.GetGame();
-        g.Init(players, ImmutableArray.Create(trajectories), ImmutableArray.Create(events));
+        g.Init(players, trajectories, events);
         double score = g.Simulate();
         GamePool.FreeGame(g);
         Assert.AreEqual(-194.0 / 6.0, score, 0.000000001);
-    }
-
-    private Player GetEmptyPlayer()
-    {
-        return new Player(ImmutableArray.Create(GetEmptyActions()));
-    }
-
-    private Act[] GetEmptyActions()
-    {
-        Act[] output = new Act[12];
-        Array.Fill(output, Act.Empty);
-        return output;
-    }
-
-    private Trajectory[] ConstructTrajectories(int l, int m, int r, int i)
-    {
-        return new Trajectory[4]
-        {
-            new Trajectory(l-1),
-            new Trajectory(m-1),
-            new Trajectory(r-1),
-            new Trajectory(i-1)
-        };
     }
 }
