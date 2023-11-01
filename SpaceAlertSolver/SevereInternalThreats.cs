@@ -416,7 +416,7 @@ class RebelliousRobots : InThreat
     {
         for(int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].AndroidState == AndroidState.Alive)
+            if (ship.players[i].AndroidState == AndroidState.Alive && ship.players[i].Position < 6)
                 ship.players[i].Kill();
         }
     }
@@ -432,41 +432,38 @@ class RebelliousRobots : InThreat
     {
         for (int i = 0; i < ship.players.Length; i++)
         {
-            if (ship.players[i].Position != 1)
+            if (ship.players[i].Position != 1 && ship.players[i].Position < 6)
                 ship.players[i].Kill();
         }
     }
     internal override bool DealDamage(int position, InternalDamageType damageType)
-    {
-        if (damageType == vulnerability)
-        {
-            //Check if at any of the two positions
-            if(position == 2 || position == 3)
-            {
-                health--;
-                //Bonus damage if both stations activated
-                hits[position - 2] = true;
-                if (!tookExtraDamage)
-                {
-                    if(hits[0] && hits[1])
-                    {
-                        health--;
-                        tookExtraDamage = true;
-                    }
-                }
-                //Check death
-                if (health <= 0)
-                {
-                    beaten = true;
-                    alive = false;
-                    OnClear();
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-    public override bool ProcessTurnEnd()
+	{
+		if (damageType != vulnerability)
+			return false;
+        if (position != 2 && position != 3)
+            return false;
+
+		health--;
+		if (!tookExtraDamage)
+		{
+			//Bonus damage if both stations activated
+			hits[position - 2] = true;
+			if (hits[0] && hits[1])
+			{
+				health--;
+				tookExtraDamage = true;
+			}
+		}
+		//Check death
+		if (health <= 0)
+		{
+			beaten = true;
+			alive = false;
+			OnClear();
+		}
+		return true;
+	}
+	public override bool ProcessTurnEnd()
     {
         if (beaten)
             return true;
