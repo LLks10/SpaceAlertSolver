@@ -6,7 +6,7 @@ namespace SpaceAlertSolver;
 
 class CommandosRed : InThreat
 {
-    public CommandosRed(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public CommandosRed(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         position = 3;
@@ -19,10 +19,10 @@ class CommandosRed : InThreat
 
     public CommandosRed() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         CommandosRed clone = new CommandosRed();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         return clone;
     }
 
@@ -44,24 +44,24 @@ class CommandosRed : InThreat
         else
         {
             int z = position % 3;
-            ship.DealDamageIntern(z, 2);
+            game.ship.DealDamageIntern(z, 2);
         }            
     }
     public override void ActZ()
     {
         int z = position % 3;
-        ship.DealDamageIntern(z, 4);
-        for(int i = 0; i < ship.players.Length; i++)
+        game.ship.DealDamageIntern(z, 4);
+        for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (ship.players[i].Position == position)
-                ship.players[i].Kill();
+            if (game.ship.Players[i].Position == position)
+                game.ship.Players[i].Kill();
         }
     }
 }
 
 class CommandosBlue : InThreat
 {
-    public CommandosBlue(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public CommandosBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         position = 2;
@@ -74,10 +74,10 @@ class CommandosBlue : InThreat
 
     public CommandosBlue() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         CommandosBlue clone = new CommandosBlue();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         return clone;
     }
 
@@ -99,24 +99,24 @@ class CommandosBlue : InThreat
         else
         {
             int z = position % 3;
-            ship.DealDamageIntern(z, 2);
+            game.ship.DealDamageIntern(z, 2);
         }
     }
     public override void ActZ()
     {
         int z = position % 3;
-        ship.DealDamageIntern(z, 4);
-        for (int i = 0; i < ship.players.Length; i++)
+        game.ship.DealDamageIntern(z, 4);
+        for (int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (ship.players[i].Position == position)
-                ship.players[i].Kill();
+            if (game.ship.Players[i].Position == position)
+                game.ship.Players[i].Kill();
         }
     }
 }
 
 class Alien : InThreat
 {
-    public Alien(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public Alien(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         position = 4;
@@ -128,10 +128,10 @@ class Alien : InThreat
 
     public Alien() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         Alien clone = new Alien();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         return clone;
     }
 
@@ -146,24 +146,24 @@ class Alien : InThreat
         else
             position -= 3;
         int c = 0;
-        for(int i = 0; i < ship.players.Length; i++)
+        for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (ship.players[i].Position == position)
+            if (game.ship.Players[i].Position == position)
                 c++;
         }
-        ship.DealDamageIntern(position % 3, c);
+        game.ship.DealDamageIntern(position % 3, c);
     }
     public override void ActZ()
     {
-        ship.damage[0] = 7;
-        ship.damage[1] = 7;
-        ship.damage[2] = 7;
+        game.ship.Damage[0] = 7;
+        game.ship.Damage[1] = 7;
+        game.ship.Damage[2] = 7;
     }
 }
 
 class Eliminator : InThreat
 {
-    public Eliminator(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public Eliminator(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         position = 2;
@@ -176,10 +176,10 @@ class Eliminator : InThreat
 
     public Eliminator() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         Eliminator clone = new Eliminator();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         return clone;
     }
 
@@ -199,23 +199,23 @@ class Eliminator : InThreat
     }
     public override void ActZ()
     {
-        ship.DealDamageIntern(position % 3, 3);
+        game.ship.DealDamageIntern(position % 3, 3);
     }
 
     private void KillAll()
     {
         int z = position % 3;
-        for(int i = 0; i < ship.players.Length; i++)
+        for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (ship.players[i].Position % 3 == z && ship.players[i].Position < 6 && ship.players[i].AndroidState != AndroidState.Alive)
-                ship.players[i].Kill();
+            if (game.ship.Players[i].Position % 3 == z && game.ship.Players[i].Position < 6 && game.ship.Players[i].AndroidState != AndroidState.Alive)
+                game.ship.Players[i].Kill();
         }
     }
 }
 
 class SearchRobot : InThreat
 {
-    public SearchRobot(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public SearchRobot(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         position = 1;
@@ -227,10 +227,10 @@ class SearchRobot : InThreat
 
     public SearchRobot() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         SearchRobot clone = new SearchRobot();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         return clone;
     }
 
@@ -244,11 +244,11 @@ class SearchRobot : InThreat
     }
     public override void ActZ()
     {
-        ship.DealDamageIntern(position % 3, 5);
-        for(int i = 0; i < ship.players.Length; i++)
+        game.ship.DealDamageIntern(position % 3, 5);
+        for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (ship.players[i].Position == position)
-                ship.players[i].Kill();
+            if (game.ship.Players[i].Position == position)
+                game.ship.Players[i].Kill();
         }
     }
 
@@ -259,7 +259,7 @@ class SearchRobot : InThreat
             health--;
             if (health <= 0)
             {
-                ship.GetCurrentTurnPlayer().Kill();
+                game.ship.GetCurrentTurnPlayer().Kill();
 
                 alive = false;
                 beaten = true;
@@ -295,7 +295,7 @@ class SearchRobot : InThreat
         }
         int best = -1;
         int score = int.MinValue;
-        Player[] ps = ship.players;
+        Player[] ps = game.ship.Players;
         //Count players and choose best station
         for(int i = 0; i < nearbyStation.Length; i++)
         {
@@ -323,11 +323,11 @@ class SearchRobot : InThreat
 class AtomicBomb : InThreat
 {
     int damage = 0;
-    public AtomicBomb(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public AtomicBomb(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 1;
         position = 4;
-        ship.CDefect[4]++;
+        game.ship.CDefect[4]++;
         speed = 4;
         scoreLose = 0;
         scoreWin = 12;
@@ -336,10 +336,10 @@ class AtomicBomb : InThreat
 
     public AtomicBomb() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         AtomicBomb clone = new AtomicBomb();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         clone.damage = damage;
         return clone;
     }
@@ -353,9 +353,9 @@ class AtomicBomb : InThreat
     }
     public override void ActZ()
     {
-        ship.damage[0] = 7;
-        ship.damage[1] = 7;
-        ship.damage[2] = 7;
+        game.ship.Damage[0] = 7;
+        game.ship.Damage[1] = 7;
+        game.ship.Damage[2] = 7;
     }
     internal override bool DealDamage(int position, InternalDamageType damageType)
     {
@@ -367,7 +367,7 @@ class AtomicBomb : InThreat
                 health--;
                 beaten = true;
                 alive = false;
-                ship.CDefect[4]--;
+                game.ship.CDefect[4]--;
             }
             return true;
         }
@@ -386,11 +386,11 @@ class RebelliousRobots : InThreat
 {
     bool tookExtraDamage;
     bool[] hits = new bool[2];
-    public RebelliousRobots(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public RebelliousRobots(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 4;
-        ship.CDefect[2]++;
-        ship.CDefect[3]++;
+        game.ship.CDefect[2]++;
+        game.ship.CDefect[3]++;
         speed = 2;
         scoreLose = 4;
         scoreWin = 8;
@@ -399,41 +399,41 @@ class RebelliousRobots : InThreat
 
     public RebelliousRobots() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         RebelliousRobots clone = new RebelliousRobots();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         clone.tookExtraDamage = tookExtraDamage;
         clone.hits = hits.ToArray();
         return clone;
     }
     public override void OnClear()
     {
-        ship.CDefect[2]--;
-        ship.CDefect[3]--;
+        game.ship.CDefect[2]--;
+        game.ship.CDefect[3]--;
     }
     public override void ActX()
     {
-        for(int i = 0; i < ship.players.Length; i++)
+        for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (ship.players[i].AndroidState == AndroidState.Alive && ship.players[i].Position < 6)
-                ship.players[i].Kill();
+            if (game.ship.Players[i].AndroidState == AndroidState.Alive && game.ship.Players[i].Position < 6)
+                game.ship.Players[i].Kill();
         }
     }
     public override void ActY()
     {
-        for (int i = 0; i < ship.players.Length; i++)
+        for (int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (ship.players[i].Position == 2 || ship.players[i].Position == 3)
-                ship.players[i].Kill();
+            if (game.ship.Players[i].Position == 2 || game.ship.Players[i].Position == 3)
+                game.ship.Players[i].Kill();
         }
     }
     public override void ActZ()
     {
-        for (int i = 0; i < ship.players.Length; i++)
+        for (int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (ship.players[i].Position != 1 && ship.players[i].Position < 6)
-                ship.players[i].Kill();
+            if (game.ship.Players[i].Position != 1 && game.ship.Players[i].Position < 6)
+                game.ship.Players[i].Kill();
         }
     }
     internal override bool DealDamage(int position, InternalDamageType damageType)
@@ -476,11 +476,11 @@ class RebelliousRobots : InThreat
 
 class SwitchedCables : InThreat
 {
-    public SwitchedCables(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public SwitchedCables(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 4;
         position = 1;
-        ship.BDefect[1]++;
+        game.ship.BDefect[1]++;
         speed = 3;
         scoreLose = 4;
         scoreWin = 8;
@@ -489,48 +489,48 @@ class SwitchedCables : InThreat
 
     public SwitchedCables() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         SwitchedCables clone = new SwitchedCables();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         return clone;
     }
 
     public override void OnClear()
     {
-        ship.BDefect[1]--;
+        game.ship.BDefect[1]--;
     }
 
     public override void ActX()
     {
-        ship.game.BranchReactorFull(1);
-        ship.game.BranchConditional(1, Defects.shield);
-        ship.shields[1] += ship.reactors[1];
-        ship.reactors[1] = 0;
-        int excess = ship.shields[1] - ship.shieldsCap[1];
+        game.BranchReactorFull(1);
+        game.BranchConditional(1, Defects.shield);
+        game.ship.Shields[1] += game.ship.Reactors[1];
+        game.ship.Reactors[1] = 0;
+        int excess = game.ship.Shields[1] - game.ship.ShieldsCap[1];
         if(excess > 0)
         {
-            ship.shields[1] = ship.shieldsCap[1];
-            ship.DealDamageIntern(1, excess);
+            game.ship.Shields[1] = game.ship.ShieldsCap[1];
+            game.ship.DealDamageIntern(1, excess);
         }
 
     }
     public override void ActY()
     {
-        ship.game.BranchShieldFull(1);
-        ship.DealDamageIntern(1, ship.shields[1]);
-        ship.shields[1] = 0;
+        game.BranchShieldFull(1);
+        game.ship.DealDamageIntern(1, game.ship.Shields[1]);
+        game.ship.Shields[1] = 0;
     }
     public override void ActZ()
     {
-        ship.game.BranchReactorFull(0);
-        ship.game.BranchReactorFull(1);
-        ship.game.BranchReactorFull(2);
+        game.BranchReactorFull(0);
+        game.BranchReactorFull(1);
+        game.BranchReactorFull(2);
 
         for (int i = 0; i < 3; i++)
         {
-            ship.DealDamageIntern(i, ship.reactors[i]);
-            ship.reactors[i] = 0;
+            game.ship.DealDamageIntern(i, game.ship.Reactors[i]);
+            game.ship.Reactors[i] = 0;
         }
     }
 }
@@ -539,12 +539,12 @@ class OverstrainedEnergyNet : InThreat
 {
     bool tookExtraDamage;
     bool[] hits = new bool[3];
-    public OverstrainedEnergyNet(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public OverstrainedEnergyNet(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 7;
-        ship.BDefect[3]++;
-        ship.BDefect[4]++;
-        ship.BDefect[5]++;
+        game.ship.BDefect[3]++;
+        game.ship.BDefect[4]++;
+        game.ship.BDefect[5]++;
         speed = 3;
         scoreLose = 6;
         scoreWin = 12;
@@ -553,38 +553,38 @@ class OverstrainedEnergyNet : InThreat
 
     public OverstrainedEnergyNet() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         OverstrainedEnergyNet clone = new OverstrainedEnergyNet();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         clone.tookExtraDamage = tookExtraDamage;
         clone.hits = hits.ToArray();
         return clone;
     }
     public override void OnClear()
     {
-        ship.BDefect[3]--;
-        ship.BDefect[4]--;
-        ship.BDefect[5]--;
+        game.ship.BDefect[3]--;
+        game.ship.BDefect[4]--;
+        game.ship.BDefect[5]--;
     }
     public override void ActX()
     {
-        ship.game.BranchReactorFull(1);
-        ship.reactors[1] = Math.Max(0, ship.reactors[1] - 2);
+        game.BranchReactorFull(1);
+        game.ship.Reactors[1] = Math.Max(0, game.ship.Reactors[1] - 2);
     }
     public override void ActY()
     {
-        ship.game.BranchReactorFull(0);
-        ship.game.BranchReactorFull(1);
-        ship.game.BranchReactorFull(2);
+        game.BranchReactorFull(0);
+        game.BranchReactorFull(1);
+        game.BranchReactorFull(2);
         for (int i = 0; i < 3; i++)
-            ship.reactors[i] = Math.Max(0, ship.reactors[i] - 1);
+            game.ship.Reactors[i] = Math.Max(0, game.ship.Reactors[i] - 1);
     }
     public override void ActZ()
     {
-        ship.DealDamageIntern(0, 3);
-        ship.DealDamageIntern(1, 3);
-        ship.DealDamageIntern(2, 3);
+        game.ship.DealDamageIntern(0, 3);
+        game.ship.DealDamageIntern(1, 3);
+        game.ship.DealDamageIntern(2, 3);
     }
     internal override bool DealDamage(int position, InternalDamageType damageType)
     {
@@ -630,11 +630,11 @@ class OverstrainedEnergyNet : InThreat
 
 class Fissure : InThreat
 {
-    public Fissure(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public Fissure(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         position = 6;
-        ship.CDefect[6]++;
+        game.ship.CDefect[6]++;
         speed = 2;
         scoreLose = 0;
         scoreWin = 8;
@@ -643,41 +643,41 @@ class Fissure : InThreat
 
     public Fissure() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         Fissure clone = new Fissure();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         return clone;
     }
     public override void OnClear()
     {
-        ship.CDefect[6]--;
-        ship.fissured[0] = false;
-        ship.fissured[1] = false;
-        ship.fissured[2] = false;
+        game.ship.CDefect[6]--;
+        game.ship.Fissured[0] = false;
+        game.ship.Fissured[1] = false;
+        game.ship.Fissured[2] = false;
     }
     public override void ActX()
     {
-        ship.fissured[0] = true;
+        game.ship.Fissured[0] = true;
     }
     public override void ActY()
     {
-        ship.fissured[0] = true;
-        ship.fissured[1] = true;
-        ship.fissured[2] = true;
+        game.ship.Fissured[0] = true;
+        game.ship.Fissured[1] = true;
+        game.ship.Fissured[2] = true;
     }
     public override void ActZ()
     {
-        ship.damage[0] = 7;
-        ship.damage[1] = 7;
-        ship.damage[2] = 7;
+        game.ship.Damage[0] = 7;
+        game.ship.Damage[1] = 7;
+        game.ship.Damage[2] = 7;
     }
 }
 
 class Infection : InThreat
 {
     bool[] isActive = new bool[] {true,false,true,true,false,true,false };
-    public Infection(Ship ship, Trajectory traj, int time) : base(ship, traj, time)
+    public Infection(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
         speed = 2;
@@ -688,20 +688,20 @@ class Infection : InThreat
 
     public Infection() { }
 
-    public override InThreat Clone(Ship ship)
+    internal override InThreat Clone(Game game)
     {
         Infection clone = new Infection();
-        clone.CloneThreat(this, ship);
+        clone.CloneThreat(this, game);
         clone.isActive = isActive.ToArray();
         return clone;
     }
 
     public override void ActX()
     {
-        for(int i = 0; i < ship.players.Length; i++)
+        for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (isActive[ship.players[i].Position])
-                ship.players[i].DelayNext();
+            if (isActive[game.ship.Players[i].Position])
+                game.ship.Players[i].DelayNext();
         }
     }
     public override void ActY()
@@ -709,20 +709,20 @@ class Infection : InThreat
         for (int i = 0; i < 6; i++)
         {
             if (isActive[i])
-                ship.DealDamageIntern(i % 3, 1);
+                game.ship.DealDamageIntern(i % 3, 1);
         }
     }
     public override void ActZ()
     {
-        for (int i = 0; i < ship.players.Length; i++)
+        for (int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (isActive[ship.players[i].Position])
-                ship.players[i].Kill();
+            if (isActive[game.ship.Players[i].Position])
+                game.ship.Players[i].Kill();
         }
         for(int i = 0; i < 6; i++)
         {
             if (isActive[i])
-                ship.stationStatus[i] |= 2;
+                game.ship.StationStatus[i] |= 2;
         }
     }
     internal override bool DealDamage(int position, InternalDamageType damageType)

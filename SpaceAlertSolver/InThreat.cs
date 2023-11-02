@@ -7,15 +7,15 @@ public abstract class InThreat
     public Trajectory trajectory;
     private protected InternalDamageType vulnerability;
     public bool alive, beaten, fightBack;
-    public Ship ship;
+    public Game game;
 
     bool started_move = false;
     int distance_moved;
     int current_speed;
 
-    public InThreat(Ship ship, Trajectory traj, int time)
+    internal InThreat(Game game, Trajectory traj, int time)
     {
-        this.ship = ship;
+        this.game = game;
         this.trajectory = traj;
         this.time = time;
         alive = true;
@@ -25,9 +25,9 @@ public abstract class InThreat
     }
     public InThreat() { }
 
-    public abstract InThreat Clone(Ship ship);
+    internal abstract InThreat Clone(Game game);
 
-    protected virtual void CloneThreat(InThreat other, Ship ship)
+    private protected virtual void CloneThreat(InThreat other, Game game)
     {
         health = other.health;
         speed = other.speed;
@@ -46,7 +46,7 @@ public abstract class InThreat
         distance_moved = other.distance_moved;
         current_speed = other.current_speed;
 
-        this.ship = ship;
+        this.game = game;
     }
 
     internal virtual bool DealDamage(int position, InternalDamageType damageType)

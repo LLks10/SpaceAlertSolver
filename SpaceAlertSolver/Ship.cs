@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Diagnostics;
 
 namespace SpaceAlertSolver;
 
@@ -10,87 +10,85 @@ namespace SpaceAlertSolver;
 //8 16 32   64 Bitmasks stations
 
 //1  2  4  Bitmasks zone
-public sealed class Ship
+internal sealed class Ship
 {
     public const int NUM_DEFECTS = 6;
 
-    public readonly Game game;
+    public readonly Game Game;
 
-    public Player[] players => game.players;
+    public Player[] Players => Game.players;
     public AndroidState AndroidTopRight;
     public AndroidState AndroidBottomLeft;
-    public readonly int[] shields = new int[3];
-    public readonly int[] shieldsCap = new int[3];
-    public readonly int[] reactors = new int[3];
-    public readonly int[] reactorsCap = new int[3];
-    public readonly int[] laserDamage = new int[3];
-    public readonly int[] plasmaDamage = new int[3];
+    public readonly int[] Shields = new int[3];
+    public readonly int[] ShieldsCap = new int[3];
+    public readonly int[] Reactors = new int[3];
+    public readonly int[] ReactorsCap = new int[3];
+    public readonly int[] LaserDamage = new int[3];
+    public readonly int[] PlasmaDamage = new int[3];
     public readonly int[] BDefect = new int[6];
     public readonly int[] CDefect = new int[7];
-    public readonly int[] stationStatus = new int[6];
-    public readonly int[] damage = new int[3];
-    public readonly bool[] fissured = new bool[3];
+    public readonly int[] StationStatus = new int[6];
+    public readonly int[] Damage = new int[3];
+    public readonly bool[] Fissured = new bool[3];
 
     //Bit flags
-    public int liftUsed, liftReset;
-    public int cannonFired;
+    private int _liftUsed;
+    private int _liftReset;
+    private int _cannonFired;
 
-    public int capsules;
+    public int CapsulesLeft;
 
-    public int rockets;
-    public bool rocketFired;
-    public bool rocketReady;
+    public int RocketsLeft;
+    private bool _rocketFired;
+    public bool RocketReady { get; private set; }
 
-    public bool interceptorReady;
-
-    public int scoutBonus;
+    public bool InterceptorReady;
 
     //Defects
-    readonly int[] numUndeterminedDefects = new int[3]; // the number of undetermined defects in each zone
-    readonly int[] numDefectOptions = new int[3]; // the number of places that a defect can be
-    public readonly DefectState[,] defectStates = new DefectState[3,NUM_DEFECTS]; // the state of each defect in each zone
+    internal readonly int[] NumUndeterminedDefects = new int[3]; // the number of undetermined defects in each zone
+    internal readonly int[] NumDefectOptions = new int[3]; // the number of places that a defect can be
+    internal readonly DefectState[,] DefectStates = new DefectState[3,NUM_DEFECTS]; // the state of each defect in each zone
                                                                                   // defect: it is definitely broken
                                                                                   // notDefect: it is definitely not broken (yet)
                                                                                   // undetermined: it might be broken (this means branch if necessary)
 
     public Ship(Game game)
     {
-        this.game = game;
+        this.Game = game;
     }
 
     public void Init(Ship other)
     {
         AndroidTopRight = other.AndroidTopRight;
         AndroidBottomLeft = other.AndroidBottomLeft;
-        other.shields.CopyTo(shields, 0);
-        other.shieldsCap.CopyTo(shieldsCap, 0);
-        other.reactors.CopyTo(reactors, 0);
-        other.reactorsCap.CopyTo(reactorsCap, 0);
-        other.laserDamage.CopyTo(laserDamage, 0);
-        other.plasmaDamage.CopyTo(plasmaDamage, 0);
+        other.Shields.CopyTo(Shields, 0);
+        other.ShieldsCap.CopyTo(ShieldsCap, 0);
+        other.Reactors.CopyTo(Reactors, 0);
+        other.ReactorsCap.CopyTo(ReactorsCap, 0);
+        other.LaserDamage.CopyTo(LaserDamage, 0);
+        other.PlasmaDamage.CopyTo(PlasmaDamage, 0);
         other.BDefect.CopyTo(BDefect, 0);
         other.CDefect.CopyTo(CDefect, 0);
-        other.stationStatus.CopyTo(stationStatus, 0);
-        other.damage.CopyTo(damage, 0);
-        other.fissured.CopyTo(fissured, 0);
+        other.StationStatus.CopyTo(StationStatus, 0);
+        other.Damage.CopyTo(Damage, 0);
+        other.Fissured.CopyTo(Fissured, 0);
 
-        liftUsed = other.liftUsed;
-        liftReset = other.liftReset;
-        cannonFired = other.cannonFired;
-        capsules = other.capsules;
-        rockets = other.rockets;
-        rocketFired = other.rocketFired;
-        rocketReady = other.rocketReady;
-        interceptorReady = other.interceptorReady;
-        scoutBonus = other.scoutBonus;
+        _liftUsed = other._liftUsed;
+        _liftReset = other._liftReset;
+        _cannonFired = other._cannonFired;
+        CapsulesLeft = other.CapsulesLeft;
+        RocketsLeft = other.RocketsLeft;
+        _rocketFired = other._rocketFired;
+        RocketReady = other.RocketReady;
+        InterceptorReady = other.InterceptorReady;
 
-        other.numUndeterminedDefects.CopyTo(numUndeterminedDefects, 0);
-        other.numDefectOptions.CopyTo(numDefectOptions, 0);
+        other.NumUndeterminedDefects.CopyTo(NumUndeterminedDefects, 0);
+        other.NumDefectOptions.CopyTo(NumDefectOptions, 0);
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < NUM_DEFECTS; j++)
             {
-                defectStates[i,j] = other.defectStates[i,j];
+                DefectStates[i,j] = other.DefectStates[i,j];
             }
         }
     }
@@ -99,68 +97,67 @@ public sealed class Ship
     {
         AndroidTopRight = AndroidState.Alive;
         AndroidBottomLeft = AndroidState.Alive;
-        Array.Fill(shields, 1);
-        shieldsCap[0] = shieldsCap[2] = 2;
-        shieldsCap[1] = 3;
-        reactors[0] = reactors[2] = 2;
-        reactors[1] = 3;
-        reactorsCap[0] = reactorsCap[2] = 3;
-        reactorsCap[1] = 5;
-        laserDamage[0] = laserDamage[2] = 4;
-        laserDamage[1] = 5;
-        Array.Fill(plasmaDamage, 2);
+        Array.Fill(Shields, 1);
+        ShieldsCap[0] = ShieldsCap[2] = 2;
+        ShieldsCap[1] = 3;
+        Reactors[0] = Reactors[2] = 2;
+        Reactors[1] = 3;
+        ReactorsCap[0] = ReactorsCap[2] = 3;
+        ReactorsCap[1] = 5;
+        LaserDamage[0] = LaserDamage[2] = 4;
+        LaserDamage[1] = 5;
+        Array.Fill(PlasmaDamage, 2);
         Array.Fill(BDefect, 0);
         Array.Fill(CDefect, 0);
-        Array.Fill(stationStatus, 0);
-        Array.Fill(damage, 0);
-        Array.Fill(fissured, false);
+        Array.Fill(StationStatus, 0);
+        Array.Fill(Damage, 0);
+        Array.Fill(Fissured, false);
 
-        liftUsed = 0;
-        liftReset = 0;
-        capsules = 3;
-        rockets = 3;
-        rocketFired = false;
-        rocketReady = false;
-        interceptorReady = true;
-        scoutBonus = 0;
+        _liftUsed = 0;
+        _liftReset = 0;
+        CapsulesLeft = 3;
+        RocketsLeft = 3;
+        _rocketFired = false;
+        RocketReady = false;
+        InterceptorReady = true;
 
         //Setup defects
-        Array.Fill(numUndeterminedDefects, 0);
-        Array.Fill(numDefectOptions, 0);
+        Array.Fill(NumUndeterminedDefects, 0);
+        Array.Fill(NumDefectOptions, 0);
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < NUM_DEFECTS; j++)
             {
-                defectStates[i,j] = DefectState.notDefect;
+                DefectStates[i,j] = DefectState.notDefect;
             }
         }
     }
 
     internal ref Player GetCurrentTurnPlayer()
     {
-        return ref game.GetCurrentTurnPlayer();
+        return ref Game.GetCurrentTurnPlayer();
     }
 
     public void DealDamage(int zone, int amount)
     {
-        amount += scoutBonus;
-        shields[zone] -= amount;
-        int dmg = -shields[zone];
+        amount += Game.ScoutBonus;
+        Shields[zone] -= amount;
+        int dmg = -Shields[zone];
 
-        if (fissured[zone])
+        if (Fissured[zone])
             dmg *= 2;
 
         //Excess damage
-        if (shields[zone] < 0)
+        if (Shields[zone] < 0)
         {
             ApplyDamage(zone, dmg);
-            shields[zone] = 0;
+            Shields[zone] = 0;
         }
     }
 
     public void DealDamageIntern(int zone, int amount)
     {
-        if (fissured[zone])
+        if (Fissured[zone])
             amount *= 2;
 
         ApplyDamage(zone, amount);
@@ -170,9 +167,9 @@ public sealed class Ship
     {
         if(amount > 0)
         {
-            numUndeterminedDefects[zone] += amount;
+            NumUndeterminedDefects[zone] += amount;
             SetUndeterminedDefects(zone);
-            damage[zone] += amount; // add damage
+            Damage[zone] += amount; // add damage
         }
     }
 
@@ -180,10 +177,10 @@ public sealed class Ship
     {
         for (int i = 0; i < NUM_DEFECTS; i++)
         {
-            if (defectStates[zone,i] == DefectState.notDefect)
+            if (DefectStates[zone,i] == DefectState.notDefect)
             {
-                defectStates[zone,i] = DefectState.undetermined; // it might be broken now
-                numDefectOptions[zone]++;
+                DefectStates[zone,i] = DefectState.undetermined; // it might be broken now
+                NumDefectOptions[zone]++;
             }
         }
     }
@@ -192,21 +189,21 @@ public sealed class Ship
     {
         for (int i = 0; i < NUM_DEFECTS; i++)
         {
-            if (defectStates[zone,i] == DefectState.undetermined)
+            if (DefectStates[zone,i] == DefectState.undetermined)
             {
-                defectStates[zone,i] = DefectState.notDefect;
-                numDefectOptions[zone]--;
+                DefectStates[zone,i] = DefectState.notDefect;
+                NumDefectOptions[zone]--;
             }
         }
     }
 
     public void AddDefect(int zone, Defects defect)
     { // we may not pass a defect that was not undetermined
-        defectStates[zone,(int)defect] = DefectState.defect;
-        numDefectOptions[zone]--;
+        DefectStates[zone,(int)defect] = DefectState.defect;
+        NumDefectOptions[zone]--;
 
-        numUndeterminedDefects[zone]--;
-        if (numUndeterminedDefects[zone] == 0)
+        NumUndeterminedDefects[zone]--;
+        if (NumUndeterminedDefects[zone] == 0)
         {
             RemoveUndeterminedDefects(zone);
         }
@@ -214,35 +211,88 @@ public sealed class Ship
         switch (defect)
         {
             case Defects.lift:
-                liftReset |= 1 << zone;
-                liftUsed |= 1 << zone;
+                _liftReset |= 1 << zone;
+                _liftUsed |= 1 << zone;
                 break;
             case Defects.reactor:
-                reactorsCap[zone]--;
-                reactors[zone] = Math.Min(reactors[zone], reactorsCap[zone]);
+                ReactorsCap[zone]--;
+                Reactors[zone] = Math.Min(Reactors[zone], ReactorsCap[zone]);
                 break;
             case Defects.shield:
-                shieldsCap[zone]--;
-                shields[zone] = Math.Min(shields[zone], shieldsCap[zone]);
+                ShieldsCap[zone]--;
+                Shields[zone] = Math.Min(Shields[zone], ShieldsCap[zone]);
                 break;
             case Defects.weaponbot:
-                plasmaDamage[zone]--;
+                PlasmaDamage[zone]--;
                 break;
             case Defects.weapontop:
-                laserDamage[zone]--;
+                LaserDamage[zone]--;
                 break;
         }
     }
 
     public void NotDefect(int zone, Defects defect)
     { // we may not pass a defect that was not undetermined
-        defectStates[zone,(int)defect] = DefectState.notDefect;
-        numDefectOptions[zone]--;
+        DefectStates[zone,(int)defect] = DefectState.notDefect;
+        NumDefectOptions[zone]--;
     }
 
     public double ChanceOfDefect(int zone)
     {
-        return (double)numUndeterminedDefects[zone] / numDefectOptions[zone];
+        return (double)NumUndeterminedDefects[zone] / NumDefectOptions[zone];
+    }
+
+    public bool CanFireRocket()
+    {
+        return !_rocketFired && RocketsLeft > 0;
+    }
+
+    public void FireRocket()
+    {
+        Debug.Assert(CanFireRocket());
+        _rocketFired = true;
+        RocketsLeft--;
+    }
+
+    public void OnTurnStart()
+    {
+        _cannonFired = 0;
+        _liftUsed = _liftReset;
+    }
+
+    public void OnTurnEnd()
+    {
+        RocketReady = _rocketFired;
+        _rocketFired = false;
+    }
+
+    public bool CanFireCannon(int position)
+    {
+        return (_cannonFired & (1 << position)) == 0;
+    }
+
+    public void FireCannon(int position)
+    {
+        _cannonFired |= (1 << position);
+    }
+
+    public bool LiftWillDelay(int zone)
+    {
+        return (_liftUsed & (1 << zone)) != 0;
+    }
+
+    public void UseLift(int zone)
+    {
+        _liftUsed |= (1 << zone);
+    }
+
+    public void TryRefillMainReactor()
+    {
+        if (CapsulesLeft <= 0)
+            return;
+
+        CapsulesLeft--;
+        Reactors[1] = ReactorsCap[1];
     }
 }
 

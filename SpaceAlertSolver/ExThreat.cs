@@ -6,16 +6,16 @@ public abstract class ExThreat
     public int health, shield, speed, distance , distanceRange, scoreWin, scoreLose, zone, time;
     public Trajectory trajectory;
     public bool rocketImmune, alive, beaten;
-    public Ship ship;
+    public Game game;
     public int damage;
 
     bool started_move = false;
     int distance_moved;
     int current_speed;
 
-    public ExThreat(Ship ship, Trajectory traj, int zone, int time)
+    internal ExThreat(Game game, Trajectory traj, int zone, int time)
     {
-        this.ship = ship;
+        this.game = game;
         this.trajectory = traj;
         this.zone = zone;
         this.time = time;
@@ -35,9 +35,9 @@ public abstract class ExThreat
 
     public ExThreat() { }
 
-    public abstract ExThreat Clone(Ship ship);
+    internal abstract ExThreat Clone(Game game);
 
-    protected virtual void CloneThreat(ExThreat other, Ship ship)
+    private protected virtual void CloneThreat(ExThreat other, Game game)
     {
         health = other.health;
         shield = other.shield;
@@ -58,7 +58,7 @@ public abstract class ExThreat
         distance_moved = other.distance_moved;
         current_speed = other.current_speed;
 
-        this.ship = ship;
+        this.game = game;
     }
 
     public virtual int GetDistance(int range, ExDmgSource source)

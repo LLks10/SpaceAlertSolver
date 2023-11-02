@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
 using System.Text;
 
 namespace SpaceAlertSolver;
@@ -24,10 +25,10 @@ namespace SpaceAlertSolver;
 public class Game
 {
     public static List<int> Scores = new();
-    static int[] obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
+    private static readonly int[] _obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
     public const int NUM_PHASES = 3;
 
-    public readonly Ship ship;
+    internal readonly Ship ship;
     public Player[] players = null!;
     public ImmutableArray<Trajectory> trajectories;
     public ImmutableArray<Event> events;
@@ -47,6 +48,8 @@ public class Game
     double scoreMultiplier;
     double scoreAddition;
 
+    public int ScoutBonus;
+
     // simulation phase
     SimulationPhase sp;
     int turn;
@@ -56,6 +59,20 @@ public class Game
     int move_threats_iEx;
     int move_threats_iIn;
     Act action;
+
+    public static int PositionToZone(int pos)
+    {
+        if (pos < 0)
+            return -1;
+
+        if (pos < 3)
+            return pos;
+
+        if (pos < 6)
+            return pos - 3;
+
+        return -1;
+    }
 
     public Game()
     {
@@ -69,9 +86,9 @@ public class Game
         trajectories = other.trajectories;
         events = other.events;
         exThreats.Clear();
-        exThreats.AddRange(other.exThreats.Select(t => t.Clone(ship)));
+        exThreats.AddRange(other.exThreats.Select(t => t.Clone(this)));
         inThreats.Clear();
-        inThreats.AddRange(other.inThreats.Select(t => t.Clone(ship)));
+        inThreats.AddRange(other.inThreats.Select(t => t.Clone(this)));
 
         phase = other.phase;
         score = other.score;
@@ -88,6 +105,8 @@ public class Game
 
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
+
+        ScoutBonus = other.ScoutBonus;
 
         sp = other.sp;
         turn = other.turn;
@@ -120,6 +139,7 @@ public class Game
         observationCount = 0;
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
+        ScoutBonus = 0;
         sp = SimulationPhase.TurnPrep;
         turn = 1;
         actions_player_i = 0;
@@ -158,7 +178,7 @@ public class Game
                         external_damage_i = 0;
                         break;
                     }
-                    TurnPrep();
+                    OnTurnStart();
                     sp = SimulationPhase.ReadAction;
                     actions_player_i = 0;
                     break;
@@ -257,7 +277,7 @@ public class Game
                     break;
 
                 case SimulationPhase.TurnCleanup:
-                    TurnCleanup();
+                    OnTurnEnd();
                     sp = SimulationPhase.TurnPrep;
                     turn++;
                     break;
@@ -270,7 +290,7 @@ public class Game
         }
     }
 
-    void TurnPrep()
+    void OnTurnStart()
     {
         //Set phase
         if (turn <= 3)
@@ -282,8 +302,7 @@ public class Game
 
         //Reset variables
         observationCount = 0;
-        ship.cannonFired = 0;
-        ship.liftUsed = ship.liftReset;
+        ship.OnTurnStart();
 
         //Check computer
         if (turn == 3 || turn == 6 || turn == 10)
@@ -315,6 +334,8 @@ public class Game
         //Check interceptor controls
         if (p.InIntercept)
         {
+            Debug.Assert(!ship.InterceptorReady, "Interceptor cannot be ready when player is in it");
+
             if (action == Act.Fight)
             {
                 //Keep fighting
@@ -324,9 +345,9 @@ public class Game
 
             //Return
             p.InIntercept = false;
-            ship.interceptorReady = true;
+            ship.InterceptorReady = true;
             p.Position = 0;
-            ApplyStatusEffect(ref p, t);
+            ApplyStatusEffect(ref p);
             p.DelayCurrent();
             return;
         }
@@ -373,7 +394,7 @@ public class Game
             if (p.Position != 2 && p.Position != 5)
                 p.Position++;
         }
-        ApplyStatusEffect(ref p, t);
+        ApplyStatusEffect(ref p);
     }
 
     void PlayerActionLift(ref Player p)
@@ -388,80 +409,78 @@ public class Game
         }
 
         //Check if elevator was used
-        int bm = 1 << z;
-        if ((ship.liftUsed & bm) == bm)
+        if (ship.LiftWillDelay(z))
             p.DelayNext();
-        ship.liftUsed |= bm;
+        ship.UseLift(z);
         //Move
         if (p.Position < 3)
             p.Position += 3;
         else
             p.Position -= 3;
-        ApplyStatusEffect(ref p, t);
+        ApplyStatusEffect(ref p);
     }
 
     void PlayerActionA(ref Player p)
     {
-        int z = p.Position % 3;
+        int zone = PositionToZone(p.Position);
 
         //Check if can fire
-        int bm = 1 << p.Position;
-        if ((ship.cannonFired & bm) == bm)
+        if (!ship.CanFireCannon(p.Position))
             return;
 
         if (p.Position < 3)
         {
             //Main guns
             //Drain energy
-            if (ship.reactors[z] > 0)
+            if (ship.Reactors[zone] > 0)
             {
-                BranchReactorFull(z);
+                BranchReactorFull(zone);
 
                 //Find target
-                int target = GetTargetEx(z, 3, ExDmgSource.laser);
+                int target = GetTargetEx(zone, 3, ExDmgSource.laser);
 
                 if (target != -1)
                 {
-                    BranchConditional(z, Defects.weapontop);
+                    BranchConditional(zone, Defects.weapontop);
 
-                    exThreats[target].DealDamage(ship.laserDamage[z], 3, ExDmgSource.laser);
+                    exThreats[target].DealDamage(ship.LaserDamage[zone], 3, ExDmgSource.laser);
                 }
 
-                ship.reactors[z]--;
+                ship.Reactors[zone]--;
             }
         }
         else
         {
             //Secondary guns
             //Impulse cannon
-            if (z == 1)
+            if (zone == 1)
             {
                 //Drain energy
-                if (ship.reactors[z] > 0)
+                if (ship.Reactors[zone] > 0)
                 {
-                    BranchReactorFull(z);
-                    BranchConditional(z, Defects.weaponbot);
+                    BranchReactorFull(zone);
+                    BranchConditional(zone, Defects.weaponbot);
 
-                    ship.reactors[z]--;
+                    ship.Reactors[zone]--;
                     foreach (ExThreat et in exThreats)
-                        et.DealDamage(1, ship.plasmaDamage[z], ExDmgSource.impulse);
+                        et.DealDamage(1, ship.PlasmaDamage[zone], ExDmgSource.impulse);
                 }
             }
             //Plasma cannon
             else
             {
                 //Find target
-                int target = GetTargetEx(z, 3, ExDmgSource.plasma);
+                int target = GetTargetEx(zone, 3, ExDmgSource.plasma);
                 //Deal damage
                 if (target != -1)
                 {
-                    BranchConditional(z, Defects.weaponbot);
-                    exThreats[target].DealDamage(ship.plasmaDamage[z], 3, ExDmgSource.laser);
+                    BranchConditional(zone, Defects.weaponbot);
+                    exThreats[target].DealDamage(ship.PlasmaDamage[zone], 3, ExDmgSource.laser);
                 }
             }
         }
 
-        ship.cannonFired |= bm;
+        ship.FireCannon(p.Position);
     }
 
     void PlayerActionB(ref Player p)
@@ -478,22 +497,22 @@ public class Game
         //Refill shield
         if (p.Position < 3)
         {
-            if (ship.reactors[z] == 0 || ship.shields[z] == ship.shieldsCap[z]) // nothing happens regardless
+            if (ship.Reactors[z] == 0 || ship.Shields[z] == ship.ShieldsCap[z]) // nothing happens regardless
                 return;
 
             // we now know that we are transferring at least 1 energy
 
             BranchConditional(z, Defects.shield);
-            int deficit = ship.shieldsCap[z] - ship.shields[z];
+            int deficit = ship.ShieldsCap[z] - ship.Shields[z];
             if (deficit == 0)
                 return; // if it broke it might turn out that we no longer transfer energy
 
             BranchReactorFull(z);
 
             //Pump over energy
-            deficit = Math.Min(ship.reactors[z], deficit);
-            ship.shields[z] += deficit;
-            ship.reactors[z] -= deficit;
+            deficit = Math.Min(ship.Reactors[z], deficit);
+            ship.Shields[z] += deficit;
+            ship.Reactors[z] -= deficit;
         }
         //Reactors
         else
@@ -501,33 +520,27 @@ public class Game
             //Main
             if (z == 1)
             {
-                //Fill main
-                if (ship.capsules == 0)
-                    return;
-
-                // no need to branch! it's at the cap so we can branch at a later stage
-                ship.reactors[z] = ship.reactorsCap[z];
-                ship.capsules--;
+                ship.TryRefillMainReactor();
             }
             //Secondary
             else
             {
-                if (ship.reactors[1] == 0 || ship.reactors[z] == ship.reactorsCap[z]) // nothing happens regardless
+                if (ship.Reactors[1] == 0 || ship.Reactors[z] == ship.ReactorsCap[z]) // nothing happens regardless
                     return;
 
                 // we now know that we are transferring at least 1 energy
 
                 BranchConditional(z, Defects.reactor);
-                int deficit = ship.reactorsCap[z] - ship.reactors[z];
+                int deficit = ship.ReactorsCap[z] - ship.Reactors[z];
                 if (deficit == 0)
                     return;
 
                 BranchReactorFull(1);
 
                 //Pump over energy
-                deficit = Math.Min(ship.reactors[1], deficit);
-                ship.reactors[z] += deficit;
-                ship.reactors[1] -= deficit;
+                deficit = Math.Min(ship.Reactors[1], deficit);
+                ship.Reactors[z] += deficit;
+                ship.Reactors[1] -= deficit;
             }
         }
     }
@@ -546,10 +559,10 @@ public class Game
             //Interceptors
             case 0:
                 //Check if requirements met
-                if (p.AndroidState == AndroidState.Alive && ship.interceptorReady)
+                if (p.AndroidState == AndroidState.Alive && ship.InterceptorReady)
                 {
                     p.InIntercept = true;
-                    ship.interceptorReady = false;
+                    ship.InterceptorReady = false;
                     p.Position = 6;
                     InterceptorDamage(ref p);
                 }
@@ -593,11 +606,8 @@ public class Game
 
             //Fire rocket
             case 5:
-                if (!ship.rocketFired && ship.rockets > 0)
-                {
-                    ship.rocketFired = true;
-                    ship.rockets--;
-                }
+                if (ship.CanFireRocket())
+                    ship.FireRocket();
                 break;
         }
     }
@@ -617,25 +627,23 @@ public class Game
 
     void RocketFire()
     {
-        if (ship.rocketReady)
+        if (!ship.RocketReady)
+            return;
+
+        int distance = int.MaxValue;
+        ExThreat? target = null;
+        for (int i = 0; i < exThreats.Count; i++)
         {
-            ship.rocketReady = false;
-            int distance = 99;
-            int target = -1;
-            for (int i = 0; i < exThreats.Count; i++)
+            ExThreat et = exThreats[i];
+            int dist = et.GetDistance(2, ExDmgSource.rocket);
+            if (dist < distance)
             {
-                ExThreat et = exThreats[i];
-                int dist = et.GetDistance(2, ExDmgSource.rocket);
-                if (dist < distance)
-                {
-                    target = i;
-                    distance = dist;
-                }
+                target = et;
+                distance = dist;
             }
-            //Deal damage
-            if (target != -1)
-                exThreats[target].DealDamage(3, 2, ExDmgSource.rocket);
         }
+        //Deal damage
+        target?.DealDamage(3, 2, ExDmgSource.rocket);
     }
 
     void InternalTurnEnd()
@@ -716,22 +724,17 @@ public class Game
         }
     }
 
-    void TurnCleanup()
+    void OnTurnEnd()
     {
-        //Move rocket
-        if (ship.rocketFired)
-        {
-            ship.rocketReady = true;
-            ship.rocketFired = false;
-        }
+        ship.OnTurnEnd();
 
         //Calculate observation bonus
-        observation[phase] = Math.Max(observation[phase], obsBonus[observationCount]);
+        observation[phase] = Math.Max(observation[phase], _obsBonus[observationCount]);
 
         //Check if gameover
         for (int i = 0; i < 3; i++)
         {
-            if (ship.damage[i] >= 7)
+            if (ship.Damage[i] >= 7)
                 gameover = true;
         }
     }
@@ -742,8 +745,8 @@ public class Game
         int highestDamage = 0;
         for (int i = 0; i < 3; i++)
         {
-            score -= ship.damage[i];
-            highestDamage = Math.Max(ship.damage[i], highestDamage);
+            score -= ship.Damage[i];
+            highestDamage = Math.Max(ship.Damage[i], highestDamage);
         }
         score -= highestDamage;
 
@@ -786,7 +789,7 @@ public class Game
     void Branch(int zone, Defects defect)
     {
         Debug.Assert(zone >= 0 && zone < 3
-            && ship.defectStates[zone,(int)defect] == DefectState.undetermined);
+            && ship.DefectStates[zone,(int)defect] == DefectState.undetermined);
 
         double chanceOfBreaking = ship.ChanceOfDefect(zone);
         if (chanceOfBreaking < 1.0)
@@ -812,7 +815,7 @@ public class Game
     {
         Debug.Assert(zone >= 0 && zone < 3);
 
-        if (ship.defectStates[zone,(int)defect] == DefectState.undetermined)
+        if (ship.DefectStates[zone,(int)defect] == DefectState.undetermined)
         {
             Branch(zone, defect);
         }
@@ -822,7 +825,7 @@ public class Game
     {
         Debug.Assert(zone >= 0 && zone < 3);
 
-        if (ship.reactors[zone] == ship.reactorsCap[zone])
+        if (ship.Reactors[zone] == ship.ReactorsCap[zone])
         {
             BranchConditional(zone, Defects.reactor);
         }
@@ -832,7 +835,7 @@ public class Game
     {
         Debug.Assert(zone >= 0 && zone < 3);
 
-        if (ship.shields[zone] == ship.shieldsCap[zone])
+        if (ship.Shields[zone] == ship.ShieldsCap[zone])
         {
             BranchConditional(zone, Defects.shield);
         }
@@ -847,11 +850,11 @@ public class Game
             Event ev = events[eventIdx];
             if (ev.IsExternal)
             {
-                exThreats.Add(ThreatFactory.SummonEx(ev.CreatureId, trajectories[ev.Zone], ev.Zone, ship, turn));
+                exThreats.Add(ThreatFactory.SummonEx(ev.CreatureId, trajectories[ev.Zone], ev.Zone, this, turn));
             }
             else
             {
-                inThreats.Add(ThreatFactory.SummonIn(ev.CreatureId, trajectories[3], ship, turn));
+                inThreats.Add(ThreatFactory.SummonIn(ev.CreatureId, trajectories[3], this, turn));
             }
             return true;
         }
@@ -929,16 +932,16 @@ public class Game
             exThreats[target].DealDamage(3, 1, ExDmgSource.intercept);
     }
 
-    void ApplyStatusEffect(ref Player p, int turn)
+    void ApplyStatusEffect(ref Player p)
     {
         //Check status effect
-        if (ship.stationStatus[p.Position] != 0)
+        if (ship.StationStatus[p.Position] != 0)
         {
             // Delay
-            if ((ship.stationStatus[p.Position] & 1) == 1)
+            if ((ship.StationStatus[p.Position] & 1) == 1)
                 p.DelayNext();
             // Kill
-            else if ((ship.stationStatus[p.Position] & 2) == 2)
+            else if ((ship.StationStatus[p.Position] & 2) == 2)
                 p.Kill();
         }
     }

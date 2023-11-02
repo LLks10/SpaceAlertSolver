@@ -5,68 +5,68 @@ public static class ThreatFactory
 {
     const int sevInStart = 13;
     //External threat
-    public static ExThreat SummonEx(int number, Trajectory traj, int zone, Ship ship, int time)
+    internal static ExThreat SummonEx(int number, Trajectory traj, int zone, Game game, int time)
     {
         switch (number)
         {
             case 0:
-                return new ArmoredCatcher(ship, traj, zone, time);
+                return new ArmoredCatcher(game, traj, zone, time);
             case 1:
-                return new Amoebe(ship, traj, zone, time);
+                return new Amoebe(game, traj, zone, time);
             case 2:
-                return new Battleship(ship, traj, zone, time);
+                return new Battleship(game, traj, zone, time);
             case 3:
-                return new Hunter(ship, traj, zone, time);
+                return new Hunter(game, traj, zone, time);
             case 4:
-                return new GyroHunter(ship, traj, zone, time);
+                return new GyroHunter(game, traj, zone, time);
             case 5:
-                return new EnergyCloud(ship, traj, zone, time);
+                return new EnergyCloud(game, traj, zone, time);
             case 6:
-                return new Meteorite(ship, traj, zone, time);
+                return new Meteorite(game, traj, zone, time);
             case 7:
-                return new ImpulseBall(ship, traj, zone, time);
+                return new ImpulseBall(game, traj, zone, time);
             case 8:
-                return new SpaceCruiser(ship, traj, zone, time);
+                return new SpaceCruiser(game, traj, zone, time);
             case 9:
-                return new StealthHunter(ship, traj, zone, time);
+                return new StealthHunter(game, traj, zone, time);
             case 10:
-                return new JellyFish(ship, traj, zone, time);
+                return new JellyFish(game, traj, zone, time);
             case 11:
-                return new SmallAsteroid(ship, traj, zone, time);
+                return new SmallAsteroid(game, traj, zone, time);
             case 12:
-                return new Kamikaze(ship, traj, zone, time);
+                return new Kamikaze(game, traj, zone, time);
             case 13:
-                return new Swarm(ship, traj, zone, time);
+                return new Swarm(game, traj, zone, time);
             case 14:
-                return new GhostHunter(ship, traj, zone, time);
+                return new GhostHunter(game, traj, zone, time);
             case 15:
-                return new Scout(ship, traj, zone, time);
+                return new Scout(game, traj, zone, time);
             case 16:
-                return new Fregat(ship, traj, zone, time);
+                return new Fregat(game, traj, zone, time);
             case 17:
-                return new GyroFregat(ship, traj, zone, time);
+                return new GyroFregat(game, traj, zone, time);
             case 18:
-                return new WarDeck(ship, traj, zone, time);
+                return new WarDeck(game, traj, zone, time);
             case 19:
-                return new InterStellarOctopus(ship, traj, zone, time);
+                return new InterStellarOctopus(game, traj, zone, time);
             case 20:
-                return new Maelstorm(ship, traj, zone, time);
+                return new Maelstorm(game, traj, zone, time);
             case 21:
-                return new Asteroid(ship, traj, zone, time);
+                return new Asteroid(game, traj, zone, time);
             case 22:
-                return new ImpulseSatellite(ship, traj, zone, time);
+                return new ImpulseSatellite(game, traj, zone, time);
             case 23:
-                return new Nemesis(ship, traj, zone, time);
+                return new Nemesis(game, traj, zone, time);
             case 24:
-                return new NebulaCrab(ship, traj, zone, time);
+                return new NebulaCrab(game, traj, zone, time);
             case 25:
-                return new PsionicSatellite(ship, traj, zone, time);
+                return new PsionicSatellite(game, traj, zone, time);
             case 26:
-                return new LargeAsteroid(ship, traj, zone, time);
+                return new LargeAsteroid(game, traj, zone, time);
             case 27:
-                return new Moloch(ship, traj, zone, time);
+                return new Moloch(game, traj, zone, time);
             case 28:
-                return new Behemoth(ship, traj, zone, time);
+                return new Behemoth(game, traj, zone, time);
         }
         return null;
     }
@@ -138,59 +138,59 @@ public static class ThreatFactory
     }
 
     //Internal threat
-    public static InThreat SummonIn(int number, Trajectory traj, Ship ship, int time)
+    internal static InThreat SummonIn(int number, Trajectory traj, Game game, int time)
     {
         switch (number)
         {
             case 0:
-                return new SaboteurRed(ship, traj, time);
+                return new SaboteurRed(game, traj, time);
             case 1:
-                return new SaboteurBlue(ship, traj, time);
+                return new SaboteurBlue(game, traj, time);
             case 2:
-                return new SkirmisherRed(ship, traj, time);
+                return new SkirmisherRed(game, traj, time);
             case 3:
-                return new SkirmisherBlue(ship, traj, time);
+                return new SkirmisherBlue(game, traj, time);
             case 4:
-                return new SoldiersRed(ship, traj, time);
+                return new SoldiersRed(game, traj, time);
             case 5:
-                return new SoldiersBlue(ship, traj, time);
+                return new SoldiersBlue(game, traj, time);
             case 6:
-                return new Virus(ship, traj, time);
+                return new Virus(game, traj, time);
             case 7:
-                return new HackedShieldsRed(ship, traj, time);
+                return new HackedShieldsRed(game, traj, time);
             case 8:
-                return new HackedShieldsBlue(ship, traj, time);
+                return new HackedShieldsBlue(game, traj, time);
             case 9:
-                return new OverheatedReactor(ship, traj, time);
+                return new OverheatedReactor(game, traj, time);
             case 10:
-                return new UnstableWarheads(ship, traj, time);
+                return new UnstableWarheads(game, traj, time);
             case 11:
-                return new SlimeBlue(ship, traj, time);
+                return new SlimeBlue(game, traj, time);
             case 12:
-                return new SlimeRed(ship, traj, time);
+                return new SlimeRed(game, traj, time);
 
             case sevInStart:
-                return new CommandosRed(ship, traj, time);
+                return new CommandosRed(game, traj, time);
             case sevInStart + 1:
-                return new CommandosBlue(ship, traj, time);
+                return new CommandosBlue(game, traj, time);
             case sevInStart + 2:
-                return new Alien(ship, traj, time);
+                return new Alien(game, traj, time);
             case sevInStart + 3:
-                return new Eliminator(ship, traj, time);
+                return new Eliminator(game, traj, time);
             case sevInStart + 4:
-                return new SearchRobot(ship, traj, time);
+                return new SearchRobot(game, traj, time);
             case sevInStart + 5:
-                return new AtomicBomb(ship, traj, time);
+                return new AtomicBomb(game, traj, time);
             case sevInStart + 6:
-                return new RebelliousRobots(ship, traj, time);
+                return new RebelliousRobots(game, traj, time);
             case sevInStart + 7:
-                return new SwitchedCables(ship, traj, time);
+                return new SwitchedCables(game, traj, time);
             case sevInStart + 8:
-                return new OverstrainedEnergyNet(ship, traj, time);
+                return new OverstrainedEnergyNet(game, traj, time);
             case sevInStart + 9:
-                return new Fissure(ship, traj, time);
+                return new Fissure(game, traj, time);
             case sevInStart + 10:
-                return new Infection(ship, traj, time);
+                return new Infection(game, traj, time);
         }
         return null;
     }
