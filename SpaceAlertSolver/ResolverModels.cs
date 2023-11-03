@@ -40,7 +40,7 @@ internal static class ResolverModelMapper
 					Act.HeroicDownRight => new ActModelFilled(15),
 					_ => new ActModel(),
 				}).ToArray(),
-				colours[i],
+				colours[i % colours.Length],
 				i)
 			).ToArray();
 
@@ -112,8 +112,8 @@ internal static class ResolverModelMapper
 			10 => "I1-07",
 			11 => "I2-01",
 			12 => "I2-02",
-			13 => "I2-03",
-			14 => "I2-04",
+			13 => "SI1-01",
+			14 => "SI1-02",
 			15 => "SI1-03",
 			16 => "SI2-01",
 			17 => "SI2-02",
