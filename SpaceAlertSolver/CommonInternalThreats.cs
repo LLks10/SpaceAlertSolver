@@ -7,7 +7,7 @@ class SaboteurRed : InThreat
     public SaboteurRed(Game game, Trajectory traj, int time) : base(game,traj,time)
     {
         health = 1;
-        position = 4;
+        position = Position.BottomMiddle;
         speed = 4;
         scoreLose = 2;
         scoreWin = 4;
@@ -23,26 +23,20 @@ class SaboteurRed : InThreat
         return clone;
     }
 
-    public override void ActX()
-    {
-        if (position > 3)
-            position--;
-    }
+    public override void ActX() => MoveLeft();
     public override void ActY()
     {
-        int z = position % 3;
-        if (game.ship.Reactors[z] == 0)
-            game.ship.DealDamageIntern(z, 1);
+        if (game.ship.Reactors[position.Zone] == 0)
+            game.ship.DealDamageIntern(position.Zone, 1);
         else
         {
-            game.BranchReactorFull(z);
-            game.ship.Reactors[z]--;
+            game.BranchReactorFull(position.Zone);
+            game.ship.Reactors[position.Zone]--;
         }
     }
     public override void ActZ()
     {
-        int z = position % 3;
-        game.ship.DealDamageIntern(z, 2);
+        game.ship.DealDamageIntern(position.Zone, 2);
     }
 }
 //ID: 1
@@ -51,7 +45,7 @@ class SaboteurBlue : InThreat
     public SaboteurBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 1;
-        position = 4;
+        position = Position.BottomMiddle;
         speed = 4;
         scoreLose = 2;
         scoreWin = 4;
@@ -67,26 +61,20 @@ class SaboteurBlue : InThreat
         return clone;
     }
 
-    public override void ActX()
-    {
-        if (position < 5)
-            position++;
-    }
+    public override void ActX() => MoveRight();
     public override void ActY()
     {
-        int z = position % 3;
-        if (game.ship.Reactors[z] == 0)
-            game.ship.DealDamageIntern(z, 1);
+        if (game.ship.Reactors[position.Zone] == 0)
+            game.ship.DealDamageIntern(position.Zone, 1);
         else
         {
-            game.BranchReactorFull(z);
-            game.ship.Reactors[z]--;
+            game.BranchReactorFull(position.Zone);
+            game.ship.Reactors[position.Zone]--;
         }
     }
     public override void ActZ()
     {
-        int z = position % 3;
-        game.ship.DealDamageIntern(z, 2);
+        game.ship.DealDamageIntern(position.Zone, 2);
     }
 }
 //ID: 2
@@ -95,7 +83,7 @@ class SkirmisherRed : InThreat
     public SkirmisherRed(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 1;
-        position = 0;
+        position = Position.TopLeft;
         speed = 3;
         scoreLose = 2;
         scoreWin = 4;
@@ -112,22 +100,11 @@ class SkirmisherRed : InThreat
         return clone;
     }
 
-    public override void ActX()
-    {
-        if (position != 2 && position != 5)
-            position++;
-    }
-    public override void ActY()
-    {
-        if (position < 3)
-            position += 3;
-        else
-            position -= 3;
-    }
+    public override void ActX() => MoveRight();
+    public override void ActY() => TakeElevator();
     public override void ActZ()
     {
-        int z = position % 3;
-        game.ship.DealDamageIntern(z, 3);
+        game.ship.DealDamageIntern(position.Zone, 3);
     }
 }
 //ID: 3
@@ -136,7 +113,7 @@ class SkirmisherBlue : InThreat
     public SkirmisherBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 1;
-        position = 2;
+        position = Position.TopRight;
         speed = 3;
         scoreLose = 2;
         scoreWin = 4;
@@ -153,22 +130,11 @@ class SkirmisherBlue : InThreat
         return clone;
     }
 
-    public override void ActX()
-    {
-        if (position != 0 && position != 3)
-            position--;
-    }
-    public override void ActY()
-    {
-        if (position < 3)
-            position += 3;
-        else
-            position -= 3;
-    }
+    public override void ActX() => MoveLeft();
+    public override void ActY() => TakeElevator();
     public override void ActZ()
     {
-        int z = position % 3;
-        game.ship.DealDamageIntern(z, 3);
+        game.ship.DealDamageIntern(position.Zone, 3);
     }
 }
 //ID: 4
@@ -177,7 +143,7 @@ class SoldiersRed : InThreat
     public SoldiersRed(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
-        position = 0;
+        position = Position.TopLeft;
         speed = 2;
         scoreLose = 3;
         scoreWin = 6;
@@ -194,23 +160,11 @@ class SoldiersRed : InThreat
         return clone;
     }
 
-    public override void ActX()
-    {
-        if (position < 3)
-            position += 3;
-        else
-            position -= 3;
-
-    }
-    public override void ActY()
-    {
-        if (position != 2 && position != 5)
-            position++;
-    }
+    public override void ActX() => TakeElevator();
+    public override void ActY() => MoveRight();
     public override void ActZ()
     {
-        int z = position % 3;
-        game.ship.DealDamageIntern(z, 4);
+        game.ship.DealDamageIntern(position.Zone, 4);
     }
 }
 //ID: 5
@@ -219,7 +173,7 @@ class SoldiersBlue : InThreat
     public SoldiersBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
-        position = 5;
+        position = Position.BottomRight;
         speed = 2;
         scoreLose = 3;
         scoreWin = 6;
@@ -236,23 +190,11 @@ class SoldiersBlue : InThreat
         return clone;
     }
 
-    public override void ActX()
-    {
-        if (position < 3)
-            position += 3;
-        else
-            position -= 3;
-        
-    }
-    public override void ActY()
-    {
-        if (position != 0 && position != 3)
-            position--;
-    }
+    public override void ActX() => TakeElevator();
+    public override void ActY() => MoveLeft();
     public override void ActZ()
     {
-        int z = position % 3;
-        game.ship.DealDamageIntern(z, 4);
+        game.ship.DealDamageIntern(position.Zone, 4);
     }
 }
 //ID: 6
@@ -261,7 +203,7 @@ class Virus : InThreat
     public Virus(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
-        position = 1;
+        position = Position.TopMiddle;
         game.ship.CDefect[1]++;
         speed = 3;
         scoreLose = 3;
@@ -301,7 +243,7 @@ class Virus : InThreat
     {
         for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].Position < 6)
+            if (game.ship.Players[i].Position.IsInShip())
                 game.ship.Players[i].DelayNext();
         }
     }
@@ -318,7 +260,7 @@ class HackedShieldsRed : InThreat
     public HackedShieldsRed(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
-        position = 0;
+        position = Position.TopLeft;
         game.ship.BDefect[0]++;
         speed = 2;
         scoreLose = 2;
@@ -360,7 +302,7 @@ class HackedShieldsBlue : InThreat
     public HackedShieldsBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
-        position = 2;
+        position = Position.TopRight;
         game.ship.BDefect[2]++;
         speed = 2;
         scoreLose = 2;
@@ -402,7 +344,7 @@ class OverheatedReactor : InThreat
     public OverheatedReactor(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
-        position = 4;
+        position = Position.BottomMiddle;
         game.ship.BDefect[4]++;
         speed = 2;
         scoreLose = 3;
@@ -438,7 +380,7 @@ class OverheatedReactor : InThreat
     {
         game.ship.DealDamageIntern(1, 2);
     }
-    internal override bool DealDamage(int position, InternalDamageType damageType)
+    internal override bool DealDamage(Position position, InternalDamageType damageType)
     {
         bool r = base.DealDamage(position, damageType);
 
@@ -446,7 +388,7 @@ class OverheatedReactor : InThreat
         {
             for(int i = 0; i < game.ship.Players.Length; i++)
             {
-                if (game.ship.Players[i].Position == 3 || game.ship.Players[i].Position == 5)
+                if (game.ship.Players[i].Position == Position.BottomLeft || game.ship.Players[i].Position == Position.BottomRight)
                     game.ship.Players[i].Kill();
             }
         }
@@ -460,7 +402,7 @@ class UnstableWarheads : InThreat
     public UnstableWarheads(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = game.ship.RocketsLeft;
-        position = 5;
+        position = Position.BottomRight;
         speed = 3;
         scoreLose = 2;
         scoreWin = 4;
@@ -538,7 +480,7 @@ class SlimeBlue : InThreat
                 {
                     if (game.inThreats[i] is UnstableWarheads)
                     {
-                        game.inThreats[i].DealDamage(i, InternalDamageType.C);
+                        game.inThreats[i].DealDamage(game.inThreats[i].position, InternalDamageType.C);
                         break;
                     }
                 }
@@ -585,17 +527,17 @@ class SlimeBlue : InThreat
             game.ship.DealDamageIntern(2, 2);
     }
 
-    internal override bool DealDamage(int position, InternalDamageType damageType)
+    internal override bool DealDamage(Position position, InternalDamageType damageType)
     {
         if (damageType == vulnerability && AtPosition(position))
         {
             //Local damage
-            healths[position]--;
-            if (healths[position] <= 0)
+            healths[position.PositionIndex]--;
+            if (healths[position.PositionIndex] <= 0)
             {
                 // Remove slime from position
-                game.ship.StationStatus[position] &= ~1;
-                positions[position] = false;
+                game.ship.StationStatus[position.PositionIndex] &= ~1;
+                positions[position.PositionIndex] = false;
             }
 
             //Full damage
@@ -610,9 +552,9 @@ class SlimeBlue : InThreat
         return false;
     }
 
-    public override bool AtPosition(int position)
+    public override bool AtPosition(Position position)
     {
-        return positions[position];
+        return positions[position.PositionIndex];
     }
 }
 
@@ -693,17 +635,17 @@ class SlimeRed : InThreat
             game.ship.DealDamageIntern(2, 2);
     }
 
-    internal override bool DealDamage(int position, InternalDamageType damageType)
+    internal override bool DealDamage(Position position, InternalDamageType damageType)
     {
         if (damageType == vulnerability && AtPosition(position))
         {
             //Local damage
-            healths[position]--;
-            if (healths[position] <= 0)
+            healths[position.PositionIndex]--;
+            if (healths[position.PositionIndex] <= 0)
             {
                 // Remove slime from position
-                game.ship.StationStatus[position] &= ~1;
-                positions[position] = false;
+                game.ship.StationStatus[position.PositionIndex] &= ~1;
+                positions[position.PositionIndex] = false;
             }
 
             //Full damage
@@ -719,9 +661,9 @@ class SlimeRed : InThreat
         return false;
     }
 
-    public override bool AtPosition(int position)
+    public override bool AtPosition(Position position)
     {
-        return positions[position];
+        return positions[position.PositionIndex];
     }
 }
 #endregion

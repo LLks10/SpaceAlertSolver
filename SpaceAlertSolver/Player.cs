@@ -1,10 +1,11 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace SpaceAlertSolver;
 
 public struct Player
 {
-    public int Position;
+    public Position Position { get; private set; }
     public bool Alive { get; private set; }
     public bool InIntercept;
     public AndroidState AndroidState;
@@ -16,7 +17,7 @@ public struct Player
 
     public Player(ImmutableArray<Act> actions)
     {
-        Position = 1;
+        Position = Position.TopMiddle;
         Alive = true;
         InIntercept = false;
         AndroidState = AndroidState.None;
@@ -74,6 +75,20 @@ public struct Player
     public void DelayCurrent()
     {
         _delayAmount++;
+    }
+
+    public void TryMoveLeft() => Position = Position.GetLeft();
+
+    public void TryMoveRight() => Position = Position.GetRight();
+
+    public void TryTakeElevator() => Position = Position.GetElevator();
+
+    public void MoveToSpace() => Position = Position.Space;
+
+    public void ReturnFromSpace()
+    {
+        Debug.Assert(Position == Position.Space);
+        Position = Position.TopLeft;
     }
 }
 

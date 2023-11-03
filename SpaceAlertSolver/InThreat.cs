@@ -3,7 +3,8 @@
 //External threat parent class
 public abstract class InThreat
 {
-    public int health, speed, distance, position, scoreWin, scoreLose, time;
+    public int health, speed, distance, scoreWin, scoreLose, time;
+    public Position position;
     public Trajectory trajectory;
     private protected InternalDamageType vulnerability;
     public bool alive, beaten, fightBack;
@@ -49,7 +50,7 @@ public abstract class InThreat
         this.game = game;
     }
 
-    internal virtual bool DealDamage(int position, InternalDamageType damageType)
+    internal virtual bool DealDamage(Position position, InternalDamageType damageType)
     {
         if(damageType == vulnerability && AtPosition(position))
         {
@@ -67,7 +68,7 @@ public abstract class InThreat
 
     public virtual void OnClear() { }
 
-    public virtual bool AtPosition(int position)
+    public virtual bool AtPosition(Position position)
     {
         return position == this.position;
     }
@@ -113,6 +114,12 @@ public abstract class InThreat
         if (distance <= 0)
             beaten = true;
     }
+
+    protected void MoveLeft() => position = position.GetLeft();
+
+    protected void MoveRight() => position = position.GetRight();
+
+    protected void TakeElevator() => position = position.GetElevator();
 
     public virtual void ActX() { }
     public virtual void ActY() { }

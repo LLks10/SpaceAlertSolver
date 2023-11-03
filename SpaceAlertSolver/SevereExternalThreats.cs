@@ -501,7 +501,7 @@ class PsionicSatellite : ExThreat
         for(int i = 0; i < game.ship.Players.Length; i++)
         {
             ref Player p = ref game.ship.Players[i];
-            if (p.Position % 3 == zone && p.Position < 6)
+            if (p.Position.Zone == zone)
                 p.DelayNext();
         }
     }
@@ -510,7 +510,7 @@ class PsionicSatellite : ExThreat
         for (int i = 0; i < game.ship.Players.Length; i++)
         { 
             ref Player p = ref game.ship.Players[i];
-            if(p.Position < 6)
+            if(p.Position.IsInShip())
                 p.DelayNext();
         }
     }
@@ -519,7 +519,7 @@ class PsionicSatellite : ExThreat
         for (int i = 0; i < game.ship.Players.Length; i++)
         {
             ref Player p = ref game.ship.Players[i];
-            if (p.Position < 6)
+            if (p.Position.IsInShip())
                 p.Kill();
         }
     }

@@ -266,19 +266,19 @@ internal sealed class Ship
         _rocketFired = false;
     }
 
-    public bool CanFireCannon(int position)
+    public bool CanFireCannon(Position position)
     {
-        return (_cannonFired & (1 << position)) == 0;
+        return (_cannonFired & (1 << position.PositionIndex)) == 0;
     }
 
-    public void FireCannon(int position)
+    public void FireCannon(Position position)
     {
-        _cannonFired |= (1 << position);
+        _cannonFired |= (1 << position.PositionIndex);
     }
 
-    public bool LiftWillDelay(int zone)
+    public bool LiftWillDelay(Position position)
     {
-        return (_liftUsed & (1 << zone)) != 0;
+        return (_liftUsed & (1 << position.Zone)) != 0;
     }
 
     public void UseLift(int zone)

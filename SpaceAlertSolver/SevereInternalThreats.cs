@@ -9,7 +9,7 @@ class CommandosRed : InThreat
     public CommandosRed(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
-        position = 3;
+        position = Position.BottomLeft;
         speed = 2;
         scoreLose = 4;
         scoreWin = 8;
@@ -26,34 +26,20 @@ class CommandosRed : InThreat
         return clone;
     }
 
-    public override void ActX()
-    {
-        if (position < 3)
-            position += 3;
-        else
-            position -= 3;
-
-    }
+    public override void ActX() => TakeElevator();
     public override void ActY()
     {
         if(health < 2)
-        {
-            if (position != 2 && position != 5)
-                position++;
-        }
+            MoveRight();
         else
-        {
-            int z = position % 3;
-            game.ship.DealDamageIntern(z, 2);
-        }            
+            game.ship.DealDamageIntern(position.Zone, 2);         
     }
     public override void ActZ()
     {
-        int z = position % 3;
-        game.ship.DealDamageIntern(z, 4);
+        game.ship.DealDamageIntern(position.Zone, 4);
         for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].Position == position)
+            if (AtPosition(game.ship.Players[i].Position))
                 game.ship.Players[i].Kill();
         }
     }
@@ -64,7 +50,7 @@ class CommandosBlue : InThreat
     public CommandosBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
-        position = 2;
+        position = Position.TopRight;
         speed = 2;
         scoreLose = 4;
         scoreWin = 8;
@@ -81,34 +67,20 @@ class CommandosBlue : InThreat
         return clone;
     }
 
-    public override void ActX()
-    {
-        if (position < 3)
-            position += 3;
-        else
-            position -= 3;
-
-    }
+    public override void ActX() => TakeElevator();
     public override void ActY()
     {
         if (health < 2)
-        {
-            if (position != 0 && position != 3)
-                position--;
-        }
+            MoveLeft();
         else
-        {
-            int z = position % 3;
-            game.ship.DealDamageIntern(z, 2);
-        }
+            game.ship.DealDamageIntern(position.Zone, 2);
     }
     public override void ActZ()
     {
-        int z = position % 3;
-        game.ship.DealDamageIntern(z, 4);
+        game.ship.DealDamageIntern(position.Zone, 4);
         for (int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].Position == position)
+            if (AtPosition(game.ship.Players[i].Position))
                 game.ship.Players[i].Kill();
         }
     }
@@ -119,7 +91,7 @@ class Alien : InThreat
     public Alien(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
-        position = 4;
+        position = Position.BottomMiddle;
         speed = 2;
         scoreLose = 0;
         scoreWin = 8;
@@ -141,17 +113,14 @@ class Alien : InThreat
     }
     public override void ActY()
     {
-        if (position < 3)
-            position += 3;
-        else
-            position -= 3;
+        TakeElevator();
         int c = 0;
         for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].Position == position)
+            if (AtPosition(game.ship.Players[i].Position))
                 c++;
         }
-        game.ship.DealDamageIntern(position % 3, c);
+        game.ship.DealDamageIntern(position.Zone, c);
     }
     public override void ActZ()
     {
@@ -166,7 +135,7 @@ class Eliminator : InThreat
     public Eliminator(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
-        position = 2;
+        position = Position.TopRight;
         speed = 2;
         scoreLose = 6;
         scoreWin = 12;
@@ -185,29 +154,29 @@ class Eliminator : InThreat
 
     public override void ActX()
     {
-        if (position != 0 && position != 3)
-            position--;
-        KillAll();
+        Position left = position.GetLeft();
+        if (position != left)
+        {
+            position = left;
+            KillAll();
+        }
     }
     public override void ActY()
     {
-        if (position < 3)
-            position += 3;
-        else
-            position -= 3;
+        Debug.Assert(position != Position.Space);
+        TakeElevator();
         KillAll();
     }
     public override void ActZ()
     {
-        game.ship.DealDamageIntern(position % 3, 3);
+        game.ship.DealDamageIntern(position.Zone, 3);
     }
 
     private void KillAll()
     {
-        int z = position % 3;
         for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].Position % 3 == z && game.ship.Players[i].Position < 6 && game.ship.Players[i].AndroidState != AndroidState.Alive)
+            if (AtPosition(game.ship.Players[i].Position) && game.ship.Players[i].Position.IsInShip() && game.ship.Players[i].AndroidState != AndroidState.Alive)
                 game.ship.Players[i].Kill();
         }
     }
@@ -218,7 +187,7 @@ class SearchRobot : InThreat
     public SearchRobot(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
-        position = 1;
+        position = Position.TopMiddle;
         speed = 2;
         scoreLose = 6;
         scoreWin = 15;
@@ -244,15 +213,15 @@ class SearchRobot : InThreat
     }
     public override void ActZ()
     {
-        game.ship.DealDamageIntern(position % 3, 5);
+        game.ship.DealDamageIntern(position.Zone, 5);
         for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].Position == position)
+            if (AtPosition(game.ship.Players[i].Position))
                 game.ship.Players[i].Kill();
         }
     }
 
-    internal override bool DealDamage(int position, InternalDamageType damageType)
+    internal override bool DealDamage(Position position, InternalDamageType damageType)
     {
         if (damageType == vulnerability && AtPosition(position))
         {
@@ -271,52 +240,29 @@ class SearchRobot : InThreat
 
     private void MoveToClosest()
     {
-        int[] nearbyStation;
-        switch (position)
-        {
-            case 0:
-                nearbyStation = new int[] { 1, 3 };
-                break;
-            case 1:
-                nearbyStation = new int[] { 0, 4, 2 };
-                break;
-            case 2:
-                nearbyStation = new int[] { 1, 5 };
-                break;
-            case 3:
-                nearbyStation = new int[] { 0, 4 };
-                break;
-            case 4:
-                nearbyStation = new int[] { 3, 1, 5 };
-                break;
-            default: //case 5
-                nearbyStation = new int[] { 2, 4 };
-                break;
-        }
-        int best = -1;
+        Position best = position;
         int score = int.MinValue;
         Player[] ps = game.ship.Players;
         //Count players and choose best station
-        for(int i = 0; i < nearbyStation.Length; i++)
+        foreach (Position pos in position.GetNeighbours())
         {
             int c = 0;
             //Count players
-            for(int j = 0; j < ps.Length; j++)
+            for(int i = 0; i < ps.Length; i++)
             {
-                if (ps[j].Position == nearbyStation[i])
+                if (ps[i].Position == pos)
                     c++;
             }
             if (c > score)
             {
-                best = i;
+                best = pos;
                 score = c;
             }
             else if (c == score)
-                best = -1;
+                best = position;
         }
 
-        if (best != -1)
-            position = nearbyStation[best];
+        position = best;
     }
 }
 
@@ -326,7 +272,7 @@ class AtomicBomb : InThreat
     public AtomicBomb(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 1;
-        position = 4;
+        position = Position.BottomMiddle;
         game.ship.CDefect[4]++;
         speed = 4;
         scoreLose = 0;
@@ -357,7 +303,7 @@ class AtomicBomb : InThreat
         game.ship.Damage[1] = 7;
         game.ship.Damage[2] = 7;
     }
-    internal override bool DealDamage(int position, InternalDamageType damageType)
+    internal override bool DealDamage(Position position, InternalDamageType damageType)
     {
         if (damageType == vulnerability && AtPosition(position))
         {
@@ -416,7 +362,7 @@ class RebelliousRobots : InThreat
     {
         for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].AndroidState == AndroidState.Alive && game.ship.Players[i].Position < 6)
+            if (game.ship.Players[i].AndroidState == AndroidState.Alive && game.ship.Players[i].Position.IsInShip())
                 game.ship.Players[i].Kill();
         }
     }
@@ -424,7 +370,7 @@ class RebelliousRobots : InThreat
     {
         for (int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].Position == 2 || game.ship.Players[i].Position == 3)
+            if (game.ship.Players[i].Position == Position.TopRight || game.ship.Players[i].Position == Position.BottomLeft)
                 game.ship.Players[i].Kill();
         }
     }
@@ -432,22 +378,22 @@ class RebelliousRobots : InThreat
     {
         for (int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (game.ship.Players[i].Position != 1 && game.ship.Players[i].Position < 6)
+            if (game.ship.Players[i].Position != Position.TopMiddle && game.ship.Players[i].Position.IsInShip())
                 game.ship.Players[i].Kill();
         }
     }
-    internal override bool DealDamage(int position, InternalDamageType damageType)
+    internal override bool DealDamage(Position position, InternalDamageType damageType)
 	{
 		if (damageType != vulnerability)
 			return false;
-        if (position != 2 && position != 3)
+        if (position != Position.TopRight && position != Position.BottomLeft)
             return false;
 
 		health--;
 		if (!tookExtraDamage)
 		{
 			//Bonus damage if both stations activated
-			hits[position - 2] = true;
+			hits[position.PositionIndex - 2] = true;
 			if (hits[0] && hits[1])
 			{
 				health--;
@@ -479,7 +425,7 @@ class SwitchedCables : InThreat
     public SwitchedCables(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 4;
-        position = 1;
+        position = Position.TopMiddle;
         game.ship.BDefect[1]++;
         speed = 3;
         scoreLose = 4;
@@ -586,16 +532,16 @@ class OverstrainedEnergyNet : InThreat
         game.ship.DealDamageIntern(1, 3);
         game.ship.DealDamageIntern(2, 3);
     }
-    internal override bool DealDamage(int position, InternalDamageType damageType)
+    internal override bool DealDamage(Position position, InternalDamageType damageType)
     {
         if (damageType == vulnerability)
         {
             //Check if at any of the two positions
-            if (position == 3 || position == 4 || position == 5)
+            if (position.IsBottom())
             {
                 health--;
                 //Bonus damage if both stations activated
-                hits[position - 3] = true;
+                hits[position.PositionIndex - 3] = true;
                 if (!tookExtraDamage)
                 {
                     if (hits[0] && hits[1] && hits[2])
@@ -633,7 +579,7 @@ class Fissure : InThreat
     public Fissure(Game game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
-        position = 6;
+        position = Position.Space;
         game.ship.CDefect[6]++;
         speed = 2;
         scoreLose = 0;
@@ -700,7 +646,7 @@ class Infection : InThreat
     {
         for(int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (isActive[game.ship.Players[i].Position])
+            if (isActive[game.ship.Players[i].Position.PositionIndex])
                 game.ship.Players[i].DelayNext();
         }
     }
@@ -716,7 +662,7 @@ class Infection : InThreat
     {
         for (int i = 0; i < game.ship.Players.Length; i++)
         {
-            if (isActive[game.ship.Players[i].Position])
+            if (isActive[game.ship.Players[i].Position.PositionIndex])
                 game.ship.Players[i].Kill();
         }
         for(int i = 0; i < 6; i++)
@@ -725,11 +671,11 @@ class Infection : InThreat
                 game.ship.StationStatus[i] |= 2;
         }
     }
-    internal override bool DealDamage(int position, InternalDamageType damageType)
+    internal override bool DealDamage(Position position, InternalDamageType damageType)
     {
-        if (damageType == vulnerability && isActive[position])
+        if (damageType == vulnerability && isActive[position.PositionIndex])
         {
-            isActive[position] = false;
+            isActive[position.PositionIndex] = false;
             health--;
             //Check death
             if (health <= 0)
