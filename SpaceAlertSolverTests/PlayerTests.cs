@@ -114,7 +114,52 @@ public class PlayerTests
         player.GetNextAction();
         player.DelayNext(); // d-rafc
         player.DelayCurrent(); // -drafc
-        Assert.Equals(Act.Lift, player.GetNextAction());
-        Assert.Equals(Act.Right, player.GetNextAction());
+        Assert.AreEqual(Act.Lift, player.GetNextAction());
+        Assert.AreEqual(Act.Right, player.GetNextAction());
+    }
+
+    [TestMethod]
+    public void DelayNextCurrentNextTest()
+    {
+        Act[] actions = new Act[] { Act.A, Act.B, Act.C, Act.Fight, Act.Empty, Act.Empty, Act.Left };
+        Player player = TestUtils.CreatePlayerFromActions(actions);
+
+        // abcf--l
+        player.GetNextAction();
+        player.DelayNext(); // a-bcf-l
+        player.DelayCurrent(); // -abcf-l
+        player.DelayNext(); // --abcfl
+        Assert.AreEqual(Act.Empty, player.GetNextAction());
+        Assert.AreEqual(Act.A, player.GetNextAction());
+        Assert.AreEqual(Act.B, player.GetNextAction());
+    }
+
+    [TestMethod]
+    public void DelayCurrentTwiceTest()
+    {
+        Act[] actions = new Act[] { Act.B, Act.Fight, Act.Right };
+        Player player = TestUtils.CreatePlayerFromActions(actions);
+
+        // bfr
+        player.GetNextAction();
+        player.DelayCurrent(); // -bf
+        player.DelayCurrent(); // -bf
+        Assert.AreEqual(Act.B, player.GetNextAction());
+        Assert.AreEqual(Act.Fight, player.GetNextAction());
+    }
+
+    [TestMethod]
+    public void DelayNextThenCurrentWhenDelayed()
+    {
+        Act[] actions = new Act[] { Act.A, Act.B, Act.C, Act.Fight, Act.Left, Act.Right };
+        Player player = TestUtils.CreatePlayerFromActions(actions);
+
+        // abcflr
+        player.DelayNext(); // -abcfl
+        Assert.AreEqual(Act.Empty, player.GetNextAction());
+        player.DelayNext(); // --abcf
+        player.DelayCurrent(); // --abcf
+        Assert.AreEqual(Act.Empty, player.GetNextAction());
+        Assert.AreEqual(Act.A, player.GetNextAction());
     }
 }

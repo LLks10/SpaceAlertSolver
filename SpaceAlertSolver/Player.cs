@@ -14,6 +14,7 @@ public struct Player
     private int _nextActionIndex;
     private int _delayAmount;
     private bool _delayed;
+    private bool _lastActionWasEmpty;
 
     public Player(ImmutableArray<Act> actions)
     {
@@ -26,6 +27,7 @@ public struct Player
         _nextActionIndex = 0;
         _delayAmount = 0;
         _delayed = false;
+        _lastActionWasEmpty = true;
     }
 
     public Act GetNextAction()
@@ -35,11 +37,13 @@ public struct Player
             _nextActionIndex++;
             _delayAmount++;
             _delayed = false;
+            _lastActionWasEmpty = true;
             return Act.Empty;
         }
 
         Act act = PeekNextAction();
         _nextActionIndex++;
+        _lastActionWasEmpty = act == Act.Empty;
         return act;
     }
 
@@ -74,7 +78,13 @@ public struct Player
 
     public void DelayCurrent()
     {
+        if (_lastActionWasEmpty)
+            return;
+
+        if (_delayed)
+            _delayed = false;
         _delayAmount++;
+        _lastActionWasEmpty = true;
     }
 
     public void TryMoveLeft() => Position = Position.GetLeft();
