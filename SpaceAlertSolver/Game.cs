@@ -33,16 +33,15 @@ public sealed class Game : IGame
     public ImmutableArray<Trajectory> trajectories;
     public readonly List<ExThreat> exThreats = new();
     public readonly List<InThreat> inThreats = new();
-    int phase;
     double score;
-    readonly bool[] phaseComputer = new bool[NUM_PHASES];
+    private bool _didComputerThisPhase;
     bool gameover;
-    int eventIdx;
 
     int exSlain, exSurvived, inSlain, inSurvived;
 
-    readonly int[] observation = new int[NUM_PHASES];
-    int observationCount;
+    private int _totalObservationPoints;
+    private int _maxObservationThisPhase;
+    private int _observationThisTurn;
 
     double scoreMultiplier;
     double scoreAddition;
@@ -66,18 +65,17 @@ public sealed class Game : IGame
         inThreats.Clear();
         inThreats.AddRange(other.inThreats.Select(t => t.Clone(this)));
 
-        phase = other.phase;
         score = other.score;
-        other.phaseComputer.CopyTo(phaseComputer, 0);
+        _didComputerThisPhase = other._didComputerThisPhase;
         gameover = other.gameover;
-        eventIdx = other.eventIdx;
         exSlain = other.exSlain;
         exSurvived = other.exSurvived;
         inSlain = other.inSlain;
         inSurvived = other.inSurvived;
 
-        other.observation.CopyTo(observation, 0);
-        observationCount = other.observationCount;
+        _totalObservationPoints = other._totalObservationPoints;
+        _maxObservationThisPhase = other._maxObservationThisPhase;
+        _observationThisTurn = other._observationThisTurn;
 
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
@@ -95,17 +93,16 @@ public sealed class Game : IGame
         this.trajectories = trajectories;
         exThreats.Clear();
         inThreats.Clear();
-        phase = 0;
         score = 0.0;
-        Array.Fill(phaseComputer, false);
+        _didComputerThisPhase = false;
         gameover = false;
-        eventIdx = 0;
         exSlain = 0;
         inSlain = 0;
         exSurvived = 0;
         inSurvived = 0;
-        Array.Fill(observation, 0);
-        observationCount = 0;
+        _totalObservationPoints = 0;
+        _maxObservationThisPhase = 0;
+        _observationThisTurn = 0;
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
         ScoutBonus = 0;
@@ -138,21 +135,24 @@ public sealed class Game : IGame
             _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
             _simulationStack.Add(SimulationStep.NewCreateProcessStepsStep());
             _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
-            if (i == 12 || i == 7 || i == 3)
-            {
-                _simulationStack.Add(SimulationStep.NewObservationUpdateStep());
-            }
+
+            bool startNewObservationPhase = (i == 12 || i == 7 || i == 3);
+            _simulationStack.Add(SimulationStep.NewObservationUpdateStep(startNewObservationPhase));
+
             for (int j = numPlayers - 1; j >= 0; j--)
             {
                 _simulationStack.Add(SimulationStep.NewPlayerActionStep(j));
             }
+
             if (i == 3 || i == 6 || i == 10)
                 _simulationStack.Add(SimulationStep.NewComputerUpdateStep());
+
             if (events[eventIndex].Turn == i)
             {
                 eventIndex--;
                 _simulationStack.Add(SimulationStep.NewThreatSpawnStep(events[eventIndex]));
             }
+
             _simulationStack.Add(SimulationStep.NewTurnStartStep());
         }
     }
@@ -180,14 +180,18 @@ public sealed class Game : IGame
         switch (simulationStep.Type)
         {
             case SimulationStepType.TurnStart:
+                TurnStart();
                 break;
             case SimulationStepType.ComputerUpdate:
+                ComputerUpdate();
                 break;
             case SimulationStepType.PlayerAction:
                 break;
             case SimulationStepType.ObservationUpdate:
+                ObservationUpdate(simulationStep.StartNewObservationPhase);
                 break;
             case SimulationStepType.RocketUpdate:
+                RocketUpdate();
                 break;
             case SimulationStepType.CreateProcessSteps:
                 break;
@@ -196,12 +200,14 @@ public sealed class Game : IGame
             case SimulationStepType.ExternalDamage:
                 break;
             case SimulationStepType.CleanThreats:
+                CleanThreats();
                 break;
             case SimulationStepType.CreateMoves:
                 break;
             case SimulationStepType.MoveThreat:
                 break;
             case SimulationStepType.SpawnThreat:
+                SpawnThreat(in simulationStep);
                 break;
             default:
                 throw new UnreachableException();
@@ -214,37 +220,105 @@ public sealed class Game : IGame
         ship.DealExternalDamage(zone, damage);
     }
 
-    void OnTurnStart()
+    private void TurnStart()
     {
-        //Set phase
-        if (turn <= 3)
-            phase = 0;
-        else if (turn <= 7)
-            phase = 1;
-        else
-            phase = 2;
-
-        //Reset variables
-        observationCount = 0;
         ship.OnTurnStart();
-
-        //Check computer
-        if (turn == 3 || turn == 6 || turn == 10)
+        for (int i = 0; i < 3; i++)
         {
-            //Delay actions if computer failed
-            if (!phaseComputer[phase])
+            if (ship.Damage[i] >= 7)
+                gameover = true;
+        }
+    }
+
+    private void ComputerUpdate()
+    {
+        if (!_didComputerThisPhase)
+        {
+            for (int i = 0; i < players.Length; i++)
             {
-                for (int i = 0; i < players.Length; i++)
+                players[i].DelayNext();
+            }
+        }
+        _didComputerThisPhase = false;
+    }
+
+    private void ObservationUpdate(bool startNewPhase)
+    {
+        _maxObservationThisPhase = Math.Max(_maxObservationThisPhase, _observationThisTurn);
+        _observationThisTurn = 0;
+        if (startNewPhase)
+        {
+            _totalObservationPoints += _obsBonus[_maxObservationThisPhase];
+            _maxObservationThisPhase = 0;
+        }
+    }
+
+    private void RocketUpdate()
+    {
+        if (ship.RocketReady)
+        {
+            int distance = 99;
+            ExThreat? target = null;
+            for (int i = 0; i < exThreats.Count; i++)
+            {
+                ExThreat et = exThreats[i];
+                int dist = et.GetDistance(2, ExDmgSource.rocket);
+                if (dist < distance)
                 {
-                    if (players[i].Position.IsInShip())
-                        players[i].DelayNext();
+                    target = et;
+                    distance = dist;
                 }
+            }
+            target?.DealDamage(3, 2, ExDmgSource.rocket);
+        }
+        ship.MoveRockets();
+    }
+
+    void CleanThreats()
+    {
+        for (int i = inThreats.Count - 1; i >= 0; i--)
+        {
+            if (inThreats[i].beaten)
+            {
+                if (inThreats[i].alive)
+                {
+                    score += inThreats[i].scoreLose;
+                    inSurvived++;
+                }
+                else
+                {
+                    score += inThreats[i].scoreWin;
+                    inSlain++;
+                }
+                inThreats.RemoveAt(i);
             }
         }
 
-        //Check event
-        if (SpawnThreat(turn, eventIdx))
-            eventIdx++;
+        for (int i = exThreats.Count - 1; i >= 0; i--)
+        {
+            if (exThreats[i].beaten)
+            {
+                if (exThreats[i].alive)
+                {
+                    score += exThreats[i].scoreLose;
+                    exSurvived++;
+                }
+                else
+                {
+                    score += exThreats[i].scoreWin;
+                    exSlain++;
+                }
+                exThreats.RemoveAt(i);
+            }
+        }
+    }
+
+    private void SpawnThreat(in SimulationStep simulationStep)
+    {
+        if (simulationStep.IsExternal)
+            exThreats.Add(ThreatFactory.SummonEx(simulationStep.CreatureId, trajectories[simulationStep.Zone], simulationStep.Zone, this));
+        else
+            inThreats.Add(ThreatFactory.SummonIn(simulationStep.CreatureId, trajectories[3], this));
     }
 
     void PlayerActions(ref Player p)
@@ -481,7 +555,7 @@ public sealed class Game : IGame
 
             //Computer
             case 1:
-                phaseComputer[phase] = true;
+                _didComputerThisPhase = true;
                 break;
 
             //Androids
@@ -512,7 +586,7 @@ public sealed class Game : IGame
 
             //Observation
             case 4:
-                observationCount++;
+                _observationThisTurn++;
                 break;
 
             //Fire rocket
@@ -532,81 +606,6 @@ public sealed class Game : IGame
             {
                 if (thrt.fightBack)
                     p.AndroidState = AndroidState.Disabled;
-            }
-        }
-    }
-
-    void RocketFire()
-    {
-        if (!ship.RocketReady)
-            return;
-
-        int distance = int.MaxValue;
-        ExThreat? target = null;
-        for (int i = 0; i < exThreats.Count; i++)
-        {
-            ExThreat et = exThreats[i];
-            int dist = et.GetDistance(2, ExDmgSource.rocket);
-            if (dist < distance)
-            {
-                target = et;
-                distance = dist;
-            }
-        }
-        //Deal damage
-        target?.DealDamage(3, 2, ExDmgSource.rocket);
-    }
-
-    void InternalTurnEnd()
-    {
-        inThreats[internal_turn_end_i].ProcessTurnEnd();
-    }
-
-    void CleanupInternal()
-    {
-        for (int i = inThreats.Count - 1; i >= 0; i--)
-        {
-            //Threat is gone
-            if (inThreats[i].beaten)
-            {
-                if (inThreats[i].alive)
-                {
-                    score += inThreats[i].scoreLose;
-                    inSurvived++;
-                }
-                else
-                {
-                    score += inThreats[i].scoreWin;
-                    inSlain++;
-                }
-                inThreats.RemoveAt(i);
-            }
-        }
-    }
-
-    void ExternalDamage()
-    {
-        exThreats[external_damage_i].ProcessDamage();
-    }
-
-    void CleanupExternal()
-    {
-        for (int i = exThreats.Count - 1; i >= 0; i--)
-        {
-            //Threat is gone
-            if (exThreats[i].beaten)
-            {
-                if (exThreats[i].alive)
-                {
-                    score += exThreats[i].scoreLose;
-                    exSurvived++;
-                }
-                else
-                {
-                    score += exThreats[i].scoreWin;
-                    exSlain++;
-                }
-                exThreats.RemoveAt(i);
             }
         }
     }
@@ -632,21 +631,6 @@ public sealed class Game : IGame
         {
             inThreats[move_threats_iIn].Move();
             move_threats_iIn++;
-        }
-    }
-
-    void OnTurnEnd()
-    {
-        ship.OnTurnEnd();
-
-        //Calculate observation bonus
-        observation[phase] = Math.Max(observation[phase], _obsBonus[observationCount]);
-
-        //Check if gameover
-        for (int i = 0; i < 3; i++)
-        {
-            if (ship.Damage[i] >= 7)
-                gameover = true;
         }
     }
 
@@ -680,7 +664,7 @@ public sealed class Game : IGame
 
         //Observation bonus
         if (!gameover)
-            score += observation[0] + observation[1] + observation[2];
+            score += _totalObservationPoints;
 
         //Gameover penalty
         if (gameover)
@@ -750,26 +734,6 @@ public sealed class Game : IGame
         {
             BranchConditional(zone, Defects.shield);
         }
-    }
-
-    //Spawn a threat
-    bool SpawnThreat(int turn, int eventIdx)
-    {
-        if (eventIdx < events.Length && events[eventIdx].Turn == turn)
-        {
-            //Summon threat
-            Event ev = events[eventIdx];
-            if (ev.IsExternal)
-            {
-                exThreats.Add(ThreatFactory.SummonEx(ev.CreatureId, trajectories[ev.Zone], ev.Zone, this, turn));
-            }
-            else
-            {
-                inThreats.Add(ThreatFactory.SummonIn(ev.CreatureId, trajectories[3], this, turn));
-            }
-            return true;
-        }
-        return false;
     }
 
     //Attack internal threat
@@ -878,10 +842,11 @@ public sealed class Game : IGame
         public readonly SimulationStepType Type;
         public int PlayerIndex => _value1;
         public int ThreatIndex => _value1;
-        public bool IsExternal => _bool1;
         public int CreatureId => _value1;
         public int Speed => _value2;
         public int Zone => _value2;
+        public bool IsExternal => _bool1;
+        public bool StartNewObservationPhase => _bool1;
 
         private readonly int _value1, _value2;
         private readonly bool _bool1;
@@ -913,7 +878,7 @@ public sealed class Game : IGame
 
         public static SimulationStep NewComputerUpdateStep() => new(SimulationStepType.ComputerUpdate);
 
-        public static SimulationStep NewObservationUpdateStep() => new(SimulationStepType.ObservationUpdate);
+        public static SimulationStep NewObservationUpdateStep(bool startNewPhase) => new(SimulationStepType.ObservationUpdate, bool1: startNewPhase);
     }
 }
 

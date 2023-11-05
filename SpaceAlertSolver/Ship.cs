@@ -254,16 +254,16 @@ internal sealed class Ship
         RocketsLeft--;
     }
 
+    public void MoveRockets()
+    {
+        RocketReady = _rocketFired;
+        _rocketFired = false;
+    }
+
     public void OnTurnStart()
     {
         _cannonFired = 0;
         _liftUsed = _liftReset;
-    }
-
-    public void OnTurnEnd()
-    {
-        RocketReady = _rocketFired;
-        _rocketFired = false;
     }
 
     public bool CanFireCannon(Position position)

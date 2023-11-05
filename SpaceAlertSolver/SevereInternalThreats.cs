@@ -6,7 +6,7 @@ namespace SpaceAlertSolver;
 
 class CommandosRed : InThreat
 {
-    public CommandosRed(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public CommandosRed(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 2;
         position = Position.BottomLeft;
@@ -47,7 +47,7 @@ class CommandosRed : InThreat
 
 class CommandosBlue : InThreat
 {
-    public CommandosBlue(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public CommandosBlue(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 2;
         position = Position.TopRight;
@@ -88,7 +88,7 @@ class CommandosBlue : InThreat
 
 class Alien : InThreat
 {
-    public Alien(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public Alien(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 2;
         position = Position.BottomMiddle;
@@ -132,7 +132,7 @@ class Alien : InThreat
 
 class Eliminator : InThreat
 {
-    public Eliminator(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public Eliminator(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 2;
         position = Position.TopRight;
@@ -184,7 +184,7 @@ class Eliminator : InThreat
 
 class SearchRobot : InThreat
 {
-    public SearchRobot(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public SearchRobot(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 2;
         position = Position.TopMiddle;
@@ -280,7 +280,7 @@ class SearchRobot : InThreat
 class AtomicBomb : InThreat
 {
     int damage = 0;
-    public AtomicBomb(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public AtomicBomb(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 1;
         position = Position.BottomMiddle;
@@ -343,7 +343,7 @@ class RebelliousRobots : InThreat
 {
     bool tookExtraDamage;
     bool[] hits = new bool[2];
-    public RebelliousRobots(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public RebelliousRobots(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 4;
         game.ship.CDefect[2]++;
@@ -433,7 +433,7 @@ class RebelliousRobots : InThreat
 
 class SwitchedCables : InThreat
 {
-    public SwitchedCables(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public SwitchedCables(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 4;
         position = Position.TopMiddle;
@@ -496,7 +496,7 @@ class OverstrainedEnergyNet : InThreat
 {
     bool tookExtraDamage;
     bool[] hits = new bool[3];
-    public OverstrainedEnergyNet(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public OverstrainedEnergyNet(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 7;
         game.ship.BDefect[3]++;
@@ -587,7 +587,7 @@ class OverstrainedEnergyNet : InThreat
 
 class Fissure : InThreat
 {
-    public Fissure(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public Fissure(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 2;
         position = Position.Space;
@@ -634,7 +634,7 @@ class Fissure : InThreat
 class Infection : InThreat
 {
     bool[] isActive = new bool[] {true,false,true,true,false,true,false };
-    public Infection(IGame game, Trajectory traj, int time) : base(game, traj, time)
+    public Infection(IGame game, Trajectory traj) : base(game, traj)
     {
         health = 3;
         speed = 2;

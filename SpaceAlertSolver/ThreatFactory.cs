@@ -5,68 +5,68 @@ public static class ThreatFactory
 {
     const int sevInStart = 13;
     //External threat
-    internal static ExThreat SummonEx(int number, Trajectory traj, int zone, Game game, int time)
+    internal static ExThreat SummonEx(int number, Trajectory traj, int zone, Game game)
     {
         switch (number)
         {
             case 0:
-                return new ArmoredCatcher(game, traj, zone, time);
+                return new ArmoredCatcher(game, traj, zone);
             case 1:
-                return new Amoebe(game, traj, zone, time);
+                return new Amoebe(game, traj, zone);
             case 2:
-                return new Battleship(game, traj, zone, time);
+                return new Battleship(game, traj, zone);
             case 3:
-                return new Hunter(game, traj, zone, time);
+                return new Hunter(game, traj, zone);
             case 4:
-                return new GyroHunter(game, traj, zone, time);
+                return new GyroHunter(game, traj, zone);
             case 5:
-                return new EnergyCloud(game, traj, zone, time);
+                return new EnergyCloud(game, traj, zone);
             case 6:
-                return new Meteorite(game, traj, zone, time);
+                return new Meteorite(game, traj, zone);
             case 7:
-                return new ImpulseBall(game, traj, zone, time);
+                return new ImpulseBall(game, traj, zone);
             case 8:
-                return new SpaceCruiser(game, traj, zone, time);
+                return new SpaceCruiser(game, traj, zone);
             case 9:
-                return new StealthHunter(game, traj, zone, time);
+                return new StealthHunter(game, traj, zone);
             case 10:
-                return new JellyFish(game, traj, zone, time);
+                return new JellyFish(game, traj, zone);
             case 11:
-                return new SmallAsteroid(game, traj, zone, time);
+                return new SmallAsteroid(game, traj, zone);
             case 12:
-                return new Kamikaze(game, traj, zone, time);
+                return new Kamikaze(game, traj, zone);
             case 13:
-                return new Swarm(game, traj, zone, time);
+                return new Swarm(game, traj, zone);
             case 14:
-                return new GhostHunter(game, traj, zone, time);
+                return new GhostHunter(game, traj, zone);
             case 15:
-                return new Scout(game, traj, zone, time);
+                return new Scout(game, traj, zone);
             case 16:
-                return new Fregat(game, traj, zone, time);
+                return new Fregat(game, traj, zone);
             case 17:
-                return new GyroFregat(game, traj, zone, time);
+                return new GyroFregat(game, traj, zone);
             case 18:
-                return new WarDeck(game, traj, zone, time);
+                return new WarDeck(game, traj, zone);
             case 19:
-                return new InterStellarOctopus(game, traj, zone, time);
+                return new InterStellarOctopus(game, traj, zone);
             case 20:
-                return new Maelstorm(game, traj, zone, time);
+                return new Maelstorm(game, traj, zone);
             case 21:
-                return new Asteroid(game, traj, zone, time);
+                return new Asteroid(game, traj, zone);
             case 22:
-                return new ImpulseSatellite(game, traj, zone, time);
+                return new ImpulseSatellite(game, traj, zone);
             case 23:
-                return new Nemesis(game, traj, zone, time);
+                return new Nemesis(game, traj, zone);
             case 24:
-                return new NebulaCrab(game, traj, zone, time);
+                return new NebulaCrab(game, traj, zone);
             case 25:
-                return new PsionicSatellite(game, traj, zone, time);
+                return new PsionicSatellite(game, traj, zone);
             case 26:
-                return new LargeAsteroid(game, traj, zone, time);
+                return new LargeAsteroid(game, traj, zone);
             case 27:
-                return new Moloch(game, traj, zone, time);
+                return new Moloch(game, traj, zone);
             case 28:
-                return new Behemoth(game, traj, zone, time);
+                return new Behemoth(game, traj, zone);
         }
         return null;
     }
@@ -138,59 +138,59 @@ public static class ThreatFactory
     }
 
     //Internal threat
-    internal static InThreat SummonIn(int number, Trajectory traj, Game game, int time)
+    internal static InThreat SummonIn(int number, Trajectory traj, Game game)
     {
         switch (number)
         {
             case 0:
-                return new SaboteurRed(game, traj, time);
+                return new SaboteurRed(game, traj);
             case 1:
-                return new SaboteurBlue(game, traj, time);
+                return new SaboteurBlue(game, traj);
             case 2:
-                return new SkirmisherRed(game, traj, time);
+                return new SkirmisherRed(game, traj);
             case 3:
-                return new SkirmisherBlue(game, traj, time);
+                return new SkirmisherBlue(game, traj);
             case 4:
-                return new SoldiersRed(game, traj, time);
+                return new SoldiersRed(game, traj);
             case 5:
-                return new SoldiersBlue(game, traj, time);
+                return new SoldiersBlue(game, traj);
             case 6:
-                return new Virus(game, traj, time);
+                return new Virus(game, traj);
             case 7:
-                return new HackedShieldsRed(game, traj, time);
+                return new HackedShieldsRed(game, traj);
             case 8:
-                return new HackedShieldsBlue(game, traj, time);
+                return new HackedShieldsBlue(game, traj);
             case 9:
-                return new OverheatedReactor(game, traj, time);
+                return new OverheatedReactor(game, traj);
             case 10:
-                return new UnstableWarheads(game, traj, time);
+                return new UnstableWarheads(game, traj);
             case 11:
-                return new SlimeBlue(game, traj, time);
+                return new SlimeBlue(game, traj);
             case 12:
-                return new SlimeRed(game, traj, time);
+                return new SlimeRed(game, traj);
 
             case sevInStart:
-                return new CommandosRed(game, traj, time);
+                return new CommandosRed(game, traj);
             case sevInStart + 1:
-                return new CommandosBlue(game, traj, time);
+                return new CommandosBlue(game, traj);
             case sevInStart + 2:
-                return new Alien(game, traj, time);
+                return new Alien(game, traj);
             case sevInStart + 3:
-                return new Eliminator(game, traj, time);
+                return new Eliminator(game, traj);
             case sevInStart + 4:
-                return new SearchRobot(game, traj, time);
+                return new SearchRobot(game, traj);
             case sevInStart + 5:
-                return new AtomicBomb(game, traj, time);
+                return new AtomicBomb(game, traj);
             case sevInStart + 6:
-                return new RebelliousRobots(game, traj, time);
+                return new RebelliousRobots(game, traj);
             case sevInStart + 7:
-                return new SwitchedCables(game, traj, time);
+                return new SwitchedCables(game, traj);
             case sevInStart + 8:
-                return new OverstrainedEnergyNet(game, traj, time);
+                return new OverstrainedEnergyNet(game, traj);
             case sevInStart + 9:
-                return new Fissure(game, traj, time);
+                return new Fissure(game, traj);
             case sevInStart + 10:
-                return new Infection(game, traj, time);
+                return new Infection(game, traj);
         }
         return null;
     }

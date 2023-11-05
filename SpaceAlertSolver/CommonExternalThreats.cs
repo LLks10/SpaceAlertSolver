@@ -5,7 +5,7 @@
 class ArmoredCatcher : ExThreat
 {
     int maxHealth;
-    public ArmoredCatcher(IGame game, Trajectory traj, int zone, int time) : base(game,traj,zone,time)
+    public ArmoredCatcher(IGame game, Trajectory traj, int zone) : base(game,traj,zone,time)
     {
         health = 4;
         maxHealth = 4;
@@ -43,7 +43,7 @@ class ArmoredCatcher : ExThreat
 class Amoebe : ExThreat
 {
     int maxHealth;
-    public Amoebe(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Amoebe(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 8;
         maxHealth = 8;
@@ -81,7 +81,7 @@ class Amoebe : ExThreat
 //ID: 2
 class Battleship : ExThreat
 {
-    public Battleship(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Battleship(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 5;
         shield = 2;
@@ -116,7 +116,7 @@ class Battleship : ExThreat
 //ID: 3
 class Hunter : ExThreat
 {
-    public Hunter(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Hunter(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 4;
         shield = 2;
@@ -152,7 +152,7 @@ class Hunter : ExThreat
 class GyroHunter : ExThreat
 {
     bool hasShield;
-    public GyroHunter(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public GyroHunter(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 4;
         shield = 1;
@@ -202,7 +202,7 @@ class GyroHunter : ExThreat
 class EnergyCloud : ExThreat
 {
     int baseShield;
-    public EnergyCloud(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public EnergyCloud(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 5;
         shield = 3;
@@ -273,7 +273,7 @@ class EnergyCloud : ExThreat
 //ID: 6
 class Meteorite : ExThreat
 {
-    public Meteorite(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Meteorite(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 5;
         shield = 0;
@@ -300,7 +300,7 @@ class Meteorite : ExThreat
 //ID: 7
 class ImpulseBall : ExThreat
 {
-    public ImpulseBall(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public ImpulseBall(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 5;
         shield = 1;
@@ -350,7 +350,7 @@ class ImpulseBall : ExThreat
 //ID: 8
 class SpaceCruiser : ExThreat
 {
-    public SpaceCruiser(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public SpaceCruiser(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 5;
         shield = 2;
@@ -393,7 +393,7 @@ class SpaceCruiser : ExThreat
 class StealthHunter : ExThreat
 {
     bool visible = false;
-    public StealthHunter(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public StealthHunter(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 4;
         shield = 2;
@@ -447,7 +447,7 @@ class StealthHunter : ExThreat
 class JellyFish : ExThreat
 {
     int baseHealth;
-    public JellyFish(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public JellyFish(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 13;
         baseHealth = health;
@@ -505,7 +505,7 @@ class JellyFish : ExThreat
 class SmallAsteroid : ExThreat
 {
     int revenge;
-    public SmallAsteroid(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public SmallAsteroid(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 7;
         shield = 0;
@@ -563,7 +563,7 @@ class SmallAsteroid : ExThreat
 //ID: 12
 class Kamikaze : ExThreat
 {
-    public Kamikaze(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Kamikaze(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 5;
         shield = 2;
@@ -601,7 +601,7 @@ class Kamikaze : ExThreat
 //ID: 13
 class Swarm : ExThreat
 {
-    public Swarm(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Swarm(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 3;
         shield = 0;
@@ -660,7 +660,7 @@ class Swarm : ExThreat
 class GhostHunter : ExThreat
 {
     bool visible = false;
-    public GhostHunter(IGame game, Trajectory traj, int zone,int time) : base(game, traj, zone, time)
+    public GhostHunter(IGame game, Trajectory traj, int zone,int time) : base(game, traj, zone)
     {
         health = 3;
         shield = 3;
@@ -711,7 +711,7 @@ class Scout : ExThreat
 {
     int act_y_i = 0;
 
-    public Scout(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Scout(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 3;
         shield = 1;

@@ -3,7 +3,7 @@
 //External threat parent class
 public abstract class ExThreat
 {
-    public int health, shield, speed, distance , distanceRange, scoreWin, scoreLose, zone, time;
+    public int health, shield, speed, distance , distanceRange, scoreWin, scoreLose, zone;
     public Trajectory trajectory;
     public bool rocketImmune, alive, beaten;
     public IGame game;
@@ -13,12 +13,11 @@ public abstract class ExThreat
     int distance_moved;
     int current_speed;
 
-    internal ExThreat(IGame game, Trajectory traj, int zone, int time)
+    internal ExThreat(IGame game, Trajectory traj, int zone)
     {
         this.game = game;
         this.trajectory = traj;
         this.zone = zone;
-        this.time = time;
         alive = true;
 
         //Get trajectory information

@@ -4,7 +4,7 @@
 //ID: 16
 class Fregat : ExThreat
 {
-    public Fregat(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Fregat(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 7;
         shield = 2;
@@ -39,7 +39,7 @@ class Fregat : ExThreat
 class GyroFregat : ExThreat
 {
     bool hasShield;
-    public GyroFregat(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public GyroFregat(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 7;
         shield = 1;
@@ -86,7 +86,7 @@ class GyroFregat : ExThreat
 //ID: 18
 class WarDeck : ExThreat
 {
-    public WarDeck(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public WarDeck(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 9;
         shield = 2;
@@ -122,7 +122,7 @@ class WarDeck : ExThreat
 class InterStellarOctopus : ExThreat
 {
     int maxHealth;
-    public InterStellarOctopus(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public InterStellarOctopus(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 8;
         maxHealth = 8;
@@ -184,7 +184,7 @@ class InterStellarOctopus : ExThreat
 class Maelstorm : ExThreat
 {
     int baseShield;
-    public Maelstorm(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Maelstorm(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 8;
         shield = 3;
@@ -254,7 +254,7 @@ class Maelstorm : ExThreat
 class Asteroid : ExThreat
 {
     int revenge;
-    public Asteroid(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Asteroid(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 9;
         shield = 0;
@@ -302,7 +302,7 @@ class Asteroid : ExThreat
 //ID: 22
 class ImpulseSatellite : ExThreat
 {
-    public ImpulseSatellite(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public ImpulseSatellite(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 4;
         shield = 2;
@@ -362,7 +362,7 @@ class ImpulseSatellite : ExThreat
 //ID: 23
 class Nemesis : ExThreat
 {
-    public Nemesis(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Nemesis(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 9;
         shield = 1;
@@ -429,7 +429,7 @@ class Nemesis : ExThreat
 //ID: 24
 class NebulaCrab : ExThreat
 {
-    public NebulaCrab(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public NebulaCrab(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 7;
         shield = 2;
@@ -467,7 +467,7 @@ class NebulaCrab : ExThreat
 //ID: 25
 class PsionicSatellite : ExThreat
 {
-    public PsionicSatellite(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public PsionicSatellite(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 5;
         shield = 2;
@@ -525,7 +525,7 @@ class PsionicSatellite : ExThreat
 class LargeAsteroid : ExThreat
 {
     int revenge;
-    public LargeAsteroid(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public LargeAsteroid(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 11;
         shield = 0;
@@ -575,7 +575,7 @@ class LargeAsteroid : ExThreat
 class Moloch : ExThreat
 {
     bool increaseShield = false;
-    public Moloch(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Moloch(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 10;
         shield = 3;
@@ -640,7 +640,7 @@ class Moloch : ExThreat
 class Behemoth : ExThreat
 {
     int maxHealth;
-    public Behemoth(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Behemoth(IGame game, Trajectory traj, int zone) : base(game, traj, zone)
     {
         health = 7;
         maxHealth = health;

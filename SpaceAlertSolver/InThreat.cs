@@ -3,7 +3,7 @@
 //External threat parent class
 public abstract class InThreat
 {
-    public int health, speed, distance, scoreWin, scoreLose, time;
+    public int health, speed, distance, scoreWin, scoreLose;
     public Position position;
     public Trajectory trajectory;
     private protected InternalDamageType vulnerability;
@@ -14,11 +14,10 @@ public abstract class InThreat
     int distance_moved;
     int current_speed;
 
-    internal InThreat(IGame game, Trajectory traj, int time)
+    internal InThreat(IGame game, Trajectory traj)
     {
         this.game = game;
         this.trajectory = traj;
-        this.time = time;
         alive = true;
 
         //Get trajectory information
