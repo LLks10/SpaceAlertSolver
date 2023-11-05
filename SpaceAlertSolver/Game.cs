@@ -162,130 +162,49 @@ public sealed class Game : IGame
         return ref players[actions_player_i];
     }
 
-    //Simulate the game
     public double Simulate()
     {
-        while (true)
+        while (_simulationStack.Count > 0)
         {
-            switch (sp)
-            {
-                case SimulationPhase.TurnPrep:
-                    if (turn > 12 || gameover)
-                    {
-                        RocketFire();
-                        sp = SimulationPhase.FinalExternalDamage;
-                        external_damage_i = 0;
-                        break;
-                    }
-                    OnTurnStart();
-                    sp = SimulationPhase.ReadAction;
-                    actions_player_i = 0;
-                    break;
+            int index = _simulationStack.Count - 1;
+            SimulationStep simulationStep = _simulationStack[index];
+            HandleSimulationStep(in simulationStep);
+            _simulationStack.RemoveAt(index);
+        }
 
-                case SimulationPhase.ReadAction:
-                    if (actions_player_i >= players.Length)
-                    {
-                        sp = SimulationPhase.RocketFire;
-                        break;
-                    }
-                    action = players[actions_player_i].GetNextAction();
-                    sp = SimulationPhase.PerformAction;
-                    break;
+        return CalculateScore();
+    }
 
-                case SimulationPhase.PerformAction:
-                    PlayerActions(ref players[actions_player_i]);
-                    sp = SimulationPhase.ReadAction;
-                    actions_player_i++;
-                    break;
-
-                case SimulationPhase.RocketFire:
-                    RocketFire();
-                    sp = SimulationPhase.InternalTurnEnd;
-                    internal_turn_end_i = 0;
-                    break;
-
-                case SimulationPhase.InternalTurnEnd:
-                    if (internal_turn_end_i == inThreats.Count)
-                    {
-                        sp = SimulationPhase.CleanupInternal;
-                        break;
-                    }
-                    InternalTurnEnd();
-                    internal_turn_end_i++;
-                    break;
-
-                case SimulationPhase.CleanupInternal:
-                    CleanupInternal();
-                    sp = SimulationPhase.ExternalDamage;
-                    external_damage_i = 0;
-                    break;
-
-                case SimulationPhase.ExternalDamage:
-                    if (external_damage_i == exThreats.Count)
-                    {
-                        sp = SimulationPhase.CleanupExternal;
-                        break;
-                    }
-                    ExternalDamage();
-                    external_damage_i++;
-                    break;
-
-                case SimulationPhase.FinalExternalDamage:
-                    if (external_damage_i == exThreats.Count)
-                    {
-                        sp = SimulationPhase.FinalCleanup;
-                        break;
-                    }
-                    ExternalDamage();
-                    external_damage_i++;
-                    break;
-
-                case SimulationPhase.CleanupExternal:
-                    CleanupExternal();
-                    sp = SimulationPhase.MoveThreats;
-                    move_threats_iEx = 0;
-                    move_threats_iIn = 0;
-                    break;
-
-                case SimulationPhase.FinalCleanup:
-                    CleanupInternal();
-                    CleanupExternal();
-                    sp = SimulationPhase.FinalMoveThreats;
-                    move_threats_iEx = 0;
-                    move_threats_iIn = 0;
-                    break;
-
-                case SimulationPhase.MoveThreats:
-                    if (move_threats_iEx == exThreats.Count
-                        && move_threats_iIn == inThreats.Count)
-                    {
-                        sp = SimulationPhase.TurnCleanup;
-                        break;
-                    }
-                    MoveThreats(); // no increment it will happen in the function
-                    break;
-
-                case SimulationPhase.FinalMoveThreats:
-                    if (move_threats_iEx == exThreats.Count
-                        && move_threats_iIn == inThreats.Count)
-                    {
-                        sp = SimulationPhase.FinalScoring;
-                        break;
-                    }
-                    MoveThreats(); // no increment it will happen in the function
-                    break;
-
-                case SimulationPhase.TurnCleanup:
-                    OnTurnEnd();
-                    sp = SimulationPhase.TurnPrep;
-                    turn++;
-                    break;
-
-                case SimulationPhase.FinalScoring:
-                    CleanupInternal();
-                    CleanupExternal();
-                    return CalculateScore();
-            }
+    private void HandleSimulationStep(in SimulationStep simulationStep)
+    {
+        switch (simulationStep.Type)
+        {
+            case SimulationStepType.TurnStart:
+                break;
+            case SimulationStepType.ComputerUpdate:
+                break;
+            case SimulationStepType.PlayerAction:
+                break;
+            case SimulationStepType.ObservationUpdate:
+                break;
+            case SimulationStepType.RocketUpdate:
+                break;
+            case SimulationStepType.CreateProcessSteps:
+                break;
+            case SimulationStepType.InternalTurnEnd:
+                break;
+            case SimulationStepType.ExternalDamage:
+                break;
+            case SimulationStepType.CleanThreats:
+                break;
+            case SimulationStepType.CreateMoves:
+                break;
+            case SimulationStepType.MoveThreat:
+                break;
+            case SimulationStepType.SpawnThreat:
+                break;
+            default:
+                throw new UnreachableException();
         }
     }
 
