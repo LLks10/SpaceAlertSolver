@@ -30,8 +30,7 @@ public sealed class Game : IGame
 
     internal readonly Ship ship;
     public Player[] players = null!;
-    public ImmutableArray<Trajectory> trajectories; 
-    public ImmutableArray<Event> events;
+    public ImmutableArray<Trajectory> trajectories;
     public readonly List<ExThreat> exThreats = new();
     public readonly List<InThreat> inThreats = new();
     int phase;
@@ -62,7 +61,6 @@ public sealed class Game : IGame
         ship.Init(other.ship);
         InitPlayers(other.players);
         trajectories = other.trajectories;
-        events = other.events;
         exThreats.Clear();
         exThreats.AddRange(other.exThreats.Select(t => t.Clone(this)));
         inThreats.Clear();
@@ -95,7 +93,6 @@ public sealed class Game : IGame
         ship.Init();
         InitPlayers(players);
         this.trajectories = trajectories;
-        this.events = events;
         exThreats.Clear();
         inThreats.Clear();
         phase = 0;
@@ -112,7 +109,7 @@ public sealed class Game : IGame
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
         ScoutBonus = 0;
-        InitSimulationStack();
+        InitSimulationStack(players.Length, events);
     }
 
     private void InitPlayers(Player[] other)
@@ -123,10 +120,41 @@ public sealed class Game : IGame
         other.CopyTo(players, 0);
     }
 
-    private void InitSimulationStack()
+    private void InitSimulationStack(int numPlayers, ImmutableArray<Event> events)
     {
+        const int NUM_NORMAL_TURNS = 12;
+
         _simulationStack.Clear();
-        throw new NotImplementedException();
+
+        _simulationStack.Add(SimulationStep.NewCreateMovesStep());
+        _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
+        _simulationStack.Add(SimulationStep.NewCreateProcessStepsStep());
+        _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
+
+        int eventIndex = events.Length - 1;
+        for (int i = NUM_NORMAL_TURNS; i > 0; i--)
+        {
+            _simulationStack.Add(SimulationStep.NewCreateMovesStep());
+            _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
+            _simulationStack.Add(SimulationStep.NewCreateProcessStepsStep());
+            _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
+            if (i == 12 || i == 7 || i == 3)
+            {
+                _simulationStack.Add(SimulationStep.NewObservationUpdateStep());
+            }
+            for (int j = numPlayers - 1; j >= 0; j--)
+            {
+                _simulationStack.Add(SimulationStep.NewPlayerActionStep(j));
+            }
+            if (i == 3 || i == 6 || i == 10)
+                _simulationStack.Add(SimulationStep.NewComputerUpdateStep());
+            if (events[eventIndex].Turn == i)
+            {
+                eventIndex--;
+                _simulationStack.Add(SimulationStep.NewThreatSpawnStep(events[eventIndex]));
+            }
+            _simulationStack.Add(SimulationStep.NewTurnStartStep());
+        }
     }
 
     internal ref Player GetCurrentTurnPlayer()
@@ -916,20 +944,57 @@ public sealed class Game : IGame
         ComputerUpdate,
         PlayerAction,
         ObservationUpdate,
+        RocketUpdate,
         CreateProcessSteps,
         InternalTurnEnd,
         ExternalDamage,
         CleanThreats,
         CreateMoves,
         MoveThreat,
+        SpawnThreat,
     }
 
     private readonly struct SimulationStep
     {
         public readonly SimulationStepType Type;
-        public readonly int Index; // can be player index, external threat index, internal threat index
-        public readonly bool IsExternal;
-        public readonly int Speed;
+        public int PlayerIndex => _value1;
+        public int ThreatIndex => _value1;
+        public bool IsExternal => _bool1;
+        public int CreatureId => _value1;
+        public int Speed => _value2;
+        public int Zone => _value2;
+
+        private readonly int _value1, _value2;
+        private readonly bool _bool1;
+
+        private SimulationStep(SimulationStepType type, int value1 = default, int value2 = default, bool bool1 = default)
+        {
+            Type = type;
+            _value1 = value1;
+            _value2 = value2;
+            _bool1 = bool1;
+        }
+
+        public static SimulationStep NewCreateMovesStep() => new(SimulationStepType.CreateMoves);
+
+        public static SimulationStep NewCleanThreatsStep() => new(SimulationStepType.CleanThreats);
+
+        public static SimulationStep NewCreateProcessStepsStep() => new(SimulationStepType.CreateProcessSteps);
+
+        public static SimulationStep NewRocketUpdateStep() => new(SimulationStepType.RocketUpdate);
+
+        public static SimulationStep NewPlayerActionStep(int playerIndex) => new(SimulationStepType.PlayerAction, value1: playerIndex);
+
+        public static SimulationStep NewTurnStartStep() => new(SimulationStepType.TurnStart);
+
+        public static SimulationStep NewThreatSpawnStep(int creatureId, int zone, bool isExternal)
+            => new(SimulationStepType.SpawnThreat, value1:creatureId, value2: zone, bool1: isExternal);
+
+        public static SimulationStep NewThreatSpawnStep(in Event @event) => NewThreatSpawnStep(@event.CreatureId, @event.Zone, @event.IsExternal);
+
+        public static SimulationStep NewComputerUpdateStep() => new(SimulationStepType.ComputerUpdate);
+
+        public static SimulationStep NewObservationUpdateStep() => new(SimulationStepType.ObservationUpdate);
     }
 }
 
