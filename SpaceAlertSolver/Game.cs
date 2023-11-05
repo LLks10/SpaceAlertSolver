@@ -50,15 +50,7 @@ public sealed class Game : IGame
 
     public int ScoutBonus;
 
-    // simulation phase
-    SimulationPhase sp;
-    int turn;
-    int actions_player_i;
-    int internal_turn_end_i;
-    int external_damage_i;
-    int move_threats_iEx;
-    int move_threats_iIn;
-    Act action;
+    private readonly List<SimulationStep> _simulationStack = new();
 
     public Game()
     {
@@ -94,14 +86,8 @@ public sealed class Game : IGame
 
         ScoutBonus = other.ScoutBonus;
 
-        sp = other.sp;
-        turn = other.turn;
-        actions_player_i = other.actions_player_i;
-        internal_turn_end_i = other.internal_turn_end_i;
-        external_damage_i = other.external_damage_i;
-        move_threats_iEx = other.move_threats_iEx;
-        move_threats_iIn = other.move_threats_iIn;
-        action = other.action;
+        _simulationStack.Clear();
+        _simulationStack.AddRange(other._simulationStack);
     }
 
     public void Init(Player[] players, ImmutableArray<Trajectory> trajectories, ImmutableArray<Event> events)
@@ -126,14 +112,7 @@ public sealed class Game : IGame
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
         ScoutBonus = 0;
-        sp = SimulationPhase.TurnPrep;
-        turn = 1;
-        actions_player_i = 0;
-        internal_turn_end_i = 0;
-        external_damage_i = 0;
-        move_threats_iEx = 0;
-        move_threats_iIn = 0;
-        action = Act.Empty;
+        InitSimulationStack();
     }
 
     private void InitPlayers(Player[] other)
@@ -142,6 +121,12 @@ public sealed class Game : IGame
             players = new Player[other.Length];
 
         other.CopyTo(players, 0);
+    }
+
+    private void InitSimulationStack()
+    {
+        _simulationStack.Clear();
+        throw new NotImplementedException();
     }
 
     internal ref Player GetCurrentTurnPlayer()
@@ -925,22 +910,26 @@ public sealed class Game : IGame
         }
     }
 
-    private enum SimulationPhase
+    private enum SimulationStepType
     {
-        TurnPrep,
-        ReadAction,
-        PerformAction,
-        RocketFire,
+        TurnStart,
+        ComputerUpdate,
+        PlayerAction,
+        ObservationUpdate,
+        CreateProcessSteps,
         InternalTurnEnd,
-        CleanupInternal,
         ExternalDamage,
-        CleanupExternal,
-        MoveThreats,
-        TurnCleanup,
-        FinalExternalDamage,
-        FinalCleanup,
-        FinalMoveThreats,
-        FinalScoring
+        CleanThreats,
+        CreateMoves,
+        MoveThreat,
+    }
+
+    private readonly struct SimulationStep
+    {
+        public readonly SimulationStepType Type;
+        public readonly int Index; // can be player index, external threat index, internal threat index
+        public readonly bool IsExternal;
+        public readonly int Speed;
     }
 }
 
