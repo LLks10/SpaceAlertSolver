@@ -450,7 +450,7 @@ public class Game
                 if (target != -1)
                 {
                     BranchConditional(p.Position.Zone, Defects.weaponbot);
-                    exThreats[target].DealDamage(ship.PlasmaDamage[p.Position.Zone], 3, ExDmgSource.laser);
+                    exThreats[target].DealDamage(ship.PlasmaDamage[p.Position.Zone], 3, ExDmgSource.plasma);
                 }
             }
         }
