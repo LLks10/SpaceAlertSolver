@@ -138,7 +138,7 @@ internal sealed class Ship
         return ref Game.GetCurrentTurnPlayer();
     }
 
-    public void DealDamage(int zone, int amount)
+    public void DealExternalDamage(int zone, int amount)
     {
         amount += Game.ScoutBonus;
         Shields[zone] -= amount;

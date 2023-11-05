@@ -5,7 +5,7 @@
 class ArmoredCatcher : ExThreat
 {
     int maxHealth;
-    public ArmoredCatcher(Game game, Trajectory traj, int zone, int time) : base(game,traj,zone,time)
+    public ArmoredCatcher(IGame game, Trajectory traj, int zone, int time) : base(game,traj,zone,time)
     {
         health = 4;
         maxHealth = 4;
@@ -27,8 +27,7 @@ class ArmoredCatcher : ExThreat
 
     public override void ActX()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 1);
+        game.DealExternalDamage(zone, 1);
     }
     public override void ActY()
     {
@@ -36,8 +35,7 @@ class ArmoredCatcher : ExThreat
     }
     public override void ActZ()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 4);
+        game.DealExternalDamage(zone, 4);
     }
 }
 
@@ -45,7 +43,7 @@ class ArmoredCatcher : ExThreat
 class Amoebe : ExThreat
 {
     int maxHealth;
-    public Amoebe(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Amoebe(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 8;
         maxHealth = 8;
@@ -76,15 +74,14 @@ class Amoebe : ExThreat
     }
     public override void ActZ()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 4);
+        game.DealExternalDamage(zone, 4);
     }
 }
 
 //ID: 2
 class Battleship : ExThreat
 {
-    public Battleship(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Battleship(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 5;
         shield = 2;
@@ -104,25 +101,22 @@ class Battleship : ExThreat
 
     public override void ActX()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 2);
+        game.DealExternalDamage(zone, 2);
     }
     public override void ActY()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 2);
+        game.DealExternalDamage(zone, 2);
     }
     public override void ActZ()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 3);
+        game.DealExternalDamage(zone, 3);
     }
 }
 
 //ID: 3
 class Hunter : ExThreat
 {
-    public Hunter(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Hunter(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 4;
         shield = 2;
@@ -142,18 +136,15 @@ class Hunter : ExThreat
 
     public override void ActX()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 1);
+        game.DealExternalDamage(zone, 1);
     }
     public override void ActY()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 2);
+        game.DealExternalDamage(zone, 2);
     }
     public override void ActZ()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 3);
+        game.DealExternalDamage(zone, 3);
     }
 }
 
@@ -161,7 +152,7 @@ class Hunter : ExThreat
 class GyroHunter : ExThreat
 {
     bool hasShield;
-    public GyroHunter(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public GyroHunter(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 4;
         shield = 1;
@@ -183,18 +174,15 @@ class GyroHunter : ExThreat
 
     public override void ActX()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 1);
+        game.DealExternalDamage(zone, 1);
     }
     public override void ActY()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 2);
+        game.DealExternalDamage(zone, 2);
     }
     public override void ActZ()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 2);
+        game.DealExternalDamage(zone, 2);
     }
     public override bool ProcessDamage()
     {
@@ -214,7 +202,7 @@ class GyroHunter : ExThreat
 class EnergyCloud : ExThreat
 {
     int baseShield;
-    public EnergyCloud(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public EnergyCloud(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 5;
         shield = 3;
@@ -285,7 +273,7 @@ class EnergyCloud : ExThreat
 //ID: 6
 class Meteorite : ExThreat
 {
-    public Meteorite(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Meteorite(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 5;
         shield = 0;
@@ -305,15 +293,14 @@ class Meteorite : ExThreat
     }
     public override void ActZ()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, health);
+        game.DealExternalDamage(zone, health);
     }
 }
 
 //ID: 7
 class ImpulseBall : ExThreat
 {
-    public ImpulseBall(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public ImpulseBall(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 5;
         shield = 1;
@@ -363,7 +350,7 @@ class ImpulseBall : ExThreat
 //ID: 8
 class SpaceCruiser : ExThreat
 {
-    public SpaceCruiser(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public SpaceCruiser(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 5;
         shield = 2;
@@ -382,22 +369,19 @@ class SpaceCruiser : ExThreat
     }
     public override void ActX()
     {
-        game.BranchShieldFull(zone);
         if (game.ship.Shields[zone] == 0)
-            game.ship.DealDamage(zone, 2);
+            game.DealExternalDamage(zone, 2);
         else
-            game.ship.DealDamage(zone, 1);
+            game.DealExternalDamage(zone, 1);
     }
     public override void ActY()
     {
-        game.BranchShieldFull(zone);
-
         int dmg = 2;
         int bonus = 2 - game.ship.Shields[zone];
         if (bonus > 0)
             dmg += bonus;
 
-        game.ship.DealDamage(zone, dmg);
+        game.DealExternalDamage(zone, dmg);
     }
     public override void ActZ()
     {
@@ -409,7 +393,7 @@ class SpaceCruiser : ExThreat
 class StealthHunter : ExThreat
 {
     bool visible = false;
-    public StealthHunter(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public StealthHunter(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 4;
         shield = 2;
@@ -434,7 +418,7 @@ class StealthHunter : ExThreat
     public override void ActY()
     {
         game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 2);
+        game.DealExternalDamage(zone, 2);
     }
     public override void ActZ()
     {
@@ -463,7 +447,7 @@ class StealthHunter : ExThreat
 class JellyFish : ExThreat
 {
     int baseHealth;
-    public JellyFish(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public JellyFish(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 13;
         baseHealth = health;
@@ -521,7 +505,7 @@ class JellyFish : ExThreat
 class SmallAsteroid : ExThreat
 {
     int revenge;
-    public SmallAsteroid(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public SmallAsteroid(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 7;
         shield = 0;
@@ -579,7 +563,7 @@ class SmallAsteroid : ExThreat
 //ID: 12
 class Kamikaze : ExThreat
 {
-    public Kamikaze(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Kamikaze(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 5;
         shield = 2;
@@ -610,14 +594,14 @@ class Kamikaze : ExThreat
     public override void ActZ()
     {
         game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 6);
+        game.DealExternalDamage(zone, 6);
     }
 }
 
 //ID: 13
 class Swarm : ExThreat
 {
-    public Swarm(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Swarm(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 3;
         shield = 0;
@@ -638,8 +622,7 @@ class Swarm : ExThreat
 
     public override void ActX()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 1);
+        game.DealExternalDamage(zone, 1);
     }
     public override void ActY()
     {
@@ -677,7 +660,7 @@ class Swarm : ExThreat
 class GhostHunter : ExThreat
 {
     bool visible = false;
-    public GhostHunter(Game game, Trajectory traj, int zone,int time) : base(game, traj, zone, time)
+    public GhostHunter(IGame game, Trajectory traj, int zone,int time) : base(game, traj, zone, time)
     {
         health = 3;
         shield = 3;
@@ -701,13 +684,11 @@ class GhostHunter : ExThreat
     }
     public override void ActY()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 2);
+        game.DealExternalDamage(zone, 2);
     }
     public override void ActZ()
     {
-        game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 3);
+        game.DealExternalDamage(zone, 3);
     }
     public override int GetDistance(int range, ExDmgSource source)
     {
@@ -730,7 +711,7 @@ class Scout : ExThreat
 {
     int act_y_i = 0;
 
-    public Scout(Game game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
+    public Scout(IGame game, Trajectory traj, int zone, int time) : base(game, traj, zone, time)
     {
         health = 3;
         shield = 1;

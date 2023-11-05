@@ -4,7 +4,7 @@
 //ID: 0
 class SaboteurRed : InThreat
 {
-    public SaboteurRed(Game game, Trajectory traj, int time) : base(game,traj,time)
+    public SaboteurRed(IGame game, Trajectory traj, int time) : base(game,traj,time)
     {
         health = 1;
         position = Position.BottomMiddle;
@@ -42,7 +42,7 @@ class SaboteurRed : InThreat
 //ID: 1
 class SaboteurBlue : InThreat
 {
-    public SaboteurBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public SaboteurBlue(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 1;
         position = Position.BottomMiddle;
@@ -80,7 +80,7 @@ class SaboteurBlue : InThreat
 //ID: 2
 class SkirmisherRed : InThreat
 {
-    public SkirmisherRed(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public SkirmisherRed(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 1;
         position = Position.TopLeft;
@@ -110,7 +110,7 @@ class SkirmisherRed : InThreat
 //ID: 3
 class SkirmisherBlue : InThreat
 {
-    public SkirmisherBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public SkirmisherBlue(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 1;
         position = Position.TopRight;
@@ -140,7 +140,7 @@ class SkirmisherBlue : InThreat
 //ID: 4
 class SoldiersRed : InThreat
 {
-    public SoldiersRed(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public SoldiersRed(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         position = Position.TopLeft;
@@ -170,7 +170,7 @@ class SoldiersRed : InThreat
 //ID: 5
 class SoldiersBlue : InThreat
 {
-    public SoldiersBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public SoldiersBlue(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         position = Position.BottomRight;
@@ -200,7 +200,7 @@ class SoldiersBlue : InThreat
 //ID: 6
 class Virus : InThreat
 {
-    public Virus(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public Virus(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
         position = Position.TopMiddle;
@@ -257,7 +257,7 @@ class Virus : InThreat
 //ID: 7
 class HackedShieldsRed : InThreat
 {
-    public HackedShieldsRed(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public HackedShieldsRed(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
         position = Position.TopLeft;
@@ -299,7 +299,7 @@ class HackedShieldsRed : InThreat
 //ID: 8
 class HackedShieldsBlue : InThreat
 {
-    public HackedShieldsBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public HackedShieldsBlue(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
         position = Position.TopRight;
@@ -341,7 +341,7 @@ class HackedShieldsBlue : InThreat
 //ID: 9
 class OverheatedReactor : InThreat
 {
-    public OverheatedReactor(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public OverheatedReactor(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 3;
         position = Position.BottomMiddle;
@@ -399,7 +399,7 @@ class OverheatedReactor : InThreat
 //ID: 10
 class UnstableWarheads : InThreat
 {
-    public UnstableWarheads(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public UnstableWarheads(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = game.ship.RocketsLeft;
         position = Position.BottomRight;
@@ -440,7 +440,7 @@ class SlimeBlue : InThreat
 {
     bool[] positions;
     int[] healths;
-    public SlimeBlue(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public SlimeBlue(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         speed = 2;
@@ -563,7 +563,7 @@ class SlimeRed : InThreat
 {
     bool[] positions;
     int[] healths;
-    public SlimeRed(Game game, Trajectory traj, int time) : base(game, traj, time)
+    public SlimeRed(IGame game, Trajectory traj, int time) : base(game, traj, time)
     {
         health = 2;
         speed = 2;

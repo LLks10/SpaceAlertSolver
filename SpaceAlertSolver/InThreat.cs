@@ -8,13 +8,13 @@ public abstract class InThreat
     public Trajectory trajectory;
     private protected InternalDamageType vulnerability;
     public bool alive, beaten, fightBack;
-    public Game game;
+    public IGame game;
 
     bool started_move = false;
     int distance_moved;
     int current_speed;
 
-    internal InThreat(Game game, Trajectory traj, int time)
+    internal InThreat(IGame game, Trajectory traj, int time)
     {
         this.game = game;
         this.trajectory = traj;

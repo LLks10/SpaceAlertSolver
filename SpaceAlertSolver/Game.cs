@@ -22,7 +22,7 @@ namespace SpaceAlertSolver;
 */
 
 
-public class Game
+public sealed class Game : IGame
 {
     public static List<int> Scores = new();
     private static readonly int[] _obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
@@ -30,7 +30,7 @@ public class Game
 
     internal readonly Ship ship;
     public Player[] players = null!;
-    public ImmutableArray<Trajectory> trajectories;
+    public ImmutableArray<Trajectory> trajectories; 
     public ImmutableArray<Event> events;
     public readonly List<ExThreat> exThreats = new();
     public readonly List<InThreat> inThreats = new();
@@ -274,6 +274,12 @@ public class Game
                     return CalculateScore();
             }
         }
+    }
+
+    public void DealExternalDamage(int zone, int damage)
+    {
+        BranchShieldFull(zone);
+        ship.DealExternalDamage(zone, damage);
     }
 
     void OnTurnStart()

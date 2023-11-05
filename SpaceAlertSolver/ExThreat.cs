@@ -6,14 +6,14 @@ public abstract class ExThreat
     public int health, shield, speed, distance , distanceRange, scoreWin, scoreLose, zone, time;
     public Trajectory trajectory;
     public bool rocketImmune, alive, beaten;
-    public Game game;
+    public IGame game;
     public int damage;
 
     bool started_move = false;
     int distance_moved;
     int current_speed;
 
-    internal ExThreat(Game game, Trajectory traj, int zone, int time)
+    internal ExThreat(IGame game, Trajectory traj, int zone, int time)
     {
         this.game = game;
         this.trajectory = traj;
