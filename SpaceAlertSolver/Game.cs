@@ -256,6 +256,7 @@ public class Game
                     if (move_threats_iEx == exThreats.Count
                         && move_threats_iIn == inThreats.Count)
                     {
+                        OnTurnEnd();
                         sp = SimulationPhase.FinalScoring;
                         break;
                     }
