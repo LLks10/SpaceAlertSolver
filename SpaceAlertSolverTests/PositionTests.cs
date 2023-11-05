@@ -71,20 +71,6 @@ public class PositionTests
     }
 
     [TestMethod]
-    public void TestGetNeighbours()
-    {
-        Position[] neighbours = Position.BottomLeft.GetNeighbours().ToArray();
-        List<Position> expected = new() { Position.TopLeft, Position.BottomMiddle };
-        CollectionAssert.AreEquivalent(expected, neighbours);
-
-        neighbours = Position.BottomMiddle.GetNeighbours().ToArray();
-        expected = new() { Position.BottomLeft, Position.BottomRight, Position.TopMiddle };
-        CollectionAssert.AreEquivalent(expected, neighbours);
-
-        Assert.AreEqual(0, Position.Space.GetNeighbours().Count());
-    }
-
-    [TestMethod]
     public void TestClassifications()
     {
         Assert.IsTrue(Position.TopLeft.IsTop());

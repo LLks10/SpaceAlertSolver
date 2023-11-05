@@ -242,15 +242,14 @@ class SearchRobot : InThreat
     {
         Position best = position;
         int score = int.MinValue;
-        Player[] ps = game.ship.Players;
-        //Count players and choose best station
-        foreach (Position pos in position.GetNeighbours())
+
+        void TestPosition(in Position pos)
         {
             int c = 0;
             //Count players
-            for(int i = 0; i < ps.Length; i++)
+            for (int i = 0; i < game.ship.Players.Length; i++)
             {
-                if (ps[i].Position == pos)
+                if (game.ship.Players[i].Position == pos)
                     c++;
             }
             if (c > score)
@@ -261,6 +260,18 @@ class SearchRobot : InThreat
             else if (c == score)
                 best = position;
         }
+
+        Position left = position.GetLeft();
+        if (position != left)
+            TestPosition(in left);
+
+        Position right = position.GetRight();
+        if (position != right)
+            TestPosition(in right);
+
+        Position elevated = position.GetElevator();
+        Debug.Assert(position != elevated, "Elevator must always have an effect for this threat");
+        TestPosition(in elevated);
 
         position = best;
     }

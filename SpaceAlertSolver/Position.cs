@@ -81,19 +81,4 @@ public readonly struct Position : IEquatable<Position>
     public bool IsMiddle() => Zone == 1;
 
     public bool IsRight() => Zone == 2;
-
-    public IEnumerable<Position> GetNeighbours()
-    {
-        Position left = GetLeft();
-        if (this != left)
-            yield return left;
-
-        Position right = GetRight();
-        if (this != right)
-            yield return right;
-
-        Position elevator = GetElevator();
-        if (this != elevator)
-            yield return elevator;
-    }
 }
