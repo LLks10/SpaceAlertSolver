@@ -145,7 +145,9 @@ public sealed class Game : IGame
             }
 
             if (i == 3 || i == 6 || i == 10)
-                _simulationStack.Add(SimulationStep.NewComputerUpdateStep());
+                _simulationStack.Add(SimulationStep.NewCheckComputerStep());
+            else if (i == 4 || i == 8)
+                _simulationStack.Add(SimulationStep.NewResetComputerStep());
 
             if (events[eventIndex].Turn == i)
             {
@@ -182,8 +184,11 @@ public sealed class Game : IGame
             case SimulationStepType.TurnStart:
                 TurnStart();
                 break;
-            case SimulationStepType.ComputerUpdate:
-                ComputerUpdate();
+            case SimulationStepType.ResetComputer:
+                ResetComputer();
+                break;
+            case SimulationStepType.CheckComputer:
+                CheckComputer();
                 break;
             case SimulationStepType.PlayerAction:
                 break;
@@ -230,17 +235,21 @@ public sealed class Game : IGame
         }
     }
 
-    private void ComputerUpdate()
+    private void ResetComputer()
     {
-        if (!_didComputerThisPhase)
-        {
-            for (int i = 0; i < players.Length; i++)
-            {
-                if (players[i].Position.IsInShip())
-                    players[i].DelayNext();
-            }
-        }
         _didComputerThisPhase = false;
+    }
+
+    private void CheckComputer()
+    {
+        if (_didComputerThisPhase)
+            return;
+
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i].Position.IsInShip())
+                players[i].DelayNext();
+        }
     }
 
     private void ObservationUpdate(bool startNewPhase)
@@ -825,7 +834,8 @@ public sealed class Game : IGame
     private enum SimulationStepType
     {
         TurnStart,
-        ComputerUpdate,
+        ResetComputer,
+        CheckComputer,
         PlayerAction,
         ObservationUpdate,
         RocketUpdate,
@@ -877,7 +887,9 @@ public sealed class Game : IGame
 
         public static SimulationStep NewThreatSpawnStep(in Event @event) => NewThreatSpawnStep(@event.CreatureId, @event.Zone, @event.IsExternal);
 
-        public static SimulationStep NewComputerUpdateStep() => new(SimulationStepType.ComputerUpdate);
+        public static SimulationStep NewResetComputerStep() => new(SimulationStepType.ResetComputer);
+
+        public static SimulationStep NewCheckComputerStep() => new(SimulationStepType.CheckComputer);
 
         public static SimulationStep NewObservationUpdateStep(bool startNewPhase) => new(SimulationStepType.ObservationUpdate, bool1: startNewPhase);
     }
