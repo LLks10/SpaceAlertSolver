@@ -236,7 +236,8 @@ public sealed class Game : IGame
         {
             for (int i = 0; i < players.Length; i++)
             {
-                players[i].DelayNext();
+                if (players[i].Position.IsInShip())
+                    players[i].DelayNext();
             }
         }
         _didComputerThisPhase = false;
