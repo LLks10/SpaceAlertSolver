@@ -46,7 +46,7 @@ internal partial struct Threat
 }
 
 [AttributeUsage(AttributeTargets.Method)]
-internal sealed class ThreatIdAttribute : Attribute
+internal abstract class ThreatIdAttribute : Attribute
 {
     public int ThreatId;
 
@@ -54,6 +54,26 @@ internal sealed class ThreatIdAttribute : Attribute
     {
         ThreatId = threatId;
     }
+}
+
+internal sealed class InternalCommonThreatAttribute : ThreatIdAttribute
+{
+    public InternalCommonThreatAttribute(int threatId) : base(threatId) { }
+}
+
+internal sealed class InternalSevereThreatAttribute : ThreatIdAttribute
+{
+    public InternalSevereThreatAttribute(int threatId) : base(threatId) { }
+}
+
+internal sealed class ExternalCommonThreatAttribute : ThreatIdAttribute
+{
+    public ExternalCommonThreatAttribute(int threatId) : base(threatId) { }
+}
+
+internal sealed class ExternalSevereThreatAttribute : ThreatIdAttribute
+{
+    public ExternalSevereThreatAttribute(int threatId) : base(threatId) { }
 }
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]

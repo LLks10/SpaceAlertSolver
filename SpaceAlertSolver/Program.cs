@@ -76,26 +76,14 @@ class Program
     {
         //Extension.InitKeys(5, 8, 1 << 25);
         //Create damage order
-        Random r = new Random(seed);
-        List<Event> events = new List<Event>();
+        Random r = new(seed);
+        List<Event> events = new();
 
         //Setup threat pool
-        int comExThreatCount = 16;
-        List<int> comExThreats = new List<int>();
-        for (int i = 0; i < comExThreatCount; i++)
-            comExThreats.Add(i);
-        int sevExThreatCount = 13;
-        List<int> sevExThreats = new List<int>();
-        for (int i = 0; i < sevExThreatCount; i++)
-            sevExThreats.Add(i + comExThreatCount);
-        int comInThreatCount = 13;
-        List<int> comInThreats = new List<int>();
-        for (int i = 0; i < comInThreatCount; i++)
-            comInThreats.Add(i);
-        int sevInThreatCount = 11;
-        List<int> sevInThreats = new List<int>();
-        for (int i = 0; i < sevInThreatCount; i++)
-            sevInThreats.Add(i + comInThreatCount);
+        List<int> comExThreats = new(ThreatFactory.Instance.ExternalCommonThreatIds);
+        List<int> sevExThreats = new(ThreatFactory.Instance.ExternalSevereThreatIds);
+        List<int> comInThreats = new(ThreatFactory.Instance.InternalCommonThreatIds);
+        List<int> sevInThreats = new(ThreatFactory.Instance.InternalSevereThreatIds);
 
         //Load trajectories
         Trajectory[] trajectoriesArray = new Trajectory[4];
@@ -124,85 +112,70 @@ class Program
         Console.WriteLine("Trajectories:");
         Console.WriteLine("Lt{0} Mt{1} Rt{2} It{3}", trajectories[0].number + 1, trajectories[1].number + 1, trajectories[2].number + 1, trajectories[3].number + 1);
         Console.WriteLine();
-        Console.WriteLine("Add events: 'turn 1...12' 'zone 0,1,2,3' ('name' | 'r' 'severity 0,1') | Type 'start' to start simulation");
+        Console.WriteLine("Add internal threat: \"<turn> (<name> | r0 | r1)\"");
+        Console.WriteLine("Add external threat: \"<turn> <zone (0..2)> (<name> | r0 | r1)\"");
+        Console.WriteLine("Start simulation: \"start\"");
         string[] zoneStr = new string[] { "Red", "White", "Blue", "Internal" };
         while (true)
         {
-            string str = Console.ReadLine();
+            string str = Console.ReadLine()!;
             if (str == "start")
                 break;
-            //Get threat
-            else
+
+            string[] strsplit = str.Split(' ');
+            int turn = int.Parse(strsplit[0]);
+            if (strsplit.Length >= 3)
             {
-                string[] strsplit = str.Split(' ');
-                int t = int.Parse(strsplit[0]);
-                int z = int.Parse(strsplit[1]);
-                
-                // name given
-                if (strsplit[2] == "r")
+                int threatId;
+                string threatName;
+                if (strsplit[2] == "r0")
                 {
-                    int thrt;
-                    string name;
-                    if (z < 3)
-                    {
-                        if(strsplit[3] == "0")
-                        {
-                            int thrtIdx = r.Next(comExThreats.Count);
-                            thrt = comExThreats[thrtIdx];
-                            comExThreats.RemoveAt(thrtIdx);
-                        }
-                        else
-                        {
-                            int thrtIdx = r.Next(sevExThreats.Count);
-                            thrt = sevExThreats[thrtIdx];
-                            sevExThreats.RemoveAt(thrtIdx);
-                        }
-
-                        name = ThreatFactory.ExName(thrt);
-                    }
-                    else
-                    {
-                        if (strsplit[3] == "0")
-                        {
-                            int thrtIdx = r.Next(comInThreats.Count);
-                            thrt = comInThreats[thrtIdx];
-                            comInThreats.RemoveAt(thrtIdx);
-                        }
-                        else
-                        {
-                            int thrtIdx = r.Next(sevInThreats.Count);
-                            thrt = sevInThreats[thrtIdx];
-                            sevInThreats.RemoveAt(thrtIdx);
-                        }
-
-                        name = ThreatFactory.InName(thrt);
-                    }
-
-                    events.Add(new Event(z < 3, t, z, thrt));
-                    Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", name, t, zoneStr[z], thrt);
+                    int i = r.Next(comExThreats.Count);
+                    threatId = comExThreats[i];
+                    comExThreats.RemoveAt(i);
+                    threatName = ThreatFactory.Instance.ThreatNameById[i];
+                }
+                else if (strsplit[2] == "r1")
+                {
+                    int i = r.Next(sevExThreats.Count);
+                    threatId = sevExThreats[i];
+                    sevExThreats.RemoveAt(i);
+                    threatName = ThreatFactory.Instance.ThreatNameById[i];
                 }
                 else
                 {
-                    string name = strsplit[2];
-                    for (int i = 3; i < strsplit.Length; i++)
-                    {
-                        name += ' ' + strsplit[i];
-                    }
-
-                    ThreatName tn;
-                    // external
-                    if (z < 3)
-                    {
-                        tn = ThreatParser.ParseExThreat(name);
-                    }
-                    else
-                    {
-                        tn = ThreatParser.ParseInThreat(name);
-                    }
-
-                    events.Add(new Event(tn.external, t, z, tn.id));
-                    Console.WriteLine("Loaded {0} on turn {1} in zone {2} ({3})", tn.name, t, zoneStr[z], tn.id);
+                    (threatName, threatId) = ThreatFactory.Instance.FindThreatMatchingName(strsplit[2]);
                 }
+
+                int zone = int.Parse(strsplit[1]);
+                events.Add(new(true, turn, zone, threatId));
+                Console.WriteLine($"Loaded {threatName} on turn {turn} in zone {zoneStr[zone]} ({threatId})");
+            }
+            else
+            {
+                int threatId;
+                string threatName;
+                if (strsplit[1] == "r0")
+                {
+                    int i = r.Next(comInThreats.Count);
+                    threatId = comInThreats[i];
+                    comInThreats.RemoveAt(i);
+                    threatName = ThreatFactory.Instance.ThreatNameById[i];
+                }
+                else if (strsplit[1] == "r1")
+                {
+                    int i = r.Next(sevInThreats.Count);
+                    threatId = sevInThreats[i];
+                    sevInThreats.RemoveAt(i);
+                    threatName = ThreatFactory.Instance.ThreatNameById[i];
+                }
+                else
+                {
+                    (threatName, threatId) = ThreatFactory.Instance.FindThreatMatchingName(strsplit[1]);
+                }
+
+                events.Add(new(false, turn, 3, threatId));
+                Console.WriteLine($"Loaded {threatName} on turn {turn} in zone {zoneStr[3]} ({threatId})");
             }
         }
         ImmutableArray<Event> evArr = events.OrderBy(e => e.Turn).ToImmutableArray();

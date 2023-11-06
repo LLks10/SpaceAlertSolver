@@ -12,6 +12,17 @@ internal sealed class ThreatFactory
     private readonly List<(string, int)> _nameIdPairs = new();
 
     public IReadOnlyList<Threat> ThreatsById => _threatsById;
+    public IReadOnlyList<string> ThreatNameById => _threatNamesById;
+
+    private readonly List<int> _internalCommonThreatIds = new();
+    private readonly List<int> _internalSevereThreatIds = new();
+    private readonly List<int> _externalCommonThreatIds = new();
+    private readonly List<int> _externalSevereThreatIds = new();
+
+    public IReadOnlyList<int> InternalCommonThreatIds => _internalCommonThreatIds;
+    public IReadOnlyList<int> InternalSevereThreatIds => _internalSevereThreatIds;
+    public IReadOnlyList<int> ExternalCommonThreatIds => _externalCommonThreatIds;
+    public IReadOnlyList<int> ExternalSevereThreatIds => _externalSevereThreatIds;
 
     private ThreatFactory()
     {
@@ -42,6 +53,17 @@ internal sealed class ThreatFactory
             {
                 _nameIdPairs.Add((threatName.Name, idAttribute.ThreatId));
             }
+
+            if (idAttribute is InternalCommonThreatAttribute)
+                _internalCommonThreatIds.Add(idAttribute.ThreatId);
+            else if (idAttribute is InternalSevereThreatAttribute)
+                _internalSevereThreatIds.Add(idAttribute.ThreatId);
+            else if (idAttribute is ExternalCommonThreatAttribute)
+                _externalCommonThreatIds.Add(idAttribute.ThreatId);
+            else if (idAttribute is ExternalSevereThreatAttribute)
+                _externalSevereThreatIds.Add(idAttribute.ThreatId);
+            else
+                throw new UnreachableException("Unknown threat type");
         }
     }
 
