@@ -8,7 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="SpaceAlertSolverTests"/>      
+    <Compile Remove="CommonExternalThreats.cs" />
+    <Compile Remove="CommonInternalThreats.cs" />
+    <Compile Remove="ExThreat.cs" />
+    <Compile Remove="InThreat.cs" />
+    <Compile Remove="SevereExternalThreats.cs" />
+    <Compile Remove="SevereInternalThreats.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SpaceAlertSolverTests" />      
   </ItemGroup>
 
 </Project>
