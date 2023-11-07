@@ -133,11 +133,6 @@ internal sealed class Ship
         }
     }
 
-    internal ref Player GetCurrentTurnPlayer()
-    {
-        return ref Game.GetCurrentTurnPlayer();
-    }
-
     public void DealExternalDamage(int zone, int amount)
     {
         amount += Game.ScoutBonus;

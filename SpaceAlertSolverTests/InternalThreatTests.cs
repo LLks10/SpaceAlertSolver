@@ -8,6 +8,6 @@ public class InternalThreatTests
     [TestMethod]
     public void SearchRobotMovementTest()
     {
-        SearchRobot searchRobot = new SearchRobot();
+        throw new NotImplementedException();
     }
 }

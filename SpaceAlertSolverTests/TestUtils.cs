@@ -5,6 +5,19 @@ namespace SpaceAlertSolverTests;
 
 public static class TestUtils
 {
+    internal static int GetThreatIdMatchingExactPrimaryName(string primaryName)
+    {
+        var (_, id) = ThreatFactory.Instance.FindThreatMatchingName(primaryName);
+        if (ThreatFactory.Instance.ThreatNameById[id] != primaryName)
+            throw new Exception("Primary name does match");
+        return id;
+    }
+
+    internal static Threat GetThreatMatchingExactPrimaryName(string primaryName)
+    {
+        return ThreatFactory.Instance.ThreatsById[GetThreatIdMatchingExactPrimaryName(primaryName)];
+    }
+
     public static ImmutableArray<Trajectory> GetTrajectoriesFromString(string str)
     {
         const int NUM_TRAJECTORIES = 4;

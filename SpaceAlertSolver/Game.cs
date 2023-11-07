@@ -31,7 +31,7 @@ public sealed class Game : IGame
     internal readonly Ship ship;
     public Player[] players = null!;
     public ImmutableArray<Trajectory> trajectories;
-    public readonly List<Threat> Threats = new();
+    internal readonly List<Threat> Threats = new();
     double score;
     private bool _didComputerThisPhase;
     bool gameover;
@@ -145,10 +145,10 @@ public sealed class Game : IGame
             else if (i == 4 || i == 8)
                 _simulationStack.Add(SimulationStep.NewResetComputerStep());
 
-            if (events[eventIndex].Turn == i)
+            if (eventIndex >= 0 && events[eventIndex].Turn == i)
             {
-                eventIndex--;
                 _simulationStack.Add(SimulationStep.NewThreatSpawnStep(events[eventIndex]));
+                eventIndex--;
             }
 
             _simulationStack.Add(SimulationStep.NewTurnStartStep());
@@ -309,319 +309,6 @@ public sealed class Game : IGame
         Threats.Add(ThreatFactory.Instance.ThreatsById[simulationStep.ThreatId]);
     }
 
-    void PlayerActions(ref Player p)
-    {
-        int t = turn - 1;
-
-        //Exit if dead
-        if (!p.Alive)
-            return;
-
-        //Check interceptor controls
-        if (p.InIntercept)
-        {
-            Debug.Assert(!ship.InterceptorReady, "Interceptor cannot be ready when player is in it");
-
-            if (action == Act.Fight)
-            {
-                //Keep fighting
-                InterceptorDamage(ref p);
-                return;
-            }
-
-            //Return
-            p.InIntercept = false;
-            ship.InterceptorReady = true;
-            p.ReturnFromSpace();
-            ApplyStatusEffect(ref p);
-            p.DelayCurrent();
-            return;
-        }
-
-        //Perform action
-        switch (action)
-        {
-            case Act.Left:
-                {
-                    Position oldPosition = p.Position;
-                    p.TryMoveLeft();
-                    if (p.Position != oldPosition)
-                        ApplyStatusEffect(ref p);
-                    break;
-                }
-            case Act.Right:
-                {
-                    Position oldPosition = p.Position;
-                    p.TryMoveRight();
-                    if (p.Position != oldPosition)
-                        ApplyStatusEffect(ref p);
-                    break;
-                }
-            case Act.Lift:
-                PlayerActionLift(ref p);
-                break;
-            case Act.A:
-                PlayerActionA(ref p);
-                break;
-            case Act.B:
-                PlayerActionB(ref p);
-                break;
-            case Act.C:
-                PlayerActionC(ref p);
-                break;
-            //Empty for now
-            case Act.Fight:
-                PlayerActionFight(ref p);
-                break;
-            case Act.Empty:
-                break;
-        }
-    }
-
-    void PlayerActionLift(ref Player p)
-    {
-        int t = turn - 1;
-
-        // branching
-        if (t < 11 && p.PeekNextAction() != Act.Empty) // no branching needed if nothing to be delayed
-        {
-            BranchConditional(p.Position.Zone, Defects.lift);
-        }
-
-        //Check if elevator was used
-        if (ship.LiftWillDelay(p.Position))
-            p.DelayNext();
-        ship.UseLift(p.Position.Zone);
-        //Move
-        p.TryTakeElevator();
-        ApplyStatusEffect(ref p);
-    }
-
-    void PlayerActionA(ref Player p)
-    {
-        //Check if can fire
-        if (!ship.CanFireCannon(p.Position))
-            return;
-
-        if (p.Position.IsTop())
-        {
-            //Main guns
-            //Drain energy
-            if (ship.Reactors[p.Position.Zone] > 0)
-            {
-                BranchReactorFull(p.Position.Zone);
-
-                //Find target
-                int target = GetTargetEx(p.Position.Zone, 3, ExDmgSource.laser);
-
-                if (target != -1)
-                {
-                    BranchConditional(p.Position.Zone, Defects.weapontop);
-
-                    exThreats[target].DealDamage(ship.LaserDamage[p.Position.Zone], 3, ExDmgSource.laser);
-                }
-
-                ship.Reactors[p.Position.Zone]--;
-            }
-        }
-        else
-        {
-            //Secondary guns
-            //Impulse cannon
-            if (p.Position.IsMiddle())
-            {
-                //Drain energy
-                if (ship.Reactors[p.Position.Zone] > 0)
-                {
-                    BranchReactorFull(p.Position.Zone);
-                    BranchConditional(p.Position.Zone, Defects.weaponbot);
-
-                    ship.Reactors[p.Position.Zone]--;
-                    foreach (ExThreat et in exThreats)
-                        et.DealDamage(1, ship.PlasmaDamage[p.Position.Zone], ExDmgSource.impulse);
-                }
-            }
-            //Plasma cannon
-            else
-            {
-                //Find target
-                int target = GetTargetEx(p.Position.Zone, 3, ExDmgSource.plasma);
-                //Deal damage
-                if (target != -1)
-                {
-                    BranchConditional(p.Position.Zone, Defects.weaponbot);
-                    exThreats[target].DealDamage(ship.PlasmaDamage[p.Position.Zone], 3, ExDmgSource.plasma);
-                }
-            }
-        }
-
-        ship.FireCannon(p.Position);
-    }
-
-    void PlayerActionB(ref Player p)
-    {
-        //Check for a defect
-        if (ship.BDefect[p.Position.PositionIndex] > 0)
-        {
-            AttackInternal(p.Position, InternalDamageType.B);
-            return;
-        }
-
-        //Refill shield
-        if (p.Position.IsTop())
-        {
-            if (ship.Reactors[p.Position.Zone] == 0 || ship.Shields[p.Position.Zone] == ship.ShieldsCap[p.Position.Zone]) // nothing happens regardless
-                return;
-
-            // we now know that we are transferring at least 1 energy
-
-            BranchConditional(p.Position.Zone, Defects.shield);
-            int deficit = ship.ShieldsCap[p.Position.Zone] - ship.Shields[p.Position.Zone];
-            if (deficit == 0)
-                return; // if it broke it might turn out that we no longer transfer energy
-
-            BranchReactorFull(p.Position.Zone);
-
-            //Pump over energy
-            deficit = Math.Min(ship.Reactors[p.Position.Zone], deficit);
-            ship.Shields[p.Position.Zone] += deficit;
-            ship.Reactors[p.Position.Zone] -= deficit;
-        }
-        //Reactors
-        else
-        {
-            //Main
-            if (p.Position.IsMiddle())
-            {
-                ship.TryRefillMainReactor();
-            }
-            //Secondary
-            else
-            {
-                if (ship.Reactors[1] == 0 || ship.Reactors[p.Position.Zone] == ship.ReactorsCap[p.Position.Zone]) // nothing happens regardless
-                    return;
-
-                // we now know that we are transferring at least 1 energy
-
-                BranchConditional(p.Position.Zone, Defects.reactor);
-                int deficit = ship.ReactorsCap[p.Position.Zone] - ship.Reactors[p.Position.Zone];
-                if (deficit == 0)
-                    return;
-
-                BranchReactorFull(1);
-
-                //Pump over energy
-                deficit = Math.Min(ship.Reactors[1], deficit);
-                ship.Reactors[p.Position.Zone] += deficit;
-                ship.Reactors[1] -= deficit;
-            }
-        }
-    }
-
-    void PlayerActionC(ref Player p)
-    {
-        //Check for a defect
-        if (ship.CDefect[p.Position.PositionIndex] > 0)
-        {
-            AttackInternal(p.Position, InternalDamageType.C);
-            return;
-        }
-
-        switch (p.Position.PositionIndex)
-        {
-            //Interceptors
-            case 0:
-                //Check if requirements met
-                if (p.AndroidState == AndroidState.Alive && ship.InterceptorReady)
-                {
-                    p.InIntercept = true;
-                    ship.InterceptorReady = false;
-                    p.MoveToSpace();
-                    InterceptorDamage(ref p);
-                }
-                break;
-
-            //Computer
-            case 1:
-                _didComputerThisPhase = true;
-                break;
-
-            //Androids
-            case 2:
-                if (p.AndroidState == AndroidState.None)
-                {
-                    p.AndroidState = ship.AndroidTopRight;
-                    ship.AndroidTopRight = AndroidState.None;
-                }
-                else
-                {
-                    p.AndroidState = AndroidState.Alive;
-                }
-                break;
-
-            //Androids
-            case 3:
-                if (p.AndroidState == AndroidState.None)
-                {
-                    p.AndroidState = ship.AndroidBottomLeft;
-                    ship.AndroidBottomLeft = AndroidState.None;
-                }
-                else
-                {
-                    p.AndroidState = AndroidState.Alive;
-                }
-                break;
-
-            //Observation
-            case 4:
-                _observationThisTurn++;
-                break;
-
-            //Fire rocket
-            case 5:
-                if (ship.CanFireRocket())
-                    ship.FireRocket();
-                break;
-        }
-    }
-
-    void PlayerActionFight(ref Player p)
-    {
-        if (p.AndroidState == AndroidState.Alive)
-        {
-            InThreat thrt = AttackInternal(p.Position, InternalDamageType.Android);
-            if (thrt != null)
-            {
-                if (thrt.fightBack)
-                    p.AndroidState = AndroidState.Disabled;
-            }
-        }
-    }
-
-    void MoveThreats()
-    {
-        if (move_threats_iIn == inThreats.Count)
-        {
-            exThreats[move_threats_iEx].Move();
-            move_threats_iEx++;
-        }
-        else if (move_threats_iEx == exThreats.Count)
-        {
-            inThreats[move_threats_iIn].Move();
-            move_threats_iIn++;
-        }
-        else if (exThreats[move_threats_iEx].time < inThreats[move_threats_iIn].time)
-        {
-            exThreats[move_threats_iEx].Move();
-            move_threats_iEx++;
-        }
-        else
-        {
-            inThreats[move_threats_iIn].Move();
-            move_threats_iIn++;
-        }
-    }
-
     double CalculateScore()
     {
         //Count damage
@@ -656,11 +343,21 @@ public sealed class Game : IGame
 
         //Gameover penalty
         if (gameover)
-            score = score - 200 + turn;
+            score = score - 200 + CountRemainingTurnStarts();
 
         Scores.Add((int)score);
 
         return scoreMultiplier * score + scoreAddition;
+    }
+
+    private int CountRemainingTurnStarts()
+    {
+        int count = 0;
+        for (int i = 0; i < _simulationStack.Count; i++)
+        {
+            count += _simulationStack[i].Type == SimulationStepType.TurnStart ? 1 : 0;
+        }
+        return count;
     }
 
     /**
@@ -722,77 +419,6 @@ public sealed class Game : IGame
         {
             BranchConditional(zone, Defects.shield);
         }
-    }
-
-    //Attack internal threat
-    InThreat AttackInternal(Position position, InternalDamageType damageType)
-    {
-        //Find internal threat to attack
-        for (int j = 0; j < inThreats.Count; j++)
-        {
-            if (!inThreats[j].beaten)
-            {
-                if (inThreats[j].DealDamage(position, damageType))
-                    return inThreats[j];
-            }
-        }
-        return null;
-    }
-
-    //Gets closest external threat
-    int GetTargetEx(int zone, int range, ExDmgSource source)
-    {
-        int distance = 99;
-        int target = -1;
-        for (int i = 0; i < exThreats.Count; i++)
-        {
-            ExThreat et = exThreats[i];
-            if (et.zone == zone)
-            {
-                int dist = et.GetDistance(range, source);
-                if (dist < distance)
-                {
-                    target = i;
-                    distance = dist;
-                }
-            }
-        }
-
-        return target;
-    }
-
-    //Deal damage with interceptors
-    void InterceptorDamage(ref Player p)
-    {
-        //Attack internal threat
-        if (ship.CDefect[6] > 0)
-        {
-            AttackInternal(Position.Space, InternalDamageType.C);
-            return;
-        }
-
-        //Attack external threat
-        int target = -1;
-        for (int i = 0; i < exThreats.Count; i++)
-        {
-            if (exThreats[i].distanceRange == 1)
-            {
-                //Get first enemy
-                if (target == -1)
-                    target = i;
-                //Deal damage to all in range
-                else
-                {
-                    if (target >= 0)
-                        exThreats[target].DealDamage(1, 1, ExDmgSource.intercept);
-                    target = -2;
-                    exThreats[i].DealDamage(1, 1, ExDmgSource.intercept);
-                }
-            }
-        }
-        //Deal damage to single target
-        if (target >= 0)
-            exThreats[target].DealDamage(3, 1, ExDmgSource.intercept);
     }
 
     void ApplyStatusEffect(ref Player p)

@@ -1,4 +1,6 @@
-﻿namespace SpaceAlertSolver;
+﻿using System.Diagnostics;
+
+namespace SpaceAlertSolver;
 
 internal partial struct Threat
 {
@@ -9,10 +11,11 @@ internal partial struct Threat
     public IGame Game = null!;
     public Trajectory Trajectory = null!;
 
-    private delegate void ActDelegate(ref Threat @this);
-    private ActDelegate _actX;
-    private ActDelegate _actY;
-    private ActDelegate _actZ;
+    private delegate void ThreatDelegate(ref Threat @this);
+    private ThreatDelegate _actX;
+    private ThreatDelegate _actY;
+    private ThreatDelegate _actZ;
+    private ThreatDelegate _onBeaten;
 
     private int _value1;
 
@@ -20,11 +23,12 @@ internal partial struct Threat
     /// External threat constructor
     /// </summary>
     private Threat(int health, int shield, int speed, int scoreWin, int scoreLose, bool rocketImmune = false,
-        ActDelegate? actX = null, ActDelegate? actY = null, ActDelegate? actZ = null)
+        ThreatDelegate? actX = null, ThreatDelegate? actY = null, ThreatDelegate? actZ = null, ThreatDelegate? onBeaten = null)
     {
         _actX = actX!; // if it's null if will be solved externally
         _actY = actY!;
         _actZ = actZ!;
+        _onBeaten = onBeaten!;
 
         IsExternal = true;
         // Zone is set externally
@@ -42,14 +46,41 @@ internal partial struct Threat
 
     public void InitializeUndefinedDelegates(string name)
     {
-        _actX ??= GetType().GetMethod($"{name}ActX")!.CreateDelegate<ActDelegate>();
-        _actY ??= GetType().GetMethod($"{name}ActY")!.CreateDelegate<ActDelegate>();
-        _actZ ??= GetType().GetMethod($"{name}ActZ")!.CreateDelegate<ActDelegate>();
+        if (_actX == null)
+        {
+            ThreatDelegate? method = GetType().GetMethod($"{name}ActX")?.CreateDelegate<ThreatDelegate>();
+            Debug.Assert(method != null, "Cannot find ActX method, nor is it set in the Create method");
+            _actX = method;
+        }
+        if (_actY == null)
+        {
+            ThreatDelegate? method = GetType().GetMethod($"{name}ActY")?.CreateDelegate<ThreatDelegate>();
+            Debug.Assert(method != null, "Cannot find ActY method, nor is it set in the Create method");
+            _actY = method;
+        }
+        if (_actZ == null)
+        {
+            ThreatDelegate? method = GetType().GetMethod($"{name}ActZ")?.CreateDelegate<ThreatDelegate>();
+            Debug.Assert(method != null, "Cannot find ActZ method, nor is it set in the Create method");
+            _actZ = method;
+        }
+
+        if (_onBeaten == null)
+        {
+            ThreatDelegate? method = GetType().GetMethod($"{name}OnBeaten")?.CreateDelegate<ThreatDelegate>();
+            if (method == null)
+                _onBeaten = Blank;
+            else
+                _onBeaten = method;
+        }
     }
 
     public void ActX() => _actX(ref this);
     public void ActY() => _actY(ref this);
     public void ActZ() => _actZ(ref this);
+    public void OnBeaten() => _onBeaten(ref this);
+
+    private static void Blank(ref Threat _) { }
 }
 
 [AttributeUsage(AttributeTargets.Method)]
