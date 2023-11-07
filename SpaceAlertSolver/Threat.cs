@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace SpaceAlertSolver;
+﻿namespace SpaceAlertSolver;
 
 internal partial struct Threat
 {
@@ -11,21 +9,22 @@ internal partial struct Threat
     public IGame Game = null!;
     public Trajectory Trajectory = null!;
 
-    public readonly bool IsInitialized => _actZ != null;
-
     private delegate void ActDelegate(ref Threat @this);
-    private readonly ActDelegate _actX;
-    private readonly ActDelegate _actY;
-    private readonly ActDelegate _actZ;
+    private ActDelegate _actX;
+    private ActDelegate _actY;
+    private ActDelegate _actZ;
 
     private int _value1;
 
-    private Threat(ActDelegate actX, ActDelegate actY, ActDelegate actZ,
-        int health, int shield, int speed, int scoreWin, int scoreLose, bool rocketImmune = false)
+    /// <summary>
+    /// External threat constructor
+    /// </summary>
+    private Threat(int health, int shield, int speed, int scoreWin, int scoreLose, bool rocketImmune = false,
+        ActDelegate? actX = null, ActDelegate? actY = null, ActDelegate? actZ = null)
     {
-        _actX = actX;
-        _actY = actY;
-        _actZ = actZ;
+        _actX = actX!; // if it's null if will be solved externally
+        _actY = actY!;
+        _actZ = actZ!;
 
         IsExternal = true;
         // Zone is set externally
@@ -41,55 +40,45 @@ internal partial struct Threat
         Beaten = false;
     }
 
+    public void InitializeUndefinedDelegates(string name)
+    {
+        _actX ??= GetType().GetMethod($"{name}ActX")!.CreateDelegate<ActDelegate>();
+        _actY ??= GetType().GetMethod($"{name}ActY")!.CreateDelegate<ActDelegate>();
+        _actZ ??= GetType().GetMethod($"{name}ActZ")!.CreateDelegate<ActDelegate>();
+    }
+
     public void ActX() => _actX(ref this);
     public void ActY() => _actY(ref this);
     public void ActZ() => _actZ(ref this);
 }
 
 [AttributeUsage(AttributeTargets.Method)]
-internal abstract class ThreatIdAttribute : Attribute
+internal abstract class CreateThreatAttribute : Attribute
 {
-    public int ThreatId;
+    public string[] Names;
 
-    public ThreatIdAttribute(int threatId)
+    public CreateThreatAttribute(params string[] names)
     {
-        ThreatId = threatId;
+        Names = names;
     }
 }
 
-internal sealed class InternalCommonThreatAttribute : ThreatIdAttribute
+internal sealed class InternalCommonThreatAttribute : CreateThreatAttribute
 {
-    public InternalCommonThreatAttribute(int threatId) : base(threatId) { }
+    public InternalCommonThreatAttribute(params string[] names) : base(names) { }
 }
 
-internal sealed class InternalSevereThreatAttribute : ThreatIdAttribute
+internal sealed class InternalSevereThreatAttribute : CreateThreatAttribute
 {
-    public InternalSevereThreatAttribute(int threatId) : base(threatId) { }
+    public InternalSevereThreatAttribute(params string[] names) : base(names) { }
 }
 
-internal sealed class ExternalCommonThreatAttribute : ThreatIdAttribute
+internal sealed class ExternalCommonThreatAttribute : CreateThreatAttribute
 {
-    public ExternalCommonThreatAttribute(int threatId) : base(threatId) { }
+    public ExternalCommonThreatAttribute(params string[] names) : base(names) { }
 }
 
-internal sealed class ExternalSevereThreatAttribute : ThreatIdAttribute
+internal sealed class ExternalSevereThreatAttribute : CreateThreatAttribute
 {
-    public ExternalSevereThreatAttribute(int threatId) : base(threatId) { }
-}
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-internal class ThreatNameAttribute : Attribute
-{
-    public string Name;
-
-    public ThreatNameAttribute(string name)
-    {
-        Name = name;
-    }
-}
-
-[AttributeUsage(AttributeTargets.Method)]
-internal sealed class PrimaryThreatNameAttribute : ThreatNameAttribute
-{
-    public PrimaryThreatNameAttribute(string name) : base(name) { }
+    public ExternalSevereThreatAttribute(params string[] names) : base(names) { }
 }

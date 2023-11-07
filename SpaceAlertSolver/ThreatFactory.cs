@@ -29,41 +29,38 @@ internal sealed class ThreatFactory
         MethodInfo[] threatCreators = typeof(Threat).GetMethods(BindingFlags.Public | BindingFlags.Static);
         foreach (MethodInfo method in threatCreators)
         {
-            ThreatIdAttribute? idAttribute = method.GetCustomAttribute<ThreatIdAttribute>();
-            if (idAttribute == null)
+            CreateThreatAttribute? createAttribute = method.GetCustomAttribute<CreateThreatAttribute>();
+            if (createAttribute == null)
                 continue;
 
-            while (_threatNamesById.Count <= idAttribute.ThreatId);
-            {
-                _threatsById.Add(default);
-                _threatNamesById.Add(string.Empty);
-            }
-            Debug.Assert(!_threatsById[idAttribute.ThreatId].IsInitialized, "Overwriting threat with same id");
-            _threatsById[idAttribute.ThreatId] = (Threat)method.Invoke(null, null)!;
-            
-            string name;
-            PrimaryThreatNameAttribute? primaryName = method.GetCustomAttribute<PrimaryThreatNameAttribute>();
-            if (primaryName == null)
-                name = $"Threat{idAttribute.ThreatId}";
+            int id = _threatsById.Count;
+            _threatsById.Add((Threat)method.Invoke(null, null)!);
+
+            string primaryName;
+            if (createAttribute.Names.Length == 0)
+                primaryName = $"Threat{id}";
             else
-                name = primaryName.Name;
-            _threatNamesById[idAttribute.ThreatId] = name;
+                primaryName = createAttribute.Names[0];
+            _threatNamesById.Add(primaryName);
 
-            foreach (ThreatNameAttribute threatName in method.GetCustomAttributes<ThreatNameAttribute>())
+            foreach (string name in createAttribute.Names)
             {
-                _nameIdPairs.Add((threatName.Name, idAttribute.ThreatId));
+                _nameIdPairs.Add((name, id));
             }
 
-            if (idAttribute is InternalCommonThreatAttribute)
-                _internalCommonThreatIds.Add(idAttribute.ThreatId);
-            else if (idAttribute is InternalSevereThreatAttribute)
-                _internalSevereThreatIds.Add(idAttribute.ThreatId);
-            else if (idAttribute is ExternalCommonThreatAttribute)
-                _externalCommonThreatIds.Add(idAttribute.ThreatId);
-            else if (idAttribute is ExternalSevereThreatAttribute)
-                _externalSevereThreatIds.Add(idAttribute.ThreatId);
+            if (createAttribute is InternalCommonThreatAttribute)
+                _internalCommonThreatIds.Add(id);
+            else if (createAttribute is InternalSevereThreatAttribute)
+                _internalSevereThreatIds.Add(id);
+            else if (createAttribute is ExternalCommonThreatAttribute)
+                _externalCommonThreatIds.Add(id);
+            else if (createAttribute is ExternalSevereThreatAttribute)
+                _externalSevereThreatIds.Add(id);
             else
                 throw new UnreachableException("Unknown threat type");
+
+            Debug.Assert(method.Name.StartsWith("Create"));
+            _threatsById[id].InitializeUndefinedDelegates(method.Name["Create".Length..]);
         }
     }
 
