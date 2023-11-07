@@ -31,8 +31,7 @@ public sealed class Game : IGame
     internal readonly Ship ship;
     public Player[] players = null!;
     public ImmutableArray<Trajectory> trajectories;
-    public readonly List<ExThreat> exThreats = new();
-    public readonly List<InThreat> inThreats = new();
+    public readonly List<Threat> Threats = new();
     double score;
     private bool _didComputerThisPhase;
     bool gameover;
@@ -60,10 +59,8 @@ public sealed class Game : IGame
         ship.Init(other.ship);
         InitPlayers(other.players);
         trajectories = other.trajectories;
-        exThreats.Clear();
-        exThreats.AddRange(other.exThreats.Select(t => t.Clone(this)));
-        inThreats.Clear();
-        inThreats.AddRange(other.inThreats.Select(t => t.Clone(this)));
+        Threats.Clear();
+        Threats.AddRange(other.Threats);
 
         score = other.score;
         _didComputerThisPhase = other._didComputerThisPhase;
@@ -91,8 +88,7 @@ public sealed class Game : IGame
         ship.Init();
         InitPlayers(players);
         this.trajectories = trajectories;
-        exThreats.Clear();
-        inThreats.Clear();
+        Threats.Clear();
         score = 0.0;
         _didComputerThisPhase = false;
         gameover = false;
@@ -157,11 +153,6 @@ public sealed class Game : IGame
 
             _simulationStack.Add(SimulationStep.NewTurnStartStep());
         }
-    }
-
-    internal ref Player GetCurrentTurnPlayer()
-    {
-        return ref players[actions_player_i];
     }
 
     public double Simulate()
@@ -265,70 +256,57 @@ public sealed class Game : IGame
 
     private void RocketUpdate()
     {
-        if (ship.RocketReady)
-        {
-            int distance = 99;
-            ExThreat? target = null;
-            for (int i = 0; i < exThreats.Count; i++)
-            {
-                ExThreat et = exThreats[i];
-                int dist = et.GetDistance(2, ExDmgSource.rocket);
-                if (dist < distance)
-                {
-                    target = et;
-                    distance = dist;
-                }
-            }
-            target?.DealDamage(3, 2, ExDmgSource.rocket);
-        }
-        ship.MoveRockets();
+        throw new NotImplementedException();
+        //if (ship.RocketReady)
+        //{
+        //    int distance = 99;
+        //    ExThreat? target = null;
+        //    for (int i = 0; i < exThreats.Count; i++)
+        //    {
+        //        ExThreat et = exThreats[i];
+        //        int dist = et.GetDistance(2, ExDmgSource.rocket);
+        //        if (dist < distance)
+        //        {
+        //            target = et;
+        //            distance = dist;
+        //        }
+        //    }
+        //    target?.DealDamage(3, 2, ExDmgSource.rocket);
+        //}
+        //ship.MoveRockets();
     }
 
     void CleanThreats()
     {
-        for (int i = inThreats.Count - 1; i >= 0; i--)
+        for (int i = Threats.Count - 1; i >= 0; i--)
         {
-            if (inThreats[i].beaten)
+            if (Threats[i].Beaten)
             {
-                if (inThreats[i].alive)
+                if (Threats[i].Alive)
                 {
-                    score += inThreats[i].scoreLose;
-                    inSurvived++;
+                    score += Threats[i].ScoreLose;
+                    if (Threats[i].IsExternal)
+                        exSurvived++;
+                    else
+                        inSurvived++;
                 }
                 else
                 {
-                    score += inThreats[i].scoreWin;
-                    inSlain++;
+                    score += Threats[i].ScoreWin;
+                    if (Threats[i].IsExternal)
+                        exSlain++;
+                    else
+                        inSlain++;
                 }
-                inThreats.RemoveAt(i);
-            }
-        }
-
-        for (int i = exThreats.Count - 1; i >= 0; i--)
-        {
-            if (exThreats[i].beaten)
-            {
-                if (exThreats[i].alive)
-                {
-                    score += exThreats[i].scoreLose;
-                    exSurvived++;
-                }
-                else
-                {
-                    score += exThreats[i].scoreWin;
-                    exSlain++;
-                }
-                exThreats.RemoveAt(i);
+                Threats[i].OnBeaten();
+                Threats.RemoveAt(i);
             }
         }
     }
 
     private void SpawnThreat(in SimulationStep simulationStep)
     {
-        if (simulationStep.IsExternal)
-            exThreats.Add(ThreatFactory.SummonEx(simulationStep.CreatureId, trajectories[simulationStep.Zone], simulationStep.Zone, this));
-        else
-            inThreats.Add(ThreatFactory.SummonIn(simulationStep.CreatureId, trajectories[3], this));
+        Threats.Add(ThreatFactory.Instance.ThreatsById[simulationStep.ThreatId]);
     }
 
     void PlayerActions(ref Player p)
@@ -853,7 +831,7 @@ public sealed class Game : IGame
         public readonly SimulationStepType Type;
         public int PlayerIndex => _value1;
         public int ThreatIndex => _value1;
-        public int CreatureId => _value1;
+        public int ThreatId => _value1;
         public int Speed => _value2;
         public int Zone => _value2;
         public bool IsExternal => _bool1;

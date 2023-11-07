@@ -6,6 +6,7 @@ internal partial struct Threat
 {
     public int Health, Shield, Damage, Speed, Distance, ScoreWin, ScoreLose;
     public bool RocketImmune, Alive, Beaten;
+    public readonly bool IsExternal;
     public int Zone;
     public IGame Game = null!;
     public Trajectory Trajectory = null!;
@@ -26,7 +27,7 @@ internal partial struct Threat
         _actY = actY;
         _actZ = actZ;
 
-        Debug.Assert(zone >= 0 && zone < 3);
+        IsExternal = true;
         // Zone is set externally
         Health = health;
         Shield = shield;
