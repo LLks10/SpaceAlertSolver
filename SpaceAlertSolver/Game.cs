@@ -122,7 +122,7 @@ public sealed class Game : IGame
 
         _simulationStack.Add(SimulationStep.NewCreateMovesStep());
         _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
-        _simulationStack.Add(SimulationStep.NewCreateProcessStepsStep());
+        _simulationStack.Add(SimulationStep.NewCreateProcessDamageStepsStep());
         _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
 
         int eventIndex = events.Length - 1;
@@ -130,7 +130,7 @@ public sealed class Game : IGame
         {
             _simulationStack.Add(SimulationStep.NewCreateMovesStep());
             _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
-            _simulationStack.Add(SimulationStep.NewCreateProcessStepsStep());
+            _simulationStack.Add(SimulationStep.NewCreateProcessDamageStepsStep());
             _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
 
             bool startNewObservationPhase = (i == 12 || i == 7 || i == 3);
@@ -190,11 +190,11 @@ public sealed class Game : IGame
             case SimulationStepType.RocketUpdate:
                 RocketUpdate();
                 break;
-            case SimulationStepType.CreateProcessSteps:
+            case SimulationStepType.CreateProcessDamageSteps:
+                CreateProcessDamageSteps();
                 break;
-            case SimulationStepType.InternalTurnEnd:
-                break;
-            case SimulationStepType.ExternalDamage:
+            case SimulationStepType.ProcessDamage:
+                ProcessDamage(simulationStep.ThreatId);
                 break;
             case SimulationStepType.CleanThreats:
                 CleanThreats();
@@ -281,7 +281,21 @@ public sealed class Game : IGame
         ship.MoveRockets();
     }
 
-    void CleanThreats()
+    private void CreateProcessDamageSteps()
+    {
+        for (int i = Threats.Count - 1; i >= 0; i--)
+        {
+            if (!Threats[i].IsExternal || Threats[i].Damage > 0)
+                _simulationStack.Add(SimulationStep.NewCreateProcessDamageStep(i));
+        }
+    }
+
+    private void ProcessDamage(int threatId)
+    {
+        Threats[threatId].ProcessDamage();
+    }
+
+    private void CleanThreats()
     {
         for (int i = Threats.Count - 1; i >= 0; i--)
         {
@@ -448,9 +462,8 @@ public sealed class Game : IGame
         PlayerAction,
         ObservationUpdate,
         RocketUpdate,
-        CreateProcessSteps,
-        InternalTurnEnd,
-        ExternalDamage,
+        CreateProcessDamageSteps,
+        ProcessDamage,
         CleanThreats,
         CreateMoves,
         MoveThreat,
@@ -483,7 +496,9 @@ public sealed class Game : IGame
 
         public static SimulationStep NewCleanThreatsStep() => new(SimulationStepType.CleanThreats);
 
-        public static SimulationStep NewCreateProcessStepsStep() => new(SimulationStepType.CreateProcessSteps);
+        public static SimulationStep NewCreateProcessDamageStepsStep() => new(SimulationStepType.CreateProcessDamageSteps);
+
+        public static SimulationStep NewCreateProcessDamageStep(int threatId) => new(SimulationStepType.ProcessDamage, value1: threatId);
 
         public static SimulationStep NewRocketUpdateStep() => new(SimulationStepType.RocketUpdate);
 

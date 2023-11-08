@@ -16,6 +16,7 @@ internal partial struct Threat
     private SimpleDelegate _actY;
     private SimpleDelegate _actZ;
     private SimpleDelegate _onBeaten;
+    private SimpleDelegate _processDamage;
 
     private delegate int DistanceDelegate(ref Threat @this, DamageSource damageSource);
     private DistanceDelegate _getDistance;
@@ -30,12 +31,13 @@ internal partial struct Threat
     /// </summary>
     private Threat(int health, int shield, int speed, int scoreWin, int scoreLose,
         SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onBeaten = null,
-        DistanceDelegate? getDistance = null, DamageDelegate? dealDamage = null)
+        SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, DamageDelegate? dealDamage = null)
     {
         _actX = actX!; // if it's null if will be solved externally
         _actY = actY!;
         _actZ = actZ!;
         _onBeaten = onBeaten!;
+        _processDamage = processDamage!;
         _getDistance = getDistance!;
         _dealDamage = dealDamage!;
 
@@ -82,6 +84,22 @@ internal partial struct Threat
                 _onBeaten = method;
         }
 
+        if (_processDamage == null)
+        {
+            SimpleDelegate? method = GetType().GetMethod($"{name}ProcessDamage")?.CreateDelegate<SimpleDelegate>();
+            if (method == null)
+            {
+                if (IsExternal)
+                    _processDamage = DefaultExternalProcessDamage;
+                else
+                    throw new NotImplementedException("Need to add default internal process method");
+            }
+            else
+            {
+                _processDamage = method;
+            }
+        }
+
         if (_getDistance == null)
         {
             DistanceDelegate? method = GetType().GetMethod($"{name}GetDistance")?.CreateDelegate<DistanceDelegate>();
@@ -105,8 +123,19 @@ internal partial struct Threat
     public void ActY() => _actY(ref this);
     public void ActZ() => _actZ(ref this);
     public void OnBeaten() => _onBeaten(ref this);
+    public void ProcessDamage() => _processDamage(ref this);
     public int GetDistance(DamageSource damageSource) => _getDistance(ref this, damageSource);
     public void DealDamage(DamageSource damageSource, int damage) => _dealDamage(ref this, damageSource, damage);
+
+    public bool UpdateAlive()
+    {
+        if (Health <= 0)
+        {
+            Beaten = true;
+            Alive = false;
+        }
+        return Alive;
+    }
 
     private static void Blank(ref Threat _) { }
     private static int DefaultGetDistance(ref Threat @this, DamageSource _)
@@ -118,6 +147,18 @@ internal partial struct Threat
     private static void DefaultDealDamage(ref Threat @this, DamageSource _, int damage)
     {
         @this.Damage += damage;
+    }
+
+    private static void DefaultExternalProcessDamage(ref Threat @this)
+    {
+        Debug.Assert(@this.Damage > 0, "Should only process damage when there is some");
+        int resultingDamage = @this.Damage - @this.Shield;
+        @this.Damage = 0;
+        if (resultingDamage <= 0)
+            return;
+
+        @this.Health -= resultingDamage;
+        @this.UpdateAlive();
     }
 
     private static int RocketImmuneGetDistance(ref Threat @this, DamageSource damageSource)
