@@ -9,10 +9,12 @@ internal sealed class ThreatFactory
 
     private readonly List<Threat> _threatsById = new();
     private readonly List<string> _threatNamesById = new();
+    private readonly List<string> _resolverIdsById = new();
     private readonly List<(string, int)> _nameIdPairs = new();
 
     public IReadOnlyList<Threat> ThreatsById => _threatsById;
     public IReadOnlyList<string> ThreatNameById => _threatNamesById;
+    public IReadOnlyList<string> ResolverIdsById => _resolverIdsById;
 
     private readonly List<int> _internalCommonThreatIds = new();
     private readonly List<int> _internalSevereThreatIds = new();
@@ -33,7 +35,7 @@ internal sealed class ThreatFactory
             if (createAttribute == null)
                 continue;
 
-            Debug.Assert(method.Name.StartsWith("Create"));
+            Debug.Assert(method.Name.StartsWith("Create"), "Create method of threat should start with 'Create'");
             Threat threat = (Threat)method.Invoke(null, null)!;
             threat.InitializeUndefinedDelegates(method.Name["Create".Length..]);
             int id = _threatsById.Count;
@@ -45,6 +47,7 @@ internal sealed class ThreatFactory
             else
                 primaryName = createAttribute.Names[0];
             _threatNamesById.Add(primaryName);
+            _resolverIdsById.Add(createAttribute.ResolverId);
 
             foreach (string name in createAttribute.Names)
             {

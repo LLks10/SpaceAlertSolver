@@ -51,80 +51,11 @@ internal static class ResolverModelMapper
 			new(trajectories[1].number + 1),
 			new(trajectories[2].number + 1),
 			new(trajectories[3].number + 1),
-			events.Where(x => x.Zone == 0).Select(x => new ThreatModel(x.CreatureId.ConvId(isExternal: true), x.Turn)).ToArray(),
-			events.Where(x => x.Zone == 1).Select(x => new ThreatModel(x.CreatureId.ConvId(isExternal: true), x.Turn)).ToArray(),
-			events.Where(x => x.Zone == 2).Select(x => new ThreatModel(x.CreatureId.ConvId(isExternal: true), x.Turn)).ToArray(),
-			events.Where(x => x.Zone == 3).Select(x => new ThreatModel(x.CreatureId.ConvId(isExternal: false), x.Turn)).ToArray(),
+			events.Where(x => x.Zone == 0).Select(x => new ThreatModel(ThreatFactory.Instance.ResolverIdsById[x.CreatureId], x.Turn)).ToArray(),
+			events.Where(x => x.Zone == 1).Select(x => new ThreatModel(ThreatFactory.Instance.ResolverIdsById[x.CreatureId], x.Turn)).ToArray(),
+			events.Where(x => x.Zone == 2).Select(x => new ThreatModel(ThreatFactory.Instance.ResolverIdsById[x.CreatureId], x.Turn)).ToArray(),
+			events.Where(x => x.Zone == 3).Select(x => new ThreatModel(ThreatFactory.Instance.ResolverIdsById[x.CreatureId], x.Turn)).ToArray(),
 			new InitialDamageModel[] { });
-	}
-
-	private static string ConvId(this int id, bool isExternal)
-	{
-		if (isExternal)
-		{
-			return id switch
-			{
-				0 => "E1-08",
-				1 => "E1-09",
-				2 => "E1-05",
-				3 => "E1-07",
-				4 => "E1-06",
-				5 => "E1-04",
-				6 => "E1-10",
-				7 => "E1-01",
-				8 => "E1-02",
-				9 => "E1-03",
-				10 => "E2-05",
-				11 => "E2-07",
-				12 => "E2-01",
-				13 => "E2-04",
-				14 => "E2-03",
-				15 => "E2-02",
-				16 => "SE1-01",
-				17 => "SE1-05",
-				18 => "SE1-02",
-				19 => "SE1-06",
-				20 => "SE1-07",
-				21 => "SE1-08",
-				22 => "SE1-04",
-				23 => "SE2-05",
-				24 => "SE2-04",
-				25 => "SE2-03",
-				26 => "SE2-06",
-				27 => "SE2-02",
-				28 => "SE2-01",
-				_ => throw new UnreachableException(),
-			};
-		}
-
-		return id switch
-		{
-			0 => "I1-04",
-			1 => "I1-03",
-			2 => "I1-01",
-			3 => "I1-02",
-			4 => "I2-03",
-			5 => "I2-04",
-			6 => "I2-05",
-			7 => "I1-06",
-			8 => "I1-05",
-			9 => "I2-06",
-			10 => "I1-07",
-			11 => "I2-01",
-			12 => "I2-02",
-			13 => "SI1-01",
-			14 => "SI1-02",
-			15 => "SI1-03",
-			16 => "SI2-01",
-			17 => "SI2-02",
-			18 => "SI2-05",
-			19 => "SI1-06",
-			20 => "SI1-05",
-			21 => "SI2-03",
-			22 => "SI1-04",
-			23 => "SI2-04",
-			_ => throw new UnreachableException(),
-		};
 	}
 }
 

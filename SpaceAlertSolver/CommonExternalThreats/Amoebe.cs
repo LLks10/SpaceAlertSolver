@@ -2,7 +2,7 @@
 
 internal partial struct Threat
 {
-    [ExternalCommonThreat("Amoebe")]
+    [ExternalCommonThreat("E1-09", "Amoebe")]
     public static Threat CreateAmoebe()
     {
         return new Threat(8, 0, 2, 4, 2, actX: AmoebeHeal, actY: AmoebeHeal, getDistance: RocketImmuneGetDistance) { MaxHealth = 8 };

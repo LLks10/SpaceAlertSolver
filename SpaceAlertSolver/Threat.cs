@@ -172,32 +172,34 @@ internal partial struct Threat
 [AttributeUsage(AttributeTargets.Method)]
 internal abstract class CreateThreatAttribute : Attribute
 {
-    public string[] Names;
+    public readonly string ResolverId;
+    public readonly string[] Names;
 
-    public CreateThreatAttribute(params string[] names)
+    public CreateThreatAttribute(string resolverId, params string[] names)
     {
+        ResolverId = resolverId;
         Names = names;
     }
 }
 
 internal sealed class InternalCommonThreatAttribute : CreateThreatAttribute
 {
-    public InternalCommonThreatAttribute(params string[] names) : base(names) { }
+    public InternalCommonThreatAttribute(string resolverId, params string[] names) : base(resolverId, names) { }
 }
 
 internal sealed class InternalSevereThreatAttribute : CreateThreatAttribute
 {
-    public InternalSevereThreatAttribute(params string[] names) : base(names) { }
+    public InternalSevereThreatAttribute(string resolverId, params string[] names) : base(resolverId, names) { }
 }
 
 internal sealed class ExternalCommonThreatAttribute : CreateThreatAttribute
 {
-    public ExternalCommonThreatAttribute(params string[] names) : base(names) { }
+    public ExternalCommonThreatAttribute(string resolverId, params string[] names) : base(resolverId, names) { }
 }
 
 internal sealed class ExternalSevereThreatAttribute : CreateThreatAttribute
 {
-    public ExternalSevereThreatAttribute(params string[] names) : base(names) { }
+    public ExternalSevereThreatAttribute(string resolverId, params string[] names) : base(resolverId, names) { }
 }
 
 internal enum DamageSource
