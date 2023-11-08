@@ -143,13 +143,13 @@ class Program
                 {
                     int i = r.Next(comExThreats.Count);
                     threatId = comExThreats[i];
-                    threatName = ThreatFactory.Instance.ThreatNameById[i];
+                    threatName = ThreatFactory.Instance.ThreatNameById[threatId];
                 }
                 else if (threatString == "r1")
                 {
                     int i = r.Next(sevExThreats.Count);
                     threatId = sevExThreats[i];
-                    threatName = ThreatFactory.Instance.ThreatNameById[i];
+                    threatName = ThreatFactory.Instance.ThreatNameById[threatId];
                 }
                 else
                 {
@@ -169,13 +169,13 @@ class Program
                 {
                     int i = r.Next(comInThreats.Count);
                     threatId = comInThreats[i];
-                    threatName = ThreatFactory.Instance.ThreatNameById[i];
+                    threatName = ThreatFactory.Instance.ThreatNameById[threatId];
                 }
                 else if (threatString == "r1")
                 {
                     int i = r.Next(sevInThreats.Count);
                     threatId = sevInThreats[i];
-                    threatName = ThreatFactory.Instance.ThreatNameById[i];
+                    threatName = ThreatFactory.Instance.ThreatNameById[threatId];
                 }
                 else
                 {
