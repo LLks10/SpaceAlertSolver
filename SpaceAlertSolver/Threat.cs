@@ -5,30 +5,35 @@ namespace SpaceAlertSolver;
 internal partial struct Threat
 {
     public int Health, Shield, Damage, Speed, Distance, ScoreWin, ScoreLose;
-    public bool RocketImmune, Alive, Beaten;
+    public bool Alive, Beaten;
     public readonly bool IsExternal;
     public int Zone;
     public IGame Game = null!;
     public Trajectory Trajectory = null!;
 
-    private delegate void ThreatDelegate(ref Threat @this);
-    private ThreatDelegate _actX;
-    private ThreatDelegate _actY;
-    private ThreatDelegate _actZ;
-    private ThreatDelegate _onBeaten;
+    private delegate void SimpleDelegate(ref Threat @this);
+    private SimpleDelegate _actX;
+    private SimpleDelegate _actY;
+    private SimpleDelegate _actZ;
+    private SimpleDelegate _onBeaten;
+
+    private delegate int DistanceDelegate(ref Threat @this, DamageSource damageSource);
+    private DistanceDelegate _getDistance;
 
     private int _value1;
 
     /// <summary>
     /// External threat constructor
     /// </summary>
-    private Threat(int health, int shield, int speed, int scoreWin, int scoreLose, bool rocketImmune = false,
-        ThreatDelegate? actX = null, ThreatDelegate? actY = null, ThreatDelegate? actZ = null, ThreatDelegate? onBeaten = null)
+    private Threat(int health, int shield, int speed, int scoreWin, int scoreLose,
+        SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onBeaten = null,
+        DistanceDelegate? getDistance = null)
     {
         _actX = actX!; // if it's null if will be solved externally
         _actY = actY!;
         _actZ = actZ!;
         _onBeaten = onBeaten!;
+        _getDistance = getDistance!;
 
         IsExternal = true;
         // Zone is set externally
@@ -39,7 +44,6 @@ internal partial struct Threat
         // Distance is set externally
         ScoreWin = scoreWin;
         ScoreLose = scoreLose;
-        RocketImmune = rocketImmune;
         Alive = true;
         Beaten = false;
     }
@@ -48,30 +52,39 @@ internal partial struct Threat
     {
         if (_actX == null)
         {
-            ThreatDelegate? method = GetType().GetMethod($"{name}ActX")?.CreateDelegate<ThreatDelegate>();
+            SimpleDelegate? method = GetType().GetMethod($"{name}ActX")?.CreateDelegate<SimpleDelegate>();
             Debug.Assert(method != null, "Cannot find ActX method, nor is it set in the Create method");
             _actX = method;
         }
         if (_actY == null)
         {
-            ThreatDelegate? method = GetType().GetMethod($"{name}ActY")?.CreateDelegate<ThreatDelegate>();
+            SimpleDelegate? method = GetType().GetMethod($"{name}ActY")?.CreateDelegate<SimpleDelegate>();
             Debug.Assert(method != null, "Cannot find ActY method, nor is it set in the Create method");
             _actY = method;
         }
         if (_actZ == null)
         {
-            ThreatDelegate? method = GetType().GetMethod($"{name}ActZ")?.CreateDelegate<ThreatDelegate>();
+            SimpleDelegate? method = GetType().GetMethod($"{name}ActZ")?.CreateDelegate<SimpleDelegate>();
             Debug.Assert(method != null, "Cannot find ActZ method, nor is it set in the Create method");
             _actZ = method;
         }
 
         if (_onBeaten == null)
         {
-            ThreatDelegate? method = GetType().GetMethod($"{name}OnBeaten")?.CreateDelegate<ThreatDelegate>();
+            SimpleDelegate? method = GetType().GetMethod($"{name}OnBeaten")?.CreateDelegate<SimpleDelegate>();
             if (method == null)
                 _onBeaten = Blank;
             else
                 _onBeaten = method;
+        }
+
+        if (_getDistance == null)
+        {
+            DistanceDelegate? method = GetType().GetMethod($"{name}GetDistance")?.CreateDelegate<DistanceDelegate>();
+            if (method == null)
+                _getDistance = DefaultGetDistance;
+            else
+                _getDistance = method;
         }
     }
 
@@ -79,8 +92,21 @@ internal partial struct Threat
     public void ActY() => _actY(ref this);
     public void ActZ() => _actZ(ref this);
     public void OnBeaten() => _onBeaten(ref this);
+    public int GetDistance(DamageSource damageSource) => _getDistance(ref this, damageSource);
 
     private static void Blank(ref Threat _) { }
+    private static int DefaultGetDistance(ref Threat @this, DamageSource _)
+    {
+        Debug.Assert(!@this.Beaten, "Threat should not be beaten when this method is called");
+        return @this.Distance;
+    }
+
+    public static int RocketImmuneGetDistance(ref Threat @this, DamageSource damageSource)
+    {
+        if (damageSource == DamageSource.Rocket)
+            return int.MaxValue;
+        return DefaultGetDistance(ref @this, damageSource);
+    }
 }
 
 [AttributeUsage(AttributeTargets.Method)]
@@ -112,4 +138,12 @@ internal sealed class ExternalCommonThreatAttribute : CreateThreatAttribute
 internal sealed class ExternalSevereThreatAttribute : CreateThreatAttribute
 {
     public ExternalSevereThreatAttribute(params string[] names) : base(names) { }
+}
+
+internal enum DamageSource
+{
+    HeavyLaserCannon,
+    PlasmaCannon,
+    PulseCannon,
+    Rocket,
 }

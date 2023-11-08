@@ -33,8 +33,11 @@ internal sealed class ThreatFactory
             if (createAttribute == null)
                 continue;
 
+            Debug.Assert(method.Name.StartsWith("Create"));
+            Threat threat = (Threat)method.Invoke(null, null)!;
+            threat.InitializeUndefinedDelegates(method.Name["Create".Length..]);
             int id = _threatsById.Count;
-            _threatsById.Add((Threat)method.Invoke(null, null)!);
+            _threatsById.Add(threat);
 
             string primaryName;
             if (createAttribute.Names.Length == 0)
@@ -58,9 +61,6 @@ internal sealed class ThreatFactory
                 _externalSevereThreatIds.Add(id);
             else
                 throw new UnreachableException("Unknown threat type");
-
-            Debug.Assert(method.Name.StartsWith("Create"));
-            _threatsById[id].InitializeUndefinedDelegates(method.Name["Create".Length..]);
         }
     }
 
