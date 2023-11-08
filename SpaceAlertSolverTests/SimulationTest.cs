@@ -52,14 +52,11 @@ public class SimulationTest
         // expected score = 2/3
 
         Act[] actions = ActUtils.ParseActionsFromString("c aa        ");
-        actions[0] = Act.C;
-        actions[2] = Act.A;
-        actions[3] = Act.A;
         Player[] players = new Player[1] { TestUtils.CreatePlayerFromActions(actions) };
         ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
         ImmutableArray<Event> events = ImmutableArray.Create
         (
-            new Event(true, 1, 1, 2)
+            new Event(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Gunship"))
         );
 
         Game g = GamePool.GetGame();
