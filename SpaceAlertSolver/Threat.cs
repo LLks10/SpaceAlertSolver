@@ -9,7 +9,6 @@ internal partial struct Threat
     public readonly bool IsExternal;
     public int Zone;
     public IGame Game = null!;
-    public Trajectory Trajectory = null!;
 
     private delegate void SimpleDelegate(ref Threat @this);
     private SimpleDelegate _actX;

@@ -137,14 +137,13 @@ internal sealed class Ship
     {
         amount += Game.ScoutBonus;
         Shields[zone] -= amount;
-        int dmg = -Shields[zone];
-
-        if (Fissured[zone])
-            dmg *= 2;
 
         //Excess damage
         if (Shields[zone] < 0)
         {
+            int dmg = -Shields[zone];
+            if (Fissured[zone])
+                dmg *= 2;
             ApplyDamage(zone, dmg);
             Shields[zone] = 0;
         }
@@ -160,12 +159,10 @@ internal sealed class Ship
 
     void ApplyDamage(int zone, int amount)
     {
-        if(amount > 0)
-        {
-            NumUndeterminedDefects[zone] += amount;
-            SetUndeterminedDefects(zone);
-            Damage[zone] += amount; // add damage
-        }
+        Debug.Assert(amount > 0);
+        NumUndeterminedDefects[zone] += amount;
+        SetUndeterminedDefects(zone);
+        Damage[zone] += amount; // add damage
     }
 
     void SetUndeterminedDefects(int zone)

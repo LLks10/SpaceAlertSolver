@@ -32,7 +32,7 @@ public sealed class Game : IGame
     internal readonly Ship ship;
     public Player[] players = null!;
     public ImmutableArray<Trajectory> trajectories;
-    internal readonly List<Threat> Threats = new();
+    internal readonly RefList<Threat> Threats = new();
     double score;
     private bool _didComputerThisPhase;
     bool gameover;
@@ -62,6 +62,10 @@ public sealed class Game : IGame
         trajectories = other.trajectories;
         Threats.Clear();
         Threats.AddRange(other.Threats);
+        for (int i = 0; i < Threats.Count; i++)
+        {
+            Threats[i].Game = this;
+        }
 
         score = other.score;
         _didComputerThisPhase = other._didComputerThisPhase;
@@ -120,6 +124,8 @@ public sealed class Game : IGame
 
         _simulationStack.Clear();
 
+        _simulationStack.Add(SimulationStep.NewTurnStartStep()); // turn start to check gameover
+        _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
         _simulationStack.Add(SimulationStep.NewCreateMovesStep());
         _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
         _simulationStack.Add(SimulationStep.NewCreateProcessDamageStepsStep());
@@ -128,6 +134,7 @@ public sealed class Game : IGame
         int eventIndex = events.Length - 1;
         for (int i = NUM_NORMAL_TURNS; i > 0; i--)
         {
+            _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
             _simulationStack.Add(SimulationStep.NewCreateMovesStep());
             _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
             _simulationStack.Add(SimulationStep.NewCreateProcessDamageStepsStep());
@@ -158,7 +165,7 @@ public sealed class Game : IGame
 
     public double Simulate()
     {
-        while (_simulationStack.Count > 0)
+        while (!gameover && _simulationStack.Count > 0)
         {
             int index = _simulationStack.Count - 1;
             SimulationStep simulationStep = _simulationStack[index];
@@ -200,11 +207,22 @@ public sealed class Game : IGame
                 CleanThreats();
                 break;
             case SimulationStepType.CreateMoves:
+                CreateMoves();
                 break;
             case SimulationStepType.MoveThreat:
+                MoveThreat(simulationStep.ThreatId, simulationStep.Speed);
                 break;
             case SimulationStepType.SpawnThreat:
                 SpawnThreat(in simulationStep);
+                break;
+            case SimulationStepType.ActX:
+                Threats[simulationStep.ThreatIndex].ActX();
+                break;
+            case SimulationStepType.ActY:
+                Threats[simulationStep.ThreatIndex].ActY();
+                break;
+            case SimulationStepType.ActZ:
+                Threats[simulationStep.ThreatIndex].ActZ();
                 break;
             default:
                 throw new UnreachableException();
@@ -299,33 +317,77 @@ public sealed class Game : IGame
     {
         for (int i = Threats.Count - 1; i >= 0; i--)
         {
-            if (Threats[i].Beaten)
+            ref Threat threat = ref Threats[i];
+            if (threat.Beaten)
             {
-                if (Threats[i].Alive)
+                if (threat.Alive)
                 {
-                    score += Threats[i].ScoreLose;
-                    if (Threats[i].IsExternal)
+                    score += threat.ScoreLose;
+                    if (threat.IsExternal)
                         exSurvived++;
                     else
                         inSurvived++;
                 }
                 else
                 {
-                    score += Threats[i].ScoreWin;
-                    if (Threats[i].IsExternal)
+                    score += threat.ScoreWin;
+                    if (threat.IsExternal)
                         exSlain++;
                     else
                         inSlain++;
                 }
-                Threats[i].OnBeaten();
+                threat.OnBeaten();
                 Threats.RemoveAt(i);
             }
         }
     }
 
+    private void CreateMoves()
+    {
+        for (int i = Threats.Count - 1; i >= 0; i--)
+        {
+            int speed = Math.Min(Threats[i].Speed, Threats[i].Distance);
+            Debug.Assert(speed > 0, "If the threat has no more distance to travel it should not exist");
+            _simulationStack.Add(SimulationStep.NewMoveThreatStep(i, speed));
+        }
+    }
+
+    private void MoveThreat(int threatId, int speed)
+    {
+        int newPos = Threats[threatId].Distance - speed;
+        for (int d = newPos; d < Threats[threatId].Distance; d++)
+        {
+            switch (trajectories[Threats[threatId].Zone].actions[d])
+            {
+                case 0:
+                    break;
+                case 1:
+                    _simulationStack.Add(SimulationStep.NewActX(threatId));
+                    break;
+                case 2:
+                    _simulationStack.Add(SimulationStep.NewActY(threatId));
+                    break;
+                case 3:
+                    _simulationStack.Add(SimulationStep.NewActZ(threatId));
+                    break;
+                default:
+                    throw new UnreachableException();
+            }
+        }
+        Threats[threatId].Distance = newPos;
+        if (newPos <= 0)
+        {
+            Threats[threatId].Beaten = true;
+            Debug.Assert(Threats[threatId].Alive, "Assuming that Alive does not need to be set");
+        }
+    }
+
     private void SpawnThreat(in SimulationStep simulationStep)
     {
-        Threats.Add(ThreatFactory.Instance.ThreatsById[simulationStep.ThreatId]);
+        Threat threat = ThreatFactory.Instance.ThreatsById[simulationStep.ThreatId];
+        threat.Distance = trajectories[threat.Zone].maxDistance;
+        threat.Game = this;
+        Threats.Add(in threat);
     }
 
     double CalculateScore()
@@ -468,6 +530,9 @@ public sealed class Game : IGame
         CreateMoves,
         MoveThreat,
         SpawnThreat,
+        ActX,
+        ActY,
+        ActZ,
     }
 
     private readonly struct SimulationStep
@@ -494,6 +559,8 @@ public sealed class Game : IGame
 
         public static SimulationStep NewCreateMovesStep() => new(SimulationStepType.CreateMoves);
 
+        public static SimulationStep NewMoveThreatStep(int threatId, int speed) => new(SimulationStepType.MoveThreat, value1: threatId, value2: speed);
+
         public static SimulationStep NewCleanThreatsStep() => new(SimulationStepType.CleanThreats);
 
         public static SimulationStep NewCreateProcessDamageStepsStep() => new(SimulationStepType.CreateProcessDamageSteps);
@@ -516,6 +583,12 @@ public sealed class Game : IGame
         public static SimulationStep NewCheckComputerStep() => new(SimulationStepType.CheckComputer);
 
         public static SimulationStep NewObservationUpdateStep(bool startNewPhase) => new(SimulationStepType.ObservationUpdate, bool1: startNewPhase);
+
+        public static SimulationStep NewActX(int threatId) => new(SimulationStepType.ActX, value1: threatId);
+
+        public static SimulationStep NewActY(int threatId) => new(SimulationStepType.ActY, value1: threatId);
+
+        public static SimulationStep NewActZ(int threatId) => new(SimulationStepType.ActZ, value1: threatId);
     }
 }
 
