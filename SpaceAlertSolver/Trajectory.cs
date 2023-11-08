@@ -1,7 +1,11 @@
 ﻿namespace SpaceAlertSolver;
 
 public class Trajectory
-{ 
+{
+    public const int RANGE_1_START = 0;
+    public const int RANGE_2_START = 5;
+    public const int RANGE_3_START = 10;
+
     public int maxDistance;
     public int[] actions;
     public int dist2, dist1;

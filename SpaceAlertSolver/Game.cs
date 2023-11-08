@@ -24,9 +24,10 @@ namespace SpaceAlertSolver;
 
 public sealed class Game : IGame
 {
+    public const int ROCKET_DAMAGE = 3;
+
     public static List<int> Scores = new();
     private static readonly int[] _obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
-    public const int NUM_PHASES = 3;
 
     internal readonly Ship ship;
     public Player[] players = null!;
@@ -256,24 +257,28 @@ public sealed class Game : IGame
 
     private void RocketUpdate()
     {
-        throw new NotImplementedException();
-        //if (ship.RocketReady)
-        //{
-        //    int distance = 99;
-        //    ExThreat? target = null;
-        //    for (int i = 0; i < exThreats.Count; i++)
-        //    {
-        //        ExThreat et = exThreats[i];
-        //        int dist = et.GetDistance(2, ExDmgSource.rocket);
-        //        if (dist < distance)
-        //        {
-        //            target = et;
-        //            distance = dist;
-        //        }
-        //    }
-        //    target?.DealDamage(3, 2, ExDmgSource.rocket);
-        //}
-        //ship.MoveRockets();
+        if (ship.RocketReady)
+        {
+            int shortestDistance = Trajectory.RANGE_3_START;
+            int targetIndex = -1;
+            for (int i = 0; i < Threats.Count; i++)
+            {
+                if (!Threats[i].IsExternal)
+                    continue;
+
+                int distance = Threats[i].GetDistance(DamageSource.Rocket);
+                if (distance < shortestDistance)
+                {
+                    shortestDistance = distance;
+                    targetIndex = i;
+                }
+            }
+            if (targetIndex != -1)
+            {
+                Threats[targetIndex].DealDamage(DamageSource.Rocket, ROCKET_DAMAGE);
+            }
+        }
+        ship.MoveRockets();
     }
 
     void CleanThreats()
