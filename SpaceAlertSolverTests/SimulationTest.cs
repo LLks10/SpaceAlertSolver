@@ -83,8 +83,8 @@ public class SimulationTest
         ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("6134");
         ImmutableArray<Event> events = ImmutableArray.Create
         (
-            new Event(true, 1, 1, 23),
-            new Event(true, 2, 2, 2)
+            new Event(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Nemesis")),
+            new Event(true, 2, 2, TestUtils.GetThreatIdMatchingExactPrimaryName("Gunship"))
         );
 
         Game g = GamePool.GetGame();

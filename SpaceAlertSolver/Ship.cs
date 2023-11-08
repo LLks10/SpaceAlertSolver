@@ -133,7 +133,7 @@ internal sealed class Ship
         }
     }
 
-    public void DealExternalDamage(int zone, int amount)
+    public bool DealExternalDamage(int zone, int amount)
     {
         amount += Game.ScoutBonus;
         Shields[zone] -= amount;
@@ -144,25 +144,28 @@ internal sealed class Ship
             int dmg = -Shields[zone];
             if (Fissured[zone])
                 dmg *= 2;
-            ApplyDamage(zone, dmg);
             Shields[zone] = 0;
+            return ApplyDamage(zone, dmg);
         }
+
+        return false;
     }
 
-    public void DealDamageIntern(int zone, int amount)
+    public bool DealDamageIntern(int zone, int amount)
     {
         if (Fissured[zone])
             amount *= 2;
 
-        ApplyDamage(zone, amount);
+        return ApplyDamage(zone, amount);
     }
 
-    void ApplyDamage(int zone, int amount)
+    bool ApplyDamage(int zone, int amount)
     {
         Debug.Assert(amount > 0);
         NumUndeterminedDefects[zone] += amount;
         SetUndeterminedDefects(zone);
         Damage[zone] += amount; // add damage
+        return Damage[zone] >= 7;
     }
 
     void SetUndeterminedDefects(int zone)

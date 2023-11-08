@@ -124,11 +124,10 @@ public sealed class Game : IGame
 
         _simulationStack.Clear();
 
-        _simulationStack.Add(SimulationStep.NewTurnStartStep()); // turn start to check gameover
         _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
         _simulationStack.Add(SimulationStep.NewCreateMovesStep());
         _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
-        _simulationStack.Add(SimulationStep.NewCreateProcessDamageStepsStep());
+        _simulationStack.Add(SimulationStep.NewProcessDamageStep());
         _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
 
         int eventIndex = events.Length - 1;
@@ -137,7 +136,7 @@ public sealed class Game : IGame
             _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
             _simulationStack.Add(SimulationStep.NewCreateMovesStep());
             _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
-            _simulationStack.Add(SimulationStep.NewCreateProcessDamageStepsStep());
+            _simulationStack.Add(SimulationStep.NewProcessDamageStep());
             _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
 
             bool startNewObservationPhase = (i == 12 || i == 7 || i == 3);
@@ -197,11 +196,8 @@ public sealed class Game : IGame
             case SimulationStepType.RocketUpdate:
                 RocketUpdate();
                 break;
-            case SimulationStepType.CreateProcessDamageSteps:
-                CreateProcessDamageSteps();
-                break;
             case SimulationStepType.ProcessDamage:
-                ProcessDamage(simulationStep.ThreatId);
+                ProcessDamage();
                 break;
             case SimulationStepType.CleanThreats:
                 CleanThreats();
@@ -224,25 +220,36 @@ public sealed class Game : IGame
             case SimulationStepType.ActZ:
                 Threats[simulationStep.ThreatIndex].ActZ();
                 break;
+            case SimulationStepType.DealExternalDamage:
+                HandleExternalDamageStep(simulationStep.Zone, simulationStep.Damage);
+                break;
             default:
                 throw new UnreachableException();
         }
     }
 
+    public void DestroyShip()
+    {
+        gameover = true;
+    }
+
     public void DealExternalDamage(int zone, int damage)
     {
+        _simulationStack.Add(SimulationStep.NewDealExternalDamageStep(zone, damage));
+    }
+
+    private void HandleExternalDamageStep(int zone, int damage)
+    {
         BranchShieldFull(zone);
-        ship.DealExternalDamage(zone, damage);
+        gameover |= ship.DealExternalDamage(zone, damage);
     }
 
     private void TurnStart()
     {
         ship.OnTurnStart();
-        for (int i = 0; i < 3; i++)
-        {
-            if (ship.Damage[i] >= 7)
-                gameover = true;
-        }
+        Debug.Assert(ship.Damage[0] < 7, "Game should have ended if ship was broken");
+        Debug.Assert(ship.Damage[1] < 7, "Game should have ended if ship was broken");
+        Debug.Assert(ship.Damage[2] < 7, "Game should have ended if ship was broken");
     }
 
     private void ResetComputer()
@@ -299,18 +306,13 @@ public sealed class Game : IGame
         ship.MoveRockets();
     }
 
-    private void CreateProcessDamageSteps()
+    private void ProcessDamage()
     {
-        for (int i = Threats.Count - 1; i >= 0; i--)
+        for (int i = 0; i < Threats.Count; i++)
         {
             if (!Threats[i].IsExternal || Threats[i].Damage > 0)
-                _simulationStack.Add(SimulationStep.NewCreateProcessDamageStep(i));
+                Threats[i].ProcessDamage();
         }
-    }
-
-    private void ProcessDamage(int threatId)
-    {
-        Threats[threatId].ProcessDamage();
     }
 
     private void CleanThreats()
@@ -362,13 +364,13 @@ public sealed class Game : IGame
                 case 0:
                     break;
                 case 1:
-                    _simulationStack.Add(SimulationStep.NewActX(threatId));
+                    _simulationStack.Add(SimulationStep.NewActXStep(threatId));
                     break;
                 case 2:
-                    _simulationStack.Add(SimulationStep.NewActY(threatId));
+                    _simulationStack.Add(SimulationStep.NewActYStep(threatId));
                     break;
                 case 3:
-                    _simulationStack.Add(SimulationStep.NewActZ(threatId));
+                    _simulationStack.Add(SimulationStep.NewActZStep(threatId));
                     break;
                 default:
                     throw new UnreachableException();
@@ -524,7 +526,6 @@ public sealed class Game : IGame
         PlayerAction,
         ObservationUpdate,
         RocketUpdate,
-        CreateProcessDamageSteps,
         ProcessDamage,
         CleanThreats,
         CreateMoves,
@@ -533,6 +534,7 @@ public sealed class Game : IGame
         ActX,
         ActY,
         ActZ,
+        DealExternalDamage,
     }
 
     private readonly struct SimulationStep
@@ -541,6 +543,7 @@ public sealed class Game : IGame
         public int PlayerIndex => _value1;
         public int ThreatIndex => _value1;
         public int ThreatId => _value1;
+        public int Damage => _value1;
         public int Speed => _value2;
         public int Zone => _value2;
         public bool IsExternal => _bool1;
@@ -563,9 +566,7 @@ public sealed class Game : IGame
 
         public static SimulationStep NewCleanThreatsStep() => new(SimulationStepType.CleanThreats);
 
-        public static SimulationStep NewCreateProcessDamageStepsStep() => new(SimulationStepType.CreateProcessDamageSteps);
-
-        public static SimulationStep NewCreateProcessDamageStep(int threatId) => new(SimulationStepType.ProcessDamage, value1: threatId);
+        public static SimulationStep NewProcessDamageStep() => new(SimulationStepType.ProcessDamage);
 
         public static SimulationStep NewRocketUpdateStep() => new(SimulationStepType.RocketUpdate);
 
@@ -584,11 +585,13 @@ public sealed class Game : IGame
 
         public static SimulationStep NewObservationUpdateStep(bool startNewPhase) => new(SimulationStepType.ObservationUpdate, bool1: startNewPhase);
 
-        public static SimulationStep NewActX(int threatId) => new(SimulationStepType.ActX, value1: threatId);
+        public static SimulationStep NewActXStep(int threatId) => new(SimulationStepType.ActX, value1: threatId);
 
-        public static SimulationStep NewActY(int threatId) => new(SimulationStepType.ActY, value1: threatId);
+        public static SimulationStep NewActYStep(int threatId) => new(SimulationStepType.ActY, value1: threatId);
 
-        public static SimulationStep NewActZ(int threatId) => new(SimulationStepType.ActZ, value1: threatId);
+        public static SimulationStep NewActZStep(int threatId) => new(SimulationStepType.ActZ, value1: threatId);
+
+        public static SimulationStep NewDealExternalDamageStep(int zone, int damage) => new(SimulationStepType.DealExternalDamage, value1: damage, value2: zone);
     }
 }
 
