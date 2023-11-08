@@ -31,7 +31,7 @@ public class SimulationTest
         ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
         ImmutableArray<Event> events = ImmutableArray.Create
         (
-            new Event(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Meteorite")) // meteorite will be oneshot
+            new Event(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Meteoroid")) // meteorite will be oneshot
         );
 
         Game g = GamePool.GetGame();

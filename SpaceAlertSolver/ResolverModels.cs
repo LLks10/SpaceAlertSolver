@@ -51,10 +51,10 @@ internal static class ResolverModelMapper
 			new(trajectories[1].number + 1),
 			new(trajectories[2].number + 1),
 			new(trajectories[3].number + 1),
-			events.Where(x => x.Zone == 0).Select(x => new ThreatModel(ThreatFactory.Instance.ResolverIdsById[x.CreatureId], x.Turn)).ToArray(),
-			events.Where(x => x.Zone == 1).Select(x => new ThreatModel(ThreatFactory.Instance.ResolverIdsById[x.CreatureId], x.Turn)).ToArray(),
-			events.Where(x => x.Zone == 2).Select(x => new ThreatModel(ThreatFactory.Instance.ResolverIdsById[x.CreatureId], x.Turn)).ToArray(),
-			events.Where(x => x.Zone == 3).Select(x => new ThreatModel(ThreatFactory.Instance.ResolverIdsById[x.CreatureId], x.Turn)).ToArray(),
+			events.Where(x => x.Zone == 0).Select(x => new ThreatModel(ThreatFactory.Instance.CodesById[x.CreatureId], x.Turn)).ToArray(),
+			events.Where(x => x.Zone == 1).Select(x => new ThreatModel(ThreatFactory.Instance.CodesById[x.CreatureId], x.Turn)).ToArray(),
+			events.Where(x => x.Zone == 2).Select(x => new ThreatModel(ThreatFactory.Instance.CodesById[x.CreatureId], x.Turn)).ToArray(),
+			events.Where(x => x.Zone == 3).Select(x => new ThreatModel(ThreatFactory.Instance.CodesById[x.CreatureId], x.Turn)).ToArray(),
 			new InitialDamageModel[] { });
 	}
 }

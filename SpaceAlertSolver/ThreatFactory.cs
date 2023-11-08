@@ -9,12 +9,12 @@ internal sealed class ThreatFactory
 
     private readonly List<Threat> _threatsById = new();
     private readonly List<string> _threatNamesById = new();
-    private readonly List<string> _resolverIdsById = new();
+    private readonly List<string> _codesById = new();
     private readonly List<(string, int)> _nameIdPairs = new();
 
     public IReadOnlyList<Threat> ThreatsById => _threatsById;
     public IReadOnlyList<string> ThreatNameById => _threatNamesById;
-    public IReadOnlyList<string> ResolverIdsById => _resolverIdsById;
+    public IReadOnlyList<string> CodesById => _codesById;
 
     private readonly List<int> _internalCommonThreatIds = new();
     private readonly List<int> _internalSevereThreatIds = new();
@@ -47,7 +47,7 @@ internal sealed class ThreatFactory
             else
                 primaryName = createAttribute.Names[0];
             _threatNamesById.Add(primaryName);
-            _resolverIdsById.Add(createAttribute.ResolverId);
+            _codesById.Add(createAttribute.Code);
 
             foreach (string name in createAttribute.Names)
             {
