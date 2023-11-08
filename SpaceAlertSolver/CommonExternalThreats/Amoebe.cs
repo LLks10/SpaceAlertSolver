@@ -15,6 +15,6 @@ internal partial struct Threat
 
     public static void AmoebeActZ(ref Threat @this)
     {
-        @this.Game.DealExternalDamage(@this.Zone, 4);
+        @this.Game.DealExternalDamage(@this.Zone, 5);
     }
 }

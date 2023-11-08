@@ -4,7 +4,7 @@ internal partial struct Threat
 {
     private int MaxHealth { readonly get => _value1; set => _value1 = value; }
 
-    [ExternalCommonThreat("E1-08", "Armored Grappler", "Gepanserde Grijper")]
+    [ExternalCommonThreat("E1-08", "Armored Grappler", "Gepantserde Grijper")]
     public static Threat CreateArmoredGrappler()
     {
         return new Threat(4, 3, 2, 4, 2) { MaxHealth = 4 };
