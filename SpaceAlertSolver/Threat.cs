@@ -207,4 +207,5 @@ internal enum DamageSource
     PlasmaCannon,
     PulseCannon,
     Rocket,
+    Interceptors,
 }

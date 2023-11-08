@@ -276,9 +276,9 @@ internal sealed class Ship
         return (_liftUsed & (1 << position.Zone)) != 0;
     }
 
-    public void UseLift(int zone)
+    public void UseLift(Position position)
     {
-        _liftUsed |= (1 << zone);
+        _liftUsed |= (1 << position.Zone);
     }
 
     public void TryRefillMainReactor()

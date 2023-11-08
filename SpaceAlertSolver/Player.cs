@@ -7,7 +7,6 @@ public struct Player
 {
     public Position Position { get; private set; }
     public bool Alive { get; private set; }
-    public bool InIntercept;
     public AndroidState AndroidState;
 
     private readonly ImmutableArray<Act> _actions;
@@ -20,7 +19,6 @@ public struct Player
     {
         Position = Position.TopMiddle;
         Alive = true;
-        InIntercept = false;
         AndroidState = AndroidState.None;
 
         _actions = actions;

@@ -189,6 +189,7 @@ public sealed class Game : IGame
                 CheckComputer();
                 break;
             case SimulationStepType.PlayerAction:
+                PlayerAction(simulationStep.PlayerIndex);
                 break;
             case SimulationStepType.ObservationUpdate:
                 ObservationUpdate(simulationStep.StartNewObservationPhase);
@@ -242,6 +243,98 @@ public sealed class Game : IGame
     {
         BranchShieldFull(zone);
         gameover |= ship.DealExternalDamage(zone, damage);
+    }
+
+    private void PlayerAction(int playerIndex)
+    {
+        ref Player player = ref players[playerIndex];
+        if (!player.Alive)
+            return;
+
+        Act action = player.GetNextAction();
+        if (player.Position == Position.Space)
+        {
+            if (action == Act.Fight)
+                UseInterceptors();
+            else
+            {
+                player.ReturnFromSpace();
+                ship.InterceptorReady = true;
+                player.DelayCurrent();
+            }
+            return;
+        }
+
+        switch (action)
+        {
+            case Act.Empty:
+                break;
+            case Act.Right:
+                player.TryMoveRight();
+                break;
+            case Act.Left:
+                player.TryMoveLeft();
+                break;
+            case Act.Lift:
+                if (ship.LiftWillDelay(player.Position))
+                    player.DelayNext();
+                ship.UseLift(player.Position);
+                player.TryTakeElevator();
+                break;
+            case Act.A:
+                break;
+            case Act.B:
+                break;
+            case Act.C:
+                break;
+            case Act.Fight:
+                throw new NotImplementedException();
+            case Act.HeroicTopLeft:
+                throw new NotImplementedException();
+            case Act.HeroicTopMiddle:
+                throw new NotImplementedException();
+            case Act.HeroicTopRight:
+                throw new NotImplementedException();
+            case Act.HeroicDownLeft:
+                throw new NotImplementedException();
+            case Act.HeroicDownMiddle:
+                throw new NotImplementedException();
+            case Act.HeroicDownRight:
+                throw new NotImplementedException();
+            case Act.HeroicA:
+                throw new NotImplementedException();
+            case Act.HeroicB:
+                throw new NotImplementedException();
+            case Act.HeroicFight:
+                throw new NotImplementedException();
+            default:
+                throw new UnreachableException();
+        }
+    }
+
+    private void UseInterceptors()
+    {
+        int target = -1;
+        for (int i = 0; i < Threats.Count; i++)
+        {
+            int distance = Threats[i].GetDistance(DamageSource.Interceptors);
+            if (distance >= Trajectory.RANGE_2_START)
+                continue;
+
+            if (target == -2)
+                Threats[i].DealDamage(DamageSource.Interceptors, 1);
+            else if (target == -1)
+                target = i;
+            else
+            {
+                Debug.Assert(target >= 0);
+                Threats[target].DealDamage(DamageSource.Interceptors, 1);
+                Threats[i].DealDamage(DamageSource.Interceptors, 1);
+                target = -2;
+            }
+        }
+        if (target >= 0)
+            Threats[target].DealDamage(DamageSource.Interceptors, 3);
     }
 
     private void TurnStart()
