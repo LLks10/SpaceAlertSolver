@@ -52,14 +52,22 @@ public struct Player
             return Act.Empty;
         }
 
-        Act act = _actions[_nextActionIndex - _delayAmount];
+        Act act = GetCurrentAct();
         while (_delayAmount > 0 && act == Act.Empty)
         {
             _delayAmount--;
-            act = _actions[_nextActionIndex - _delayAmount];
+            act = GetCurrentAct();
         }
 
         return act;
+    }
+
+    private Act GetCurrentAct()
+    {
+        int index = _nextActionIndex - _delayAmount;
+        if (index >= _actions.Length)
+            return Act.Empty;
+        return _actions[index];
     }
 
     public void Kill()
