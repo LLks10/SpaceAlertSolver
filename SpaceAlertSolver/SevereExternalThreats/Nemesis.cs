@@ -5,7 +5,7 @@ internal partial struct Threat
     [ExternalSevereThreat("SE2-05", "Nemesis")]
     public static Threat CreateNemesis()
     {
-        return new Threat(9, 1, 3, 12, 0);
+        return new Threat(9, 1, 3, 12, 0, actZ: DestroyShip);
     }
 
     public static void NemesisActX(ref Threat @this)
@@ -20,11 +20,6 @@ internal partial struct Threat
         @this.Game.DealExternalDamage(@this.Zone, 2);
         @this.Health -= 2;
         @this.UpdateAlive();
-    }
-
-    public static void NemesisActZ(ref Threat @this)
-    {
-        @this.Game.DestroyShip();
     }
 
     public static void NemesisProcessDamage(ref Threat @this)

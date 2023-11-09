@@ -7,12 +7,7 @@ internal partial struct Threat
     [ExternalCommonThreat("E2-04", "Swarm", "Zwerm")]
     public static Threat CreateSwarm()
     {
-        return new Threat(3, 0, 2, 6, 3, getDistance: RocketImmuneGetDistance);
-    }
-
-    public static void SwarmActX(ref Threat @this)
-    {
-        @this.Game.DealExternalDamage(@this.Zone, 1);
+        return new Threat(3, 0, 2, 6, 3, actX: ActDealDamage(1), getDistance: RocketImmuneGetDistance);
     }
 
     public static void SwarmActY(ref Threat @this)

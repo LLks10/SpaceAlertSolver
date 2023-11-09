@@ -126,6 +126,21 @@ internal partial struct Threat
     public int GetDistance(DamageSource damageSource) => _getDistance(ref this, damageSource);
     public void DealDamage(DamageSource damageSource, int damage) => _dealDamage(ref this, damageSource, damage);
 
+    private static SimpleDelegate ActDealDamage(int damage)
+    {
+        return (ref Threat @this) => { @this.Game.DealExternalDamage(@this.Zone, damage); };
+    }
+
+    private static SimpleDelegate ActDealDamageAll(int damage)
+    {
+        return (ref Threat @this) =>
+        {
+            @this.Game.DealExternalDamage(0, damage);
+            @this.Game.DealExternalDamage(1, damage);
+            @this.Game.DealExternalDamage(2, damage);
+        };
+    }
+
     public bool UpdateAlive()
     {
         if (Health <= 0)
@@ -141,6 +156,11 @@ internal partial struct Threat
     {
         Debug.Assert(!@this.Beaten, "Threat should not be beaten when this method is called");
         return @this.Distance;
+    }
+
+    private static void DestroyShip(ref Threat @this)
+    {
+        @this.Game.DestroyShip();
     }
 
     private static void DefaultDealDamage(ref Threat @this, DamageSource _, int damage)

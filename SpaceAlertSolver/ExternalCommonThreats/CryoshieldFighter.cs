@@ -7,17 +7,7 @@ internal partial struct Threat
     [ExternalCommonThreat("E1-06", "Cryoshield Fighter", "Cryoschild Jager")]
     public static Threat CreateCryoshieldFighter()
     {
-        return new Threat(4, 1, 3, 4, 2, actY: CryoshieldFighterActYZ, actZ: CryoshieldFighterActYZ, processDamage: CryoshieldProcessDamage) { HasShield = true };
-    }
-
-    public static void CryoshieldFighterActX(ref Threat @this)
-    {
-        @this.Game.DealExternalDamage(@this.Zone, 1);
-    }
-
-    private static void CryoshieldFighterActYZ(ref Threat @this)
-    {
-        @this.Game.DealExternalDamage(@this.Zone, 2);
+        return new Threat(4, 1, 3, 4, 2, actX: ActDealDamage(1), actY: ActDealDamage(2), actZ: ActDealDamage(2), processDamage: CryoshieldProcessDamage) { HasShield = true };
     }
 
     private static void CryoshieldProcessDamage(ref Threat @this)
