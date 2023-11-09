@@ -1,7 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Numerics;
-using System.Text;
 
 namespace SpaceAlertSolver;
 
@@ -279,6 +277,8 @@ public sealed class Game : IGame
                 player.TryMoveLeft();
                 break;
             case Act.Lift:
+                if (player.PeekNextAction() != Act.Empty) // broken lift would delay actions
+                    BranchConditional(player.Position.Zone, Defects.lift);
                 if (ship.LiftWillDelay(player.Position))
                     player.DelayNext();
                 ship.UseLift(player.Position);
