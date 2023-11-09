@@ -14,7 +14,7 @@ internal sealed class Ship
 {
     public static readonly CannonStats[] _defaultCannonStats = new CannonStats[6]
     {
-        new(DamageSource.HeavyLaserCannon, 5, 3),
+        new(DamageSource.HeavyLaserCannon, 4, 3),
         new(DamageSource.HeavyLaserCannon, 5, 3),
         new(DamageSource.HeavyLaserCannon, 4, 3),
         new(DamageSource.PlasmaCannon, 2, 3),
