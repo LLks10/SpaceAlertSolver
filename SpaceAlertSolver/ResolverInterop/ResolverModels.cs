@@ -55,7 +55,8 @@ internal static class ResolverModelMapper
             events.Where(x => x.Zone == 1).Select(x => new ThreatModel(x.CreatureId.ConvId(isExternal: true), x.Turn)).ToArray(),
             events.Where(x => x.Zone == 2).Select(x => new ThreatModel(x.CreatureId.ConvId(isExternal: true), x.Turn)).ToArray(),
             events.Where(x => x.Zone == 3).Select(x => new ThreatModel(x.CreatureId.ConvId(isExternal: false), x.Turn)).ToArray(),
-            new InitialDamageModel[] { });
+            new InitialDamageModel[] { },
+            VariableRangeInterceptors: false);
     }
 
     private static string ConvId(this int id, bool isExternal)
@@ -138,7 +139,8 @@ internal record ResolverModel(
     ThreatModel[] WhiteThreats,
     ThreatModel[] BlueThreats,
     ThreatModel[] InternalThreats,
-    InitialDamageModel[] InitialDamageModels);
+    InitialDamageModel[] InitialDamageModels,
+    bool VariableRangeInterceptors);
 
 internal record PlayerModel(
     ActModel[] Actions,
