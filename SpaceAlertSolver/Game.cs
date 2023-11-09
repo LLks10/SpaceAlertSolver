@@ -225,6 +225,12 @@ public sealed class Game : IGame
             case SimulationStepType.FireCannon:
                 FireCannon(simulationStep.Position, simulationStep.CostsEnergy);
                 break;
+            case SimulationStepType.RefillShield:
+                RefillShield(simulationStep.Zone);
+                break;
+            case SimulationStepType.RefillSideReactor:
+                RefillSideReactor(simulationStep.Zone);
+                break;
             default:
                 throw new UnreachableException();
         }
@@ -285,14 +291,15 @@ public sealed class Game : IGame
                 player.TryTakeElevator();
                 break;
             case Act.A:
-                PlayerActionA(playerIndex);
+                PlayerActionA(player.Position);
                 break;
             case Act.B:
+                PlayerActionB(player.Position);
                 break;
             case Act.C:
                 break;
             case Act.Fight:
-                throw new NotImplementedException();
+                break;
             case Act.HeroicTopLeft:
                 throw new NotImplementedException();
             case Act.HeroicTopMiddle:
@@ -316,13 +323,83 @@ public sealed class Game : IGame
         }
     }
 
-    private void PlayerActionA(int playerIndex)
+    private void PlayerActionA(Position position)
     {
-        Position position = players[playerIndex].Position;
         if (!ship.CanFireCannon(position, out bool costsEnergy))
             return;
 
         _simulationStack.Add(SimulationStep.NewFireCannonStep(position, costsEnergy));
+    }
+
+    private void PlayerActionB(Position position)
+    {
+        Debug.Assert(position.IsInShip());
+        if (position.IsTop())
+        {
+            if (ship.Shields[position.Zone] >= ship.ShieldsCap[position.Zone])
+                return;
+            if (ship.Reactors[position.Zone] <= 0)
+                return;
+            _simulationStack.Add(SimulationStep.NewRefillShieldStep(position.Zone));
+        }
+        else if (position == Position.BottomMiddle)
+        {
+            ship.TryRefillMainReactor();
+        }
+        else
+        {
+            if (ship.Reactors[position.Zone] >= ship.ReactorsCap[position.Zone])
+                return;
+            if (ship.Reactors[Position.BottomMiddle.Zone] <= 0)
+                return;
+            _simulationStack.Add(SimulationStep.NewRefillSideReactorStep(position.Zone));
+        }
+    }
+
+    private void RefillShield(int zone)
+    {
+        int shieldNeed = ship.ShieldsCap[zone] - ship.Shields[zone];
+        Debug.Assert(shieldNeed > 0, "This method should not be called if the shield is full");
+
+        int deficit;
+        if (shieldNeed > ship.Reactors[zone])
+        {
+            deficit = shieldNeed;
+        }
+        else
+        {
+            BranchConditional(zone, Defects.shield);
+            deficit = ship.ShieldsCap[zone] - ship.Shields[zone];
+            if (deficit <= 0)
+                return;
+            BranchIfReactorFull(zone);
+        }
+
+        ship.Shields[zone] += deficit;
+        ship.Reactors[zone] -= deficit;
+    }
+
+    private void RefillSideReactor(int zone)
+    {
+        int reactorNeed = ship.ReactorsCap[zone] - ship.Reactors[zone];
+        Debug.Assert(reactorNeed > 0, "This method should not be called if the side reactor is full");
+
+        int deficit;
+        if (reactorNeed > ship.Reactors[Position.BottomMiddle.Zone])
+        {
+            deficit = reactorNeed;
+        }
+        else
+        {
+            BranchConditional(zone, Defects.reactor);
+            deficit = ship.ReactorsCap[zone] - ship.Reactors[zone];
+            if (deficit <= 0)
+                return;
+            BranchIfReactorFull(Position.BottomMiddle.Zone);
+        }
+
+        ship.Reactors[zone] += deficit;
+        ship.Reactors[Position.BottomMiddle.Zone] -= deficit;
     }
 
     private void FireCannon(Position position, bool costsEnergy)
@@ -734,6 +811,8 @@ public sealed class Game : IGame
         ActZ,
         DealExternalDamage,
         FireCannon,
+        RefillShield,
+        RefillSideReactor,
     }
 
     private readonly struct SimulationStep
@@ -795,6 +874,10 @@ public sealed class Game : IGame
         public static SimulationStep NewDealExternalDamageStep(int zone, int damage) => new(SimulationStepType.DealExternalDamage, value1: damage, value2: zone);
 
         public static SimulationStep NewFireCannonStep(Position position, bool costsEnergy) => new(SimulationStepType.FireCannon, value1: position.PositionIndex, bool1: costsEnergy);
+
+        public static SimulationStep NewRefillShieldStep(int zone) => new(SimulationStepType.RefillShield, value2: zone);
+
+        public static SimulationStep NewRefillSideReactorStep(int zone) => new(SimulationStepType.RefillSideReactor, value2: zone);
     }
 }
 
