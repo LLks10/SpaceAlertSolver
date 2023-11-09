@@ -12,6 +12,16 @@ namespace SpaceAlertSolver;
 //1  2  4  Bitmasks zone
 internal sealed class Ship
 {
+    public static readonly CannonStats[] _defaultCannonStats = new CannonStats[6]
+    {
+        new(DamageSource.HeavyLaserCannon, 5, 3),
+        new(DamageSource.HeavyLaserCannon, 5, 3),
+        new(DamageSource.HeavyLaserCannon, 4, 3),
+        new(DamageSource.PlasmaCannon, 2, 3),
+        new(DamageSource.PulseCannon, 1, 2),
+        new(DamageSource.PlasmaCannon, 2, 3),
+    };
+
     public const int NUM_DEFECTS = 6;
 
     public readonly Game Game;
@@ -23,13 +33,12 @@ internal sealed class Ship
     public readonly int[] ShieldsCap = new int[3];
     public readonly int[] Reactors = new int[3];
     public readonly int[] ReactorsCap = new int[3];
-    public readonly int[] LaserDamage = new int[3];
-    public readonly int[] PlasmaDamage = new int[3];
     public readonly int[] BDefect = new int[6];
     public readonly int[] CDefect = new int[7];
     public readonly int[] StationStatus = new int[6];
     public readonly int[] Damage = new int[3];
     public readonly bool[] Fissured = new bool[3];
+    internal readonly CannonStats[] CannonStats = new CannonStats[6];
 
     //Bit flags
     private int _liftUsed;
@@ -65,8 +74,7 @@ internal sealed class Ship
         other.ShieldsCap.CopyTo(ShieldsCap, 0);
         other.Reactors.CopyTo(Reactors, 0);
         other.ReactorsCap.CopyTo(ReactorsCap, 0);
-        other.LaserDamage.CopyTo(LaserDamage, 0);
-        other.PlasmaDamage.CopyTo(PlasmaDamage, 0);
+        other.CannonStats.CopyTo(CannonStats, 0);
         other.BDefect.CopyTo(BDefect, 0);
         other.CDefect.CopyTo(CDefect, 0);
         other.StationStatus.CopyTo(StationStatus, 0);
@@ -104,9 +112,7 @@ internal sealed class Ship
         Reactors[1] = 3;
         ReactorsCap[0] = ReactorsCap[2] = 3;
         ReactorsCap[1] = 5;
-        LaserDamage[0] = LaserDamage[2] = 4;
-        LaserDamage[1] = 5;
-        Array.Fill(PlasmaDamage, 2);
+        _defaultCannonStats.CopyTo(CannonStats, 0);
         Array.Fill(BDefect, 0);
         Array.Fill(CDefect, 0);
         Array.Fill(StationStatus, 0);
@@ -218,11 +224,20 @@ internal sealed class Ship
                 Shields[zone] = Math.Min(Shields[zone], ShieldsCap[zone]);
                 break;
             case Defects.weaponbot:
-                PlasmaDamage[zone]--;
-                break;
+                {
+                    Position pos = Position.GetBottom(zone);
+                    if (pos == Position.BottomMiddle)
+                        CannonStats[pos.PositionIndex].Range--;
+                    else
+                        CannonStats[pos.PositionIndex].Damage--;
+                    break;
+                }
             case Defects.weapontop:
-                LaserDamage[zone]--;
-                break;
+                {
+                    Position pos = Position.GetTop(zone);
+                    CannonStats[pos.PositionIndex].Damage--;
+                    break;
+                }
         }
     }
 
@@ -261,14 +276,28 @@ internal sealed class Ship
         _liftUsed = _liftReset;
     }
 
-    public bool CanFireCannon(Position position)
+    public bool CanFireCannon(Position position, out bool costsEnergy)
     {
+        if (position == Position.Space)
+        {
+            costsEnergy = false;
+            return false;
+        }
+
+        costsEnergy = position != Position.BottomLeft && position != Position.BottomRight;
+
+        if (costsEnergy && Reactors[position.Zone] <= 0)
+            return false;
+
         return (_cannonFired & (1 << position.PositionIndex)) == 0;
     }
 
-    public void FireCannon(Position position)
+    public void FireCannon(Position position, bool costsEnergy)
     {
+        Debug.Assert(CanFireCannon(position, out bool b) && b == costsEnergy);
         _cannonFired |= (1 << position.PositionIndex);
+        if (costsEnergy)
+            Reactors[position.Zone]--;
     }
 
     public bool LiftWillDelay(Position position)
@@ -307,3 +336,5 @@ public enum DefectState
     notDefect,
     undetermined
 }
+
+internal record struct CannonStats(DamageSource Type, int Damage, int Range);

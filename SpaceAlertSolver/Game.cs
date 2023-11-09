@@ -224,6 +224,9 @@ public sealed class Game : IGame
             case SimulationStepType.DealExternalDamage:
                 HandleExternalDamageStep(simulationStep.Zone, simulationStep.Damage);
                 break;
+            case SimulationStepType.FireCannon:
+                FireCannon(simulationStep.Position, simulationStep.CostsEnergy);
+                break;
             default:
                 throw new UnreachableException();
         }
@@ -282,6 +285,7 @@ public sealed class Game : IGame
                 player.TryTakeElevator();
                 break;
             case Act.A:
+                PlayerActionA(playerIndex);
                 break;
             case Act.B:
                 break;
@@ -309,6 +313,106 @@ public sealed class Game : IGame
                 throw new NotImplementedException();
             default:
                 throw new UnreachableException();
+        }
+    }
+
+    private void PlayerActionA(int playerIndex)
+    {
+        Position position = players[playerIndex].Position;
+        if (!ship.CanFireCannon(position, out bool costsEnergy))
+            return;
+
+        _simulationStack.Add(SimulationStep.NewFireCannonStep(position, costsEnergy));
+    }
+
+    private void FireCannon(Position position, bool costsEnergy)
+    {
+        if (costsEnergy)
+            BranchIfReactorFull(position.Zone);
+
+        if (!CannonHasAtleastOneTarget(position))
+        {
+            ship.FireCannon(position, costsEnergy);
+            return;
+        }
+
+        Defects defectType = position.IsTop() ? Defects.weapontop : Defects.weaponbot;
+        BranchConditional(position.Zone, defectType);
+        
+        DealCannonDamage(position);
+        ship.FireCannon(position, costsEnergy);
+    }
+
+    private bool CannonHasAtleastOneTarget(Position position)
+    {
+        ref CannonStats stats = ref ship.CannonStats[position.PositionIndex];
+        int outOfRangeDistance = Trajectory.SmallestValueOutOfRange[stats.Range];
+
+        if (stats.Type == DamageSource.PulseCannon)
+        {
+            for (int i = 0; i < Threats.Count; i++)
+            {
+                ref Threat threat = ref Threats[i];
+                if (!threat.IsExternal)
+                    continue;
+
+                int distance = threat.GetDistance(DamageSource.PulseCannon);
+                if (distance < outOfRangeDistance)
+                    return true;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < Threats.Count; i++)
+            {
+                ref Threat threat = ref Threats[i];
+                if (threat.Zone != position.Zone) // also does isExternal check
+                    continue;
+
+                int distance = threat.GetDistance(stats.Type);
+                if (distance < outOfRangeDistance)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void DealCannonDamage(Position position)
+    {
+        ref CannonStats stats = ref ship.CannonStats[position.PositionIndex];
+        if (stats.Type == DamageSource.PulseCannon)
+        {
+            int outOfRangeDistance = Trajectory.SmallestValueOutOfRange[stats.Range];
+            for (int i = 0; i < Threats.Count; i++)
+            {
+                ref Threat threat = ref Threats[i];
+                if (!threat.IsExternal)
+                    continue;
+
+                int distance = threat.GetDistance(DamageSource.PulseCannon);
+                if (distance < outOfRangeDistance)
+                    threat.DealDamage(DamageSource.PulseCannon, stats.Damage);
+            }
+        }
+        else
+        {
+            int shortestDistance = Trajectory.SmallestValueOutOfRange[stats.Range];
+            int threatIndex = -1;
+            for (int i = 0; i < Threats.Count; i++)
+            {
+                ref Threat threat = ref Threats[i];
+                if (threat.Zone != position.Zone)
+                    continue;
+
+                int distance = threat.GetDistance(stats.Type);
+                if (distance < shortestDistance)
+                {
+                    shortestDistance = distance;
+                    threatIndex = i;
+                }
+            }
+            Threats[threatIndex].DealDamage(stats.Type, stats.Damage);
         }
     }
 
@@ -480,7 +584,8 @@ public sealed class Game : IGame
     private void SpawnThreat(in SimulationStep simulationStep)
     {
         Threat threat = ThreatFactory.Instance.ThreatsById[simulationStep.ThreatId];
-        threat.Distance = trajectories[threat.Zone].maxDistance;
+        threat.Zone = simulationStep.Zone;
+        threat.Distance = trajectories[simulationStep.Zone].maxDistance;
         threat.Game = this;
         Threats.Add(in threat);
     }
@@ -577,7 +682,7 @@ public sealed class Game : IGame
         }
     }
 
-    public void BranchReactorFull(int zone)
+    public void BranchIfReactorFull(int zone)
     {
         Debug.Assert(zone >= 0 && zone < 3);
 
@@ -628,6 +733,7 @@ public sealed class Game : IGame
         ActY,
         ActZ,
         DealExternalDamage,
+        FireCannon,
     }
 
     private readonly struct SimulationStep
@@ -640,7 +746,9 @@ public sealed class Game : IGame
         public int Speed => _value2;
         public int Zone => _value2;
         public bool IsExternal => _bool1;
+        public bool CostsEnergy => _bool1;
         public bool StartNewObservationPhase => _bool1;
+        public Position Position => new(_value1);
 
         private readonly int _value1, _value2;
         private readonly bool _bool1;
@@ -685,6 +793,8 @@ public sealed class Game : IGame
         public static SimulationStep NewActZStep(int threatId) => new(SimulationStepType.ActZ, value1: threatId);
 
         public static SimulationStep NewDealExternalDamageStep(int zone, int damage) => new(SimulationStepType.DealExternalDamage, value1: damage, value2: zone);
+
+        public static SimulationStep NewFireCannonStep(Position position, bool costsEnergy) => new(SimulationStepType.FireCannon, value1: position.PositionIndex, bool1: costsEnergy);
     }
 }
 

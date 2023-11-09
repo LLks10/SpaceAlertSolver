@@ -15,7 +15,7 @@ public readonly struct Position : IEquatable<Position>
     public static readonly Position BottomRight = new(5);
     public static readonly Position Space = new(6);
 
-    private Position(int index)
+    internal Position(int index)
     {
         PositionIndex = (byte)index;
         if (index >= 6)
@@ -42,6 +42,10 @@ public readonly struct Position : IEquatable<Position>
     }
 
     public static Position operator -(Position a, int v) => a + (-v);
+
+    public static Position GetTop(int zone) => new(zone);
+
+    public static Position GetBottom(int zone) => new(zone + 3);
 
     public Position GetLeft()
     {
