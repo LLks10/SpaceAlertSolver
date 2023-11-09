@@ -296,6 +296,7 @@ public sealed class Game : IGame
                 PlayerActionB(player.Position);
                 break;
             case Act.C:
+                PlayerActionC(playerIndex);
                 break;
             case Act.Fight:
                 break;
@@ -352,6 +353,52 @@ public sealed class Game : IGame
             if (ship.Reactors[Position.BottomMiddle.Zone] <= 0)
                 return;
             _simulationStack.Add(SimulationStep.NewRefillSideReactorStep(position.Zone));
+        }
+    }
+
+    private void PlayerActionC(int playerIndex)
+    {
+        ref Player player = ref players[playerIndex];
+        switch (player.Position.PositionIndex)
+        {
+            case Position.TOP_LEFT_INDEX:
+                if (player.AndroidState != AndroidState.Alive || !ship.InterceptorReady)
+                    return;
+                player.MoveToSpace();
+                ship.InterceptorReady = false;
+                UseInterceptors();
+                break;
+            case Position.TOP_MIDDLE_INDEX:
+                _didComputerThisPhase = true;
+                break;
+            case Position.TOP_RIGHT_INDEX:
+                UseAndroidStation(ref player.AndroidState, ref ship.AndroidTopRight);
+                break;
+            case Position.BOTTOM_LEFT_INDEX:
+                UseAndroidStation(ref player.AndroidState, ref ship.AndroidBottomLeft);
+                break;
+            case Position.BOTTOM_MIDDLE_INDEX:
+                _observationThisTurn++;
+                break;
+            case Position.BOTTOM_RIGHT_INDEX:
+                if (ship.CanFireRocket())
+                    ship.FireRocket();
+                break;
+            default:
+                throw new Exception("Invalid position index, space is not expected here");
+        }
+    }
+
+    private void UseAndroidStation(ref AndroidState playerAndroids, ref AndroidState shipAndroids)
+    {
+        if (playerAndroids == AndroidState.None)
+        {
+            playerAndroids = shipAndroids;
+            shipAndroids = AndroidState.None;
+        }
+        else
+        {
+            playerAndroids = AndroidState.Alive;
         }
     }
 

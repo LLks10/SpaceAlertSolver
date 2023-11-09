@@ -4,16 +4,24 @@ namespace SpaceAlertSolver;
 
 public readonly struct Position : IEquatable<Position>
 {
+    public const int TOP_LEFT_INDEX = 0;
+    public const int TOP_MIDDLE_INDEX = 1;
+    public const int TOP_RIGHT_INDEX = 2;
+    public const int BOTTOM_LEFT_INDEX = 3;
+    public const int BOTTOM_MIDDLE_INDEX = 4;
+    public const int BOTTOM_RIGHT_INDEX = 5;
+    public const int SPACE_INDEX = 6;
+
+    public static readonly Position TopLeft = new(TOP_LEFT_INDEX);
+    public static readonly Position TopMiddle = new(TOP_MIDDLE_INDEX);
+    public static readonly Position TopRight = new(TOP_RIGHT_INDEX);
+    public static readonly Position BottomLeft = new(BOTTOM_LEFT_INDEX);
+    public static readonly Position BottomMiddle = new(BOTTOM_MIDDLE_INDEX);
+    public static readonly Position BottomRight = new(BOTTOM_RIGHT_INDEX);
+    public static readonly Position Space = new(SPACE_INDEX);
+
     public readonly byte PositionIndex;
     public readonly byte Zone;
-
-    public static readonly Position TopLeft = new(0);
-    public static readonly Position TopMiddle = new(1);
-    public static readonly Position TopRight = new(2);
-    public static readonly Position BottomLeft = new(3);
-    public static readonly Position BottomMiddle = new(4);
-    public static readonly Position BottomRight = new(5);
-    public static readonly Position Space = new(6);
 
     internal Position(int index)
     {
