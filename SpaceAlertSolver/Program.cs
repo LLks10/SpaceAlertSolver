@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using SpaceAlertSolver.ResolverInterop;
+using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
