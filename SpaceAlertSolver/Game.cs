@@ -758,7 +758,7 @@ public sealed class Game : IGame
 
         //Gameover penalty
         if (gameover)
-            score = score - 200 + CountRemainingTurnStarts();
+            score = score - 200 - CountRemainingTurnStarts();
 
         Scores.Add((int)score);
 

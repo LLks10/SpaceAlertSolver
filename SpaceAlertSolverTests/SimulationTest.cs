@@ -73,7 +73,7 @@ public class SimulationTest
         // break nemesis shield 2/3 times to damage all zones
         // branch for broken shield which results in survival or loss in other zone
         // score shield not broken = 0.0 with 5/6% chance
-        // score shield is broken = -194.0 with 1/6% chance
+        // score shield is broken = -209.0 with 1/6% chance
 
         Act[] actions0 = ActUtils.ParseActionsFromString("aa          ");
         Act[] actions1 = ActUtils.ParseActionsFromString("da          ");
@@ -91,6 +91,6 @@ public class SimulationTest
         g.Init(players, trajectories, events);
         double score = g.Simulate();
         GamePool.FreeGame(g);
-        Assert.AreEqual(-194.0 / 6.0, score, 0.000000001);
+        Assert.AreEqual(-209.0 / 6.0, score, 0.000000001);
     }
 }
