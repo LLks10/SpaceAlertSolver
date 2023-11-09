@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Numerics;
 
 namespace SpaceAlertSolver;
 
@@ -231,6 +232,9 @@ public sealed class Game : IGame
             case SimulationStepType.RefillSideReactor:
                 RefillSideReactor(simulationStep.Zone);
                 break;
+            case SimulationStepType.UseLift:
+                UseLift(simulationStep.PlayerIndex);
+                break;
             default:
                 throw new UnreachableException();
         }
@@ -283,12 +287,7 @@ public sealed class Game : IGame
                 player.TryMoveLeft();
                 break;
             case Act.Lift:
-                if (player.PeekNextAction() != Act.Empty) // broken lift would delay actions
-                    BranchConditional(player.Position.Zone, Defects.lift);
-                if (ship.LiftWillDelay(player.Position))
-                    player.DelayNext();
-                ship.UseLift(player.Position);
-                player.TryTakeElevator();
+                _simulationStack.Add(SimulationStep.NewUseLiftStep(playerIndex));
                 break;
             case Act.A:
                 PlayerActionA(player.Position);
@@ -354,6 +353,17 @@ public sealed class Game : IGame
                 return;
             _simulationStack.Add(SimulationStep.NewRefillSideReactorStep(position.Zone));
         }
+    }
+
+    private void UseLift(int playerIndex)
+    {
+        ref Player player = ref players[playerIndex];
+        if (player.PeekNextAction() != Act.Empty) // broken lift would delay actions
+            BranchConditional(player.Position.Zone, Defects.lift);
+        if (ship.LiftWillDelay(player.Position))
+            player.DelayNext();
+        ship.UseLift(player.Position);
+        player.TryTakeElevator();
     }
 
     private void RefillShield(int zone)
@@ -813,6 +823,7 @@ public sealed class Game : IGame
         FireCannon,
         RefillShield,
         RefillSideReactor,
+        UseLift,
     }
 
     private readonly struct SimulationStep
@@ -878,6 +889,8 @@ public sealed class Game : IGame
         public static SimulationStep NewRefillShieldStep(int zone) => new(SimulationStepType.RefillShield, value2: zone);
 
         public static SimulationStep NewRefillSideReactorStep(int zone) => new(SimulationStepType.RefillSideReactor, value2: zone);
+
+        public static SimulationStep NewUseLiftStep(int playerIndex) => new(SimulationStepType.UseLift, value1: playerIndex);
     }
 }
 
