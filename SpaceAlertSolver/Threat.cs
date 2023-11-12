@@ -4,6 +4,7 @@ namespace SpaceAlertSolver;
 
 public partial struct Threat
 {
+    public readonly int MaxHealth;
     public int Health, Shield, Damage, Speed, Distance, ScoreWin, ScoreLose;
     public bool Alive, Beaten;
     public readonly bool IsExternal;
@@ -44,6 +45,7 @@ public partial struct Threat
         Position = Position.Space;
         IsExternal = true;
         // Zone is set externally
+        MaxHealth = health;
         Health = health;
         Shield = shield;
         Damage = 0;
@@ -58,7 +60,7 @@ public partial struct Threat
     /// <summary>
     /// Internal threat constructor
     /// </summary>
-    private Threat(int health, int speed, Position position, int scoreWin, int scoreLose,
+    private Threat(int health, int speed, Position position, int scoreWin, int scoreLose, int shield = 0,
         SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onBeaten = null,
         SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, DamageDelegate? dealDamage = null)
     {
@@ -72,7 +74,8 @@ public partial struct Threat
 
         IsExternal = false;
         Health = health;
-        Shield = 0;
+        MaxHealth = health;
+        Shield = shield;
         Position = position;
         Damage = 0;
         Speed = speed;

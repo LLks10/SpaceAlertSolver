@@ -5,7 +5,7 @@ public partial struct Threat
     [ExternalCommonThreat("E1-09", "Amoebe")]
     public static Threat CreateAmoebe()
     {
-        return new Threat(8, 0, 2, 4, 2, actX: AmoebeHeal, actY: AmoebeHeal, actZ: ActDealDamage(5), getDistance: RocketImmuneGetDistance) { MaxHealth = 8 };
+        return new Threat(8, 0, 2, 4, 2, actX: AmoebeHeal, actY: AmoebeHeal, actZ: ActDealDamage(5), getDistance: RocketImmuneGetDistance);
     }
 
     private static void AmoebeHeal(ref Threat @this)
