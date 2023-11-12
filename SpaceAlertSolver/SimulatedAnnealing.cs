@@ -8,6 +8,7 @@ public sealed class SimulatedAnnealing
 
     private Gene _currentState;
     private double _highestScore = double.NegativeInfinity;
+    private float _timing;
     private int _highestBlanks = int.MinValue;
     private Gene _bestState; // use for restarts
 
@@ -33,8 +34,7 @@ public sealed class SimulatedAnnealing
             Game.Scores.Clear();
 
             Gene newState = _currentState.RandomNeighbour(rng, trajs, evts);
-            if (P(_currentState, newState,
-                    Temperature((double)iteration / maxIterations)) >= rng.NextDouble())
+            if (P(_currentState, newState, Temperature((double)iteration / maxIterations)) >= rng.NextDouble())
             {
                 _currentState = newState;
             }
@@ -46,6 +46,7 @@ public sealed class SimulatedAnnealing
                 Game.Scores = new List<int>();
 
                 _highestScore = _currentState.getScore();
+                _timing = iteration / (float)maxIterations;
                 _highestBlanks = _currentState.getBlanks();
                 _bestState = _currentState;
 
@@ -90,6 +91,10 @@ public sealed class SimulatedAnnealing
     {
         return _statsOfBest;
     }
+
+    public double BestGeneAverage => _statsOfBest.Average();
+
+    public double Timing => _timing;
 
     /**
      * <summary>The temperature function</summary>
