@@ -5,7 +5,7 @@ namespace SpaceAlertSolverTests;
 
 public static class TestUtils
 {
-    internal static int GetThreatIdMatchingExactPrimaryName(string primaryName)
+    public static int GetThreatIdMatchingExactPrimaryName(string primaryName)
     {
         var (_, id) = ThreatFactory.Instance.FindThreatMatchingName(primaryName);
         if (ThreatFactory.Instance.ThreatNameById[id] != primaryName)
@@ -13,7 +13,7 @@ public static class TestUtils
         return id;
     }
 
-    internal static Threat GetThreatMatchingExactPrimaryName(string primaryName)
+    public static Threat GetThreatMatchingExactPrimaryName(string primaryName)
     {
         return ThreatFactory.Instance.ThreatsById[GetThreatIdMatchingExactPrimaryName(primaryName)];
     }

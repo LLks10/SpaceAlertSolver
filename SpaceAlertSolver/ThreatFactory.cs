@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace SpaceAlertSolver;
 
-internal sealed class ThreatFactory
+public sealed class ThreatFactory
 {
     public static ThreatFactory Instance { get; } = new ThreatFactory();
 

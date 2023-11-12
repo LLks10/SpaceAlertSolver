@@ -18,7 +18,13 @@ internal sealed class Program
 public class AnnealingBenchmark
 {
     private readonly ImmutableArray<Trajectory> _trajectories = TestUtils.GetTrajectoriesFromString("1463");
-    private readonly ImmutableArray<Event> _events = ImmutableArray.Create<Event>( new(true, 1, 1, 17), new(true, 3, 0, 12), new(false, 4, 3, 21), new(true, 6, 1, 15) );
+    private readonly ImmutableArray<Event> _events = ImmutableArray.Create<Event>
+    (
+        new(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Cryoshield Frigate")),
+        new(true, 3, 0, 12),
+        new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Asteroid")),
+        new(true, 6, 1, 15)
+    );
 
     [Params(100000, 200000)]
     public int Iterations;
