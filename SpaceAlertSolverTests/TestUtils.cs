@@ -9,7 +9,7 @@ public static class TestUtils
     {
         var (_, id) = ThreatFactory.Instance.FindThreatMatchingName(primaryName);
         if (ThreatFactory.Instance.ThreatNameById[id] != primaryName)
-            throw new Exception("Primary name does match");
+            throw new Exception($"Primary name {primaryName} does match any known threat");
         return id;
     }
 

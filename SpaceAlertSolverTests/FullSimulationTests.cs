@@ -31,7 +31,7 @@ public class FullSimulationTests
             , new(true, 3, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Psionic Satellite"))
             , new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Executioner"))
             , new(true, 5, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Cryoshield Fighter"))
-            , new(true, 7, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Impulse Ball"))
+            , new(true, 7, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Pulse Ball"))
             , new(true, 8, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Scout"))
             );
 
