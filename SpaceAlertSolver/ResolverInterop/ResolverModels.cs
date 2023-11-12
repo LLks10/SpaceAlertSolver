@@ -93,7 +93,12 @@ internal static class ResolverModelMapper
                 25 => "SE2-03",
                 26 => "SE2-06",
                 27 => "SE2-02",
-                28 => "SE2-01",
+                28 => "SE2-01",            
+                100 => "E2-102",
+                101 => "SE2-102",
+                102 => "E3-101",
+                103 => "E3-109",
+
                 _ => throw new UnreachableException(),
             };
         }
@@ -124,6 +129,8 @@ internal static class ResolverModelMapper
             21 => "SI2-03",
             22 => "SI1-04",
             23 => "SI2-04",
+            100 => "SI3-105",
+            101 => "I3-107",
             _ => throw new UnreachableException(),
         };
     }

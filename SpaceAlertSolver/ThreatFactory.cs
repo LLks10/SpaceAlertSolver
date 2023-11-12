@@ -67,6 +67,14 @@ public static class ThreatFactory
                 return new Moloch(game, traj, zone, time);
             case 28:
                 return new Behemoth(game, traj, zone, time);
+            case 100:
+                return new PhasingFighter(game, traj, zone, time);
+            case 101:
+                return new PhasingFrigate(game, traj, zone, time);
+            case 102:
+                return new PlasmaticNeedleship(game, traj, zone, time);
+            case 103:
+                return new PolarizedFighter(game, traj, zone, time);
         }
         return null;
     }
@@ -133,6 +141,14 @@ public static class ThreatFactory
                 return "Moloch";
             case 28:
                 return "Behemoth";
+            case 100:
+                return "PhasingFighter";
+            case 101:
+                return "PhasingFrigate";
+            case 102:
+                return "PlasmaticNeedleship";
+            case 103:
+                return "PolarizedFighter";
         }
         return "";
     }
@@ -191,6 +207,10 @@ public static class ThreatFactory
                 return new Fissure(game, traj, time);
             case sevInStart + 10:
                 return new Infection(game, traj, time);
+            case 100:
+                return new Siren(game, traj, time);
+            case 101:
+                return new Driller(game, traj, time);
         }
         return null;
     }
@@ -248,6 +268,10 @@ public static class ThreatFactory
                 return "Fissure";
             case sevInStart + 10:
                 return "Contamination";
+            case 100:
+                return "Siren";
+            case 101:
+                return "Driller";
         }
         return "";
     }

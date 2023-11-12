@@ -58,6 +58,11 @@ public static class ThreatParser
         new ThreatName("Nevelkrab", true, 24),
         new ThreatName("Psionische Satelliet", true, 25),
         new ThreatName("Grote Asteroïde", true, 26),
+
+        new ThreatName("Phasing Fighter", true, 100),
+        new ThreatName("Phasing Frigate", true, 101),
+        new ThreatName("Plastmatic Needlship", true, 102),
+        new ThreatName("Polarized Fighter", true, 103),
     };
     static ThreatName[] in_threats = new ThreatName[]
     {
@@ -107,7 +112,10 @@ public static class ThreatParser
         new ThreatName("Verwisselde Kabels", false, 20),
         new ThreatName("Overbelast Energienet", false, 21),
         new ThreatName("Scheur", false, 22),
-        new ThreatName("Besmetting", false, 23)
+        new ThreatName("Besmetting", false, 23),
+
+        new ThreatName("Siren", false, 100),
+        new ThreatName("Driller", false, 101),
     };
 
     // https://gist.github.com/Davidblkx/e12ab0bb2aff7fd8072632b396538560 Thanks!
