@@ -1,6 +1,6 @@
 ﻿namespace SpaceAlertSolver;
 
-internal partial struct Threat
+public partial struct Threat
 {
     [ExternalCommonThreat("E1-10", "Meteoroid", "Meteoroïde")]
     public static Threat CreateMeteoroid()

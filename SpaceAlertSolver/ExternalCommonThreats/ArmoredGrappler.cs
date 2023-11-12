@@ -1,6 +1,6 @@
 ﻿namespace SpaceAlertSolver;
 
-internal partial struct Threat
+public partial struct Threat
 {
     private int MaxHealth { readonly get => _value1; set => _value1 = value; }
 

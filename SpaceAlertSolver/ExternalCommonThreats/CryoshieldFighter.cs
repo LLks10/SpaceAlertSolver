@@ -1,6 +1,6 @@
 ﻿namespace SpaceAlertSolver;
 
-internal partial struct Threat
+public partial struct Threat
 {
     private bool HasShield { readonly get => _value1 > 0; set => _value1 = value ? 1 : 0; }
 

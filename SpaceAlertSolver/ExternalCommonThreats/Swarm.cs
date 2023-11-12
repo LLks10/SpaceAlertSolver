@@ -2,7 +2,7 @@
 
 namespace SpaceAlertSolver;
 
-internal partial struct Threat
+public partial struct Threat
 {
     [ExternalCommonThreat("E2-04", "Swarm", "Zwerm")]
     public static Threat CreateSwarm()

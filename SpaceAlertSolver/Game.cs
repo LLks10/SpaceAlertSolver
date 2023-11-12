@@ -31,7 +31,7 @@ public sealed class Game : IGame
     internal readonly Ship ship;
     public Player[] Players { get; private set; } = null!;
     public ImmutableArray<Trajectory> trajectories;
-    internal readonly RefList<Threat> Threats = new();
+    public RefList<Threat> Threats { get; } = new();
     double score;
     private bool _didComputerThisPhase;
     bool gameover;
@@ -45,7 +45,7 @@ public sealed class Game : IGame
     double scoreMultiplier;
     double scoreAddition;
 
-    public int ScoutBonus;
+    public int ExternalDamageBonus { private get; set; }
 
     private readonly List<SimulationStep> _simulationStack = new();
 
@@ -81,7 +81,7 @@ public sealed class Game : IGame
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
 
-        ScoutBonus = other.ScoutBonus;
+        ExternalDamageBonus = other.ExternalDamageBonus;
 
         _simulationStack.Clear();
         _simulationStack.AddRange(other._simulationStack);
@@ -105,7 +105,7 @@ public sealed class Game : IGame
         _observationThisTurn = 0;
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
-        ScoutBonus = 0;
+        ExternalDamageBonus = 0;
         InitSimulationStack(Players.Length, events);
     }
 
@@ -206,7 +206,7 @@ public sealed class Game : IGame
                 CreateMoves();
                 break;
             case SimulationStepType.MoveThreat:
-                MoveThreat(simulationStep.ThreatId, simulationStep.Speed);
+                HandleMoveThreat(simulationStep.ThreatId, simulationStep.Speed);
                 break;
             case SimulationStepType.SpawnThreat:
                 SpawnThreat(in simulationStep);
@@ -255,10 +255,15 @@ public sealed class Game : IGame
         gameover |= ship.DealInternalDamage(zone, damage);
     }
 
+    public void MoveThreat(int threatId, int speed)
+    {
+        _simulationStack.Add(SimulationStep.NewMoveThreatStep(threatId, speed));
+    }
+
     private void HandleExternalDamageStep(int zone, int damage)
     {
         BranchShieldFull(zone);
-        gameover |= ship.DealExternalDamage(zone, damage);
+        gameover |= ship.DealExternalDamage(zone, damage + ExternalDamageBonus);
     }
 
     private void PlayerAction(int playerIndex)
@@ -690,7 +695,7 @@ public sealed class Game : IGame
         }
     }
 
-    private void MoveThreat(int threatId, int speed)
+    private void HandleMoveThreat(int threatId, int speed)
     {
         int newPos = Threats[threatId].Distance - speed;
         for (int d = newPos; d < Threats[threatId].Distance; d++)

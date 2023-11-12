@@ -2,7 +2,7 @@
 
 namespace SpaceAlertSolver;
 
-internal partial struct Threat
+public partial struct Threat
 {
     [InternalSevereThreat("SI2-01", "Executioner", "Eliminator")]
     public static Threat CreateExecutioner()

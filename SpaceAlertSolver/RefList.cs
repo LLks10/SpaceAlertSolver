@@ -1,11 +1,9 @@
-﻿using System.Diagnostics;
-
-namespace SpaceAlertSolver;
+﻿namespace SpaceAlertSolver;
 
 /// <summary>
 /// Implementation of List that can return by ref
 /// </summary>
-internal class RefList<T>
+public class RefList<T>
 {
     private const int INITIAL_CAPACITY = 8;
 

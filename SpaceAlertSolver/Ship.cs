@@ -140,7 +140,6 @@ internal sealed class Ship
 
     public bool DealExternalDamage(int zone, int damage)
     {
-        damage += Game.ScoutBonus;
         Shields[zone] -= damage;
 
         //Excess damage

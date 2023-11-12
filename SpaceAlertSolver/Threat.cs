@@ -2,7 +2,7 @@
 
 namespace SpaceAlertSolver;
 
-internal partial struct Threat
+public partial struct Threat
 {
     public int Health, Shield, Damage, Speed, Distance, ScoreWin, ScoreLose;
     public bool Alive, Beaten;
@@ -215,6 +215,13 @@ internal partial struct Threat
             return int.MaxValue;
         return DefaultGetDistance(ref @this, damageSource);
     }
+
+    private static int HeavyLaserImmuneGetDistance(ref Threat @this, DamageSource damageSource)
+    {
+        if (damageSource == DamageSource.HeavyLaserCannon)
+            return int.MaxValue;
+        return DefaultGetDistance(ref @this, damageSource);
+    }
 }
 
 [AttributeUsage(AttributeTargets.Method)]
@@ -250,7 +257,7 @@ internal sealed class ExternalSevereThreatAttribute : CreateThreatAttribute
     public ExternalSevereThreatAttribute(string code, params string[] names) : base(code, names) { }
 }
 
-internal enum DamageSource
+public enum DamageSource
 {
     HeavyLaserCannon,
     PlasmaCannon,

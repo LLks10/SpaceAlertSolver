@@ -1,6 +1,6 @@
 ﻿namespace SpaceAlertSolver;
 
-internal partial struct Threat
+public partial struct Threat
 {
     [ExternalSevereThreat("SE2-05", "Nemesis")]
     public static Threat CreateNemesis()
