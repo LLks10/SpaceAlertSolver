@@ -29,7 +29,7 @@ public class FullSimulationTests
         ImmutableArray<Event> events = ImmutableArray.Create<Event>
             ( new(true, 1, 2, TestUtils.GetThreatIdMatchingExactPrimaryName("Amoebe"))
             , new(true, 3, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Psionic Satellite"))
-            , new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Eliminator"))
+            , new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Executioner"))
             , new(true, 5, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Cryoshield Fighter"))
             , new(true, 7, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Impulse Ball"))
             , new(true, 8, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Scout"))

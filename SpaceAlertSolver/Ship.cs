@@ -26,7 +26,6 @@ internal sealed class Ship
 
     public readonly Game Game;
 
-    public Player[] Players => Game.players;
     public AndroidState AndroidTopRight;
     public AndroidState AndroidBottomLeft;
     public readonly int[] Shields = new int[3];
@@ -139,17 +138,15 @@ internal sealed class Ship
         }
     }
 
-    public bool DealExternalDamage(int zone, int amount)
+    public bool DealExternalDamage(int zone, int damage)
     {
-        amount += Game.ScoutBonus;
-        Shields[zone] -= amount;
+        damage += Game.ScoutBonus;
+        Shields[zone] -= damage;
 
         //Excess damage
         if (Shields[zone] < 0)
         {
             int dmg = -Shields[zone];
-            if (Fissured[zone])
-                dmg *= 2;
             Shields[zone] = 0;
             return ApplyDamage(zone, dmg);
         }
@@ -157,20 +154,16 @@ internal sealed class Ship
         return false;
     }
 
-    public bool DealDamageIntern(int zone, int amount)
+    public bool DealInternalDamage(int zone, int damage) => ApplyDamage(zone, damage);
+
+    bool ApplyDamage(int zone, int damage)
     {
+        Debug.Assert(damage > 0);
         if (Fissured[zone])
-            amount *= 2;
-
-        return ApplyDamage(zone, amount);
-    }
-
-    bool ApplyDamage(int zone, int amount)
-    {
-        Debug.Assert(amount > 0);
-        NumUndeterminedDefects[zone] += amount;
+            damage *= 2;
+        NumUndeterminedDefects[zone] += damage;
         SetUndeterminedDefects(zone);
-        Damage[zone] += amount; // add damage
+        Damage[zone] += damage; // add damage
         return Damage[zone] >= 7;
     }
 

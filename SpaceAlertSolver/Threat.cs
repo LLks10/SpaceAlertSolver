@@ -9,6 +9,7 @@ internal partial struct Threat
     public readonly bool IsExternal;
     public int Zone;
     public IGame Game = null!;
+    public Position Position;
 
     private delegate void SimpleDelegate(ref Threat @this);
     private SimpleDelegate _actX;
@@ -40,6 +41,7 @@ internal partial struct Threat
         _getDistance = getDistance!;
         _dealDamage = dealDamage!;
 
+        Position = Position.Space;
         IsExternal = true;
         // Zone is set externally
         Health = health;
@@ -47,6 +49,33 @@ internal partial struct Threat
         Damage = 0;
         Speed = speed;
         // Distance is set externally
+        ScoreWin = scoreWin;
+        ScoreLose = scoreLose;
+        Alive = true;
+        Beaten = false;
+    }
+
+    /// <summary>
+    /// Internal threat constructor
+    /// </summary>
+    private Threat(int health, int speed, Position position, int scoreWin, int scoreLose,
+        SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onBeaten = null,
+        SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, DamageDelegate? dealDamage = null)
+    {
+        _actX = actX!;
+        _actY = actY!;
+        _actZ = actZ!;
+        _onBeaten = onBeaten!;
+        _processDamage = processDamage!;
+        _getDistance = getDistance!;
+        _dealDamage = dealDamage!;
+
+        IsExternal = false;
+        Health = health;
+        Shield = 0;
+        Position = position;
+        Damage = 0;
+        Speed = speed;
         ScoreWin = scoreWin;
         ScoreLose = scoreLose;
         Alive = true;
@@ -91,7 +120,7 @@ internal partial struct Threat
                 if (IsExternal)
                     _processDamage = DefaultExternalProcessDamage;
                 else
-                    throw new NotImplementedException("Need to add default internal process method");
+                    _processDamage = Blank;
             }
             else
             {

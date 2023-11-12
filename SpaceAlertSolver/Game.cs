@@ -29,7 +29,7 @@ public sealed class Game : IGame
     private static readonly int[] _obsBonus = new int[] { 0, 1, 2, 3, 5, 7, 9, 11, 13, 15, 17 };
 
     internal readonly Ship ship;
-    public Player[] players = null!;
+    public Player[] Players { get; private set; } = null!;
     public ImmutableArray<Trajectory> trajectories;
     internal readonly RefList<Threat> Threats = new();
     double score;
@@ -57,7 +57,7 @@ public sealed class Game : IGame
     public void Init(Game other)
     {
         ship.Init(other.ship);
-        InitPlayers(other.players);
+        InitPlayers(other.Players);
         trajectories = other.trajectories;
         Threats.Clear();
         Threats.AddRange(other.Threats);
@@ -106,15 +106,15 @@ public sealed class Game : IGame
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
         ScoutBonus = 0;
-        InitSimulationStack(players.Length, events);
+        InitSimulationStack(Players.Length, events);
     }
 
     private void InitPlayers(Player[] other)
     {
-        if (players == null || players.Length != other.Length)
-            players = new Player[other.Length];
+        if (Players == null || Players.Length != other.Length)
+            Players = new Player[other.Length];
 
-        other.CopyTo(players, 0);
+        other.CopyTo(Players, 0);
     }
 
     private void InitSimulationStack(int numPlayers, ImmutableArray<Event> events)
@@ -250,6 +250,11 @@ public sealed class Game : IGame
         _simulationStack.Add(SimulationStep.NewDealExternalDamageStep(zone, damage));
     }
 
+    public void DealInternalDamage(int zone, int damage)
+    {
+        gameover |= ship.DealInternalDamage(zone, damage);
+    }
+
     private void HandleExternalDamageStep(int zone, int damage)
     {
         BranchShieldFull(zone);
@@ -258,7 +263,7 @@ public sealed class Game : IGame
 
     private void PlayerAction(int playerIndex)
     {
-        ref Player player = ref players[playerIndex];
+        ref Player player = ref Players[playerIndex];
         if (!player.Alive)
             return;
 
@@ -358,7 +363,7 @@ public sealed class Game : IGame
 
     private void PlayerActionC(int playerIndex)
     {
-        ref Player player = ref players[playerIndex];
+        ref Player player = ref Players[playerIndex];
         switch (player.Position.PositionIndex)
         {
             case Position.TOP_LEFT_INDEX:
@@ -404,7 +409,7 @@ public sealed class Game : IGame
 
     private void UseLift(int playerIndex)
     {
-        ref Player player = ref players[playerIndex];
+        ref Player player = ref Players[playerIndex];
         if (player.PeekNextAction() != Act.Empty) // broken lift would delay actions
             BranchConditional(player.Position.Zone, Defects.lift);
         if (ship.LiftWillDelay(player.Position))
@@ -593,10 +598,10 @@ public sealed class Game : IGame
         if (_didComputerThisPhase)
             return;
 
-        for (int i = 0; i < players.Length; i++)
+        for (int i = 0; i < Players.Length; i++)
         {
-            if (players[i].Position.IsInShip())
-                players[i].DelayNext();
+            if (Players[i].Position.IsInShip())
+                Players[i].DelayNext();
         }
     }
 
@@ -736,15 +741,15 @@ public sealed class Game : IGame
         score -= highestDamage;
 
         //Count dead crew
-        for (int i = 0; i < players.Length; i++)
+        for (int i = 0; i < Players.Length; i++)
         {
-            if (!players[i].Alive)
+            if (!Players[i].Alive)
                 score -= 2;
         }
         //Count dead androids
-        for (int i = 0; i < players.Length; i++)
+        for (int i = 0; i < Players.Length; i++)
         {
-            if (players[i].AndroidState == AndroidState.Disabled)
+            if (Players[i].AndroidState == AndroidState.Disabled)
                 score--;
         }
         if (ship.AndroidTopRight == AndroidState.Disabled)
