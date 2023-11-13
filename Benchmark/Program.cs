@@ -21,9 +21,9 @@ public class AnnealingBenchmark
     private readonly ImmutableArray<Event> _events = ImmutableArray.Create<Event>
     (
         new(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Cryoshield Frigate")),
-        new(true, 3, 0, 12),
+        new(true, 3, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Kamikaze")),
         new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Asteroid")),
-        new(true, 6, 1, 15)
+        new(true, 6, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Scout"))
     );
 
     [Params(100000, 200000)]
