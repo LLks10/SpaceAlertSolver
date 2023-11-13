@@ -723,15 +723,14 @@ public sealed class Game : IGame
                 Debug.Assert(!Threats[i].IsExternal, "external threat cannot be dead here");
                 continue;
             }
-            int speed = Math.Min(Threats[i].Speed, Threats[i].Distance);
-            Debug.Assert(speed > 0, "If the threat has no more distance to travel it should not exist");
-            _simulationStack.Add(SimulationStep.NewMoveThreatStep(i, speed));
+            Debug.Assert(Threats[i].Speed > 0, "If the threat has no more distance to travel it should not exist");
+            _simulationStack.Add(SimulationStep.NewMoveThreatStep(i, Threats[i].Speed));
         }
     }
 
     private void HandleMoveThreat(int threatId, int speed)
     {
-        int newPos = Threats[threatId].Distance - speed;
+        int newPos = Math.Max(0, Threats[threatId].Distance - speed);
         for (int d = newPos; d < Threats[threatId].Distance; d++)
         {
             switch (trajectories[Threats[threatId].Zone].actions[d])
