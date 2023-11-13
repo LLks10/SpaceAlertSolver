@@ -31,9 +31,12 @@ public partial struct Threat
 
     public static void PowerSystemOverloadOnBeaten(ref Threat @this)
     {
-        @this.Game.RemoveMalfunctionB(Position.BottomLeft);
-        @this.Game.RemoveMalfunctionB(Position.BottomMiddle);
-        @this.Game.RemoveMalfunctionB(Position.BottomRight);
+        if (!@this.Alive)
+        {
+            @this.Game.RemoveMalfunctionB(Position.BottomLeft);
+            @this.Game.RemoveMalfunctionB(Position.BottomMiddle);
+            @this.Game.RemoveMalfunctionB(Position.BottomRight);
+        }
     }
 
     public static void PowerSystemOverloadDealDamage(ref Threat @this, DamageSource damageSource, int damage, int _, Position position)
