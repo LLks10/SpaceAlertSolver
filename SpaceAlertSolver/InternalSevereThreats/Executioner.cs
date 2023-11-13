@@ -7,7 +7,7 @@ public partial struct Threat
     [InternalSevereThreat("SI2-01", "Executioner", "Eliminator")]
     public static Threat CreateExecutioner()
     {
-        return new(2, 2, Position.TopRight, 12, 6);
+        return new Threat(2, 2, Position.TopRight, 12, 6, IsTargetedByRobots, dealDamage: InternalDealDamageFightback);
     }
 
     public static void ExecutionerActX(ref Threat @this)

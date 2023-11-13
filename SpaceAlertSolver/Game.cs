@@ -536,7 +536,7 @@ public sealed class Game : IGame
 
                 int distance = threat.GetDistance(DamageSource.PulseCannon);
                 if (distance < outOfRangeDistance)
-                    threat.DealDamage(DamageSource.PulseCannon, stats.Damage);
+                    threat.DealExternalDamage(DamageSource.PulseCannon, stats.Damage);
             }
         }
         else
@@ -556,7 +556,7 @@ public sealed class Game : IGame
                     threatIndex = i;
                 }
             }
-            Threats[threatIndex].DealDamage(stats.Type, stats.Damage);
+            Threats[threatIndex].DealExternalDamage(stats.Type, stats.Damage);
         }
     }
 
@@ -570,19 +570,19 @@ public sealed class Game : IGame
                 continue;
 
             if (target == -2)
-                Threats[i].DealDamage(DamageSource.Interceptors, 1);
+                Threats[i].DealExternalDamage(DamageSource.Interceptors, 1);
             else if (target == -1)
                 target = i;
             else
             {
                 Debug.Assert(target >= 0);
-                Threats[target].DealDamage(DamageSource.Interceptors, 1);
-                Threats[i].DealDamage(DamageSource.Interceptors, 1);
+                Threats[target].DealExternalDamage(DamageSource.Interceptors, 1);
+                Threats[i].DealExternalDamage(DamageSource.Interceptors, 1);
                 target = -2;
             }
         }
         if (target >= 0)
-            Threats[target].DealDamage(DamageSource.Interceptors, 3);
+            Threats[target].DealExternalDamage(DamageSource.Interceptors, 3);
     }
 
     private void TurnStart()
@@ -641,7 +641,7 @@ public sealed class Game : IGame
             }
             if (targetIndex != -1)
             {
-                Threats[targetIndex].DealDamage(DamageSource.Rocket, ROCKET_DAMAGE);
+                Threats[targetIndex].DealExternalDamage(DamageSource.Rocket, ROCKET_DAMAGE);
             }
         }
         ship.MoveRockets();

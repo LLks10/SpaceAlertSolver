@@ -6,6 +6,11 @@ public partial struct Threat
 {
     public readonly int MaxHealth;
     public int Health, Shield, Damage, Speed, Distance, ScoreWin, ScoreLose;
+    public int Inaccessibility
+    {
+        get => Shield;
+        set => Shield = value;
+    }
     public bool Alive, Beaten;
     public readonly bool IsExternal;
     public int Zone;
@@ -18,6 +23,9 @@ public partial struct Threat
     private SimpleDelegate _actZ;
     private SimpleDelegate _onBeaten;
     private SimpleDelegate _processDamage;
+
+    private delegate bool TargetDelegate(ref Threat @this, DamageSource damageSource, Position position);
+    private TargetDelegate? _isTargetedBy;
 
     private delegate int DistanceDelegate(ref Threat @this, DamageSource damageSource);
     private DistanceDelegate _getDistance;
@@ -45,6 +53,7 @@ public partial struct Threat
         _getDistance = getDistance!;
         _dealExternalDamage = dealDamage;
         _dealInternalDamage = null;
+        _isTargetedBy = null;
 
         Position = Position.Space;
         IsExternal = true;
@@ -64,9 +73,9 @@ public partial struct Threat
     /// <summary>
     /// Internal threat constructor
     /// </summary>
-    private Threat(int health, int speed, Position position, int scoreWin, int scoreLose, int shield = 0,
-        SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onBeaten = null,
-        SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, InternalDamageDelegate? dealDamage = null)
+    private Threat(int health, int speed, Position position, int scoreWin, int scoreLose, TargetDelegate? isTargetedBy = null,
+        SimpleDelegate ? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, int inaccessibility = 0,
+        SimpleDelegate? onBeaten = null,SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, InternalDamageDelegate? dealDamage = null)
     {
         _actX = actX!;
         _actY = actY!;
@@ -76,11 +85,12 @@ public partial struct Threat
         _getDistance = getDistance!;
         _dealExternalDamage = null;
         _dealInternalDamage = dealDamage;
+        _isTargetedBy = isTargetedBy;
 
         IsExternal = false;
         Health = health;
         MaxHealth = health;
-        Shield = shield;
+        Inaccessibility = inaccessibility;
         Position = position;
         Damage = 0;
         Speed = speed;
@@ -109,6 +119,12 @@ public partial struct Threat
             SimpleDelegate? method = GetType().GetMethod($"{name}ActZ")?.CreateDelegate<SimpleDelegate>();
             Debug.Assert(method != null, "Cannot find ActZ method, nor is it set in the Create method");
             _actZ = method;
+        }
+        if (!IsExternal && _isTargetedBy == null)
+        {
+            TargetDelegate? method = GetType().GetMethod($"{name}IsTargetedBy")?.CreateDelegate<TargetDelegate>();
+            Debug.Assert(method != null, "Cannot find IsTargetedBy method, nor is it set in the Create method");
+            _isTargetedBy = method;
         }
 
         if (_onBeaten == null)
@@ -221,6 +237,13 @@ public partial struct Threat
         @this.UpdateAlive();
     }
 
+    private static void InternalDealDamageFightback(ref Threat @this, DamageSource damageSource, int damage, int playerId, Position position)
+    {
+        DefaultInternalDealDamage(ref @this, damageSource, damage, playerId, position);
+        Debug.Assert(@this.Game.Players[playerId].AndroidState == AndroidState.Alive, "Expecting alive androids when fighting back");
+        @this.Game.Players[playerId].AndroidState = AndroidState.Disabled;
+    }
+
     private static void DefaultExternalProcessDamage(ref Threat @this)
     {
         Debug.Assert(@this.Damage > 0, "Should only process damage when there is some");
@@ -245,6 +268,11 @@ public partial struct Threat
         if (damageSource == DamageSource.HeavyLaserCannon)
             return int.MaxValue;
         return DefaultGetDistance(ref @this, damageSource);
+    }
+
+    private static bool IsTargetedByRobots(ref Threat @this, DamageSource damageSource, Position position)
+    {
+        return damageSource == DamageSource.Robots && @this.Position == position;
     }
 }
 
@@ -288,4 +316,8 @@ public enum DamageSource
     PulseCannon,
     Rocket,
     Interceptors,
+    Robots,
+    RepairA,
+    RepairB,
+    RepairC,
 }
