@@ -22,7 +22,7 @@ public class AnnealingBenchmark
     (
         new(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Cryoshield Frigate")),
         new(true, 3, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Kamikaze")),
-        new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Asteroid")),
+        new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Power System Overload")),
         new(true, 6, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Scout"))
     );
 
