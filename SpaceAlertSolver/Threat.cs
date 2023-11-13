@@ -188,6 +188,7 @@ public partial struct Threat
     public int GetDistance(DamageSource damageSource) => _getDistance(ref this, damageSource);
     public void DealExternalDamage(DamageSource damageSource, int damage) => _dealExternalDamage!(ref this, damageSource, damage);
     public void DealInternalDamage(DamageSource damageSource, int damage, int playerId, Position position) => _dealInternalDamage!(ref this, damageSource, damage, playerId, position);
+    public bool IsTargetedBy(DamageSource damageSource, Position position) => _isTargetedBy(ref this, damageSource, position);
 
     private static SimpleDelegate ActDealDamage(int damage)
     {

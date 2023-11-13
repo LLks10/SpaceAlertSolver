@@ -309,6 +309,7 @@ public sealed class Game : IGame
                 PlayerActionC(playerIndex);
                 break;
             case Act.Fight:
+                PlayerActionFight(playerIndex);
                 break;
             case Act.HeroicTopLeft:
                 throw new NotImplementedException();
@@ -396,6 +397,26 @@ public sealed class Game : IGame
                 break;
             default:
                 throw new Exception("Invalid position index, space is not expected here");
+        }
+    }
+
+    private void PlayerActionFight(int playerIndex)
+    {
+        ref Player player = ref Players[playerIndex];
+        if (player.AndroidState != AndroidState.Alive)
+            return;
+
+        for (int i = 0; i < Threats.Count; i++)
+        {
+            ref Threat threat = ref Threats[i];
+            if (threat.IsExternal || !threat.Alive)
+                return;
+
+            if (threat.IsTargetedBy(DamageSource.Robots, player.Position))
+            {
+                threat.DealInternalDamage(DamageSource.Robots, 1, playerIndex, player.Position);
+                break;
+            }
         }
     }
 
