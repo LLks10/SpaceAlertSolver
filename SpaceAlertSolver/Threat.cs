@@ -22,8 +22,11 @@ public partial struct Threat
     private delegate int DistanceDelegate(ref Threat @this, DamageSource damageSource);
     private DistanceDelegate _getDistance;
 
-    private delegate void DamageDelegate(ref Threat @this, DamageSource damageSource, int damage);
-    private DamageDelegate _dealDamage;
+    private delegate void ExternalDamageDelegate(ref Threat @this, DamageSource damageSource, int damage);
+    private ExternalDamageDelegate? _dealExternalDamage;
+
+    private delegate void InternalDamageDelegate(ref Threat @this, DamageSource damageSourceType, int damage, int playerId, Position position);
+    private InternalDamageDelegate? _dealInternalDamage;
 
     private int _value1;
 
@@ -32,7 +35,7 @@ public partial struct Threat
     /// </summary>
     private Threat(int health, int shield, int speed, int scoreWin, int scoreLose,
         SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onBeaten = null,
-        SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, DamageDelegate? dealDamage = null)
+        SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, ExternalDamageDelegate? dealDamage = null)
     {
         _actX = actX!; // if it's null if will be solved externally
         _actY = actY!;
@@ -40,7 +43,8 @@ public partial struct Threat
         _onBeaten = onBeaten!;
         _processDamage = processDamage!;
         _getDistance = getDistance!;
-        _dealDamage = dealDamage!;
+        _dealExternalDamage = dealDamage;
+        _dealInternalDamage = null;
 
         Position = Position.Space;
         IsExternal = true;
@@ -62,7 +66,7 @@ public partial struct Threat
     /// </summary>
     private Threat(int health, int speed, Position position, int scoreWin, int scoreLose, int shield = 0,
         SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onBeaten = null,
-        SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, DamageDelegate? dealDamage = null)
+        SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, InternalDamageDelegate? dealDamage = null)
     {
         _actX = actX!;
         _actY = actY!;
@@ -70,7 +74,8 @@ public partial struct Threat
         _onBeaten = onBeaten!;
         _processDamage = processDamage!;
         _getDistance = getDistance!;
-        _dealDamage = dealDamage!;
+        _dealExternalDamage = null;
+        _dealInternalDamage = dealDamage;
 
         IsExternal = false;
         Health = health;
@@ -140,13 +145,22 @@ public partial struct Threat
                 _getDistance = method;
         }
 
-        if (_dealDamage == null)
+        if (IsExternal && _dealExternalDamage == null)
         {
-            DamageDelegate? method = GetType().GetMethod($"{name}DealDamage")?.CreateDelegate<DamageDelegate>();
+            ExternalDamageDelegate? method = GetType().GetMethod($"{name}DealDamage")?.CreateDelegate<ExternalDamageDelegate>();
             if (method == null)
-                _dealDamage = DefaultDealDamage;
+                _dealExternalDamage = DefaultExternalDealDamage;
             else
-                _dealDamage = method;
+                _dealExternalDamage = method;
+        }
+
+        if (!IsExternal && _dealInternalDamage == null)
+        {
+            InternalDamageDelegate? method = GetType().GetMethod($"{name}DealDamage")?.CreateDelegate<InternalDamageDelegate>();
+            if (method == null)
+                _dealInternalDamage = DefaultInternalDealDamage;
+            else
+                _dealInternalDamage = method;
         }
     }
 
@@ -156,7 +170,8 @@ public partial struct Threat
     public void OnBeaten() => _onBeaten(ref this);
     public void ProcessDamage() => _processDamage(ref this);
     public int GetDistance(DamageSource damageSource) => _getDistance(ref this, damageSource);
-    public void DealDamage(DamageSource damageSource, int damage) => _dealDamage(ref this, damageSource, damage);
+    public void DealExternalDamage(DamageSource damageSource, int damage) => _dealExternalDamage!(ref this, damageSource, damage);
+    public void DealInternalDamage(DamageSource damageSource, int damage, int playerId, Position position) => _dealInternalDamage!(ref this, damageSource, damage, playerId, position);
 
     private static SimpleDelegate ActDealDamage(int damage)
     {
@@ -195,9 +210,15 @@ public partial struct Threat
         @this.Game.DestroyShip();
     }
 
-    private static void DefaultDealDamage(ref Threat @this, DamageSource _, int damage)
+    private static void DefaultExternalDealDamage(ref Threat @this, DamageSource _, int damage)
     {
         @this.Damage += damage;
+    }
+
+    private static void DefaultInternalDealDamage(ref Threat @this, DamageSource _, int damage, int __, Position ___)
+    {
+        @this.Health -= damage;
+        @this.UpdateAlive();
     }
 
     private static void DefaultExternalProcessDamage(ref Threat @this)

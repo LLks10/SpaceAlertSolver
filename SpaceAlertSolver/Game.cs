@@ -651,8 +651,16 @@ public sealed class Game : IGame
     {
         for (int i = 0; i < Threats.Count; i++)
         {
-            if (!Threats[i].IsExternal || Threats[i].Damage > 0)
-                Threats[i].ProcessDamage();
+            if (Threats[i].IsExternal)
+            {
+                if (Threats[i].Damage > 0)
+                    Threats[i].ProcessDamage();
+            }
+            else
+            {
+                if (Threats[i].Alive)
+                    Threats[i].ProcessDamage();
+            }
         }
     }
 
@@ -689,6 +697,11 @@ public sealed class Game : IGame
     {
         for (int i = Threats.Count - 1; i >= 0; i--)
         {
+            if (!Threats[i].Alive)
+            {
+                Debug.Assert(!Threats[i].IsExternal, "external threat cannot be dead here");
+                continue;
+            }
             int speed = Math.Min(Threats[i].Speed, Threats[i].Distance);
             Debug.Assert(speed > 0, "If the threat has no more distance to travel it should not exist");
             _simulationStack.Add(SimulationStep.NewMoveThreatStep(i, speed));
