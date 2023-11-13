@@ -28,7 +28,7 @@ public partial struct Threat
     private TargetDelegate? _isTargetedBy;
 
     private delegate int DistanceDelegate(ref Threat @this, DamageSource damageSource);
-    private DistanceDelegate _getDistance;
+    private DistanceDelegate? _getDistance;
 
     private delegate void ExternalDamageDelegate(ref Threat @this, DamageSource damageSource, int damage);
     private ExternalDamageDelegate? _dealExternalDamage;
@@ -75,14 +75,14 @@ public partial struct Threat
     /// </summary>
     private Threat(int health, int speed, Position position, int scoreWin, int scoreLose, TargetDelegate? isTargetedBy = null,
         SimpleDelegate ? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, int inaccessibility = 0,
-        SimpleDelegate? onBeaten = null,SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, InternalDamageDelegate? dealDamage = null)
+        SimpleDelegate? onBeaten = null,SimpleDelegate? processDamage = null, InternalDamageDelegate? dealDamage = null)
     {
         _actX = actX!;
         _actY = actY!;
         _actZ = actZ!;
         _onBeaten = onBeaten!;
         _processDamage = processDamage!;
-        _getDistance = getDistance!;
+        _getDistance = null;
         _dealExternalDamage = null;
         _dealInternalDamage = dealDamage;
         _isTargetedBy = isTargetedBy;
@@ -152,7 +152,7 @@ public partial struct Threat
             }
         }
 
-        if (_getDistance == null)
+        if (IsExternal && _getDistance == null)
         {
             DistanceDelegate? method = GetType().GetMethod($"{name}GetDistance")?.CreateDelegate<DistanceDelegate>();
             if (method == null)
@@ -185,10 +185,10 @@ public partial struct Threat
     public void ActZ() => _actZ(ref this);
     public void OnBeaten() => _onBeaten(ref this);
     public void ProcessDamage() => _processDamage(ref this);
-    public int GetDistance(DamageSource damageSource) => _getDistance(ref this, damageSource);
+    public int GetDistance(DamageSource damageSource) => _getDistance!(ref this, damageSource);
     public void DealExternalDamage(DamageSource damageSource, int damage) => _dealExternalDamage!(ref this, damageSource, damage);
     public void DealInternalDamage(DamageSource damageSource, int damage, int playerId, Position position) => _dealInternalDamage!(ref this, damageSource, damage, playerId, position);
-    public bool IsTargetedBy(DamageSource damageSource, Position position) => _isTargetedBy(ref this, damageSource, position);
+    public bool IsTargetedBy(DamageSource damageSource, Position position) => _isTargetedBy!(ref this, damageSource, position);
 
     private static SimpleDelegate ActDealDamage(int damage)
     {
