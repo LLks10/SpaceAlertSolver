@@ -410,7 +410,7 @@ public sealed class Game : IGame
         {
             ref Threat threat = ref Threats[i];
             if (threat.IsExternal || !threat.Alive)
-                return;
+                continue;
 
             if (threat.IsTargetedBy(DamageSource.Robots, player.Position))
             {
