@@ -2,7 +2,7 @@
 
 public partial struct Threat
 {
-    public int RevengeDamage
+    private int RevengeDamage
     {
         get => _value1;
         set => _value1 = value;

@@ -235,8 +235,27 @@ public sealed class Game : IGame
             case SimulationStepType.UseLift:
                 UseLift(simulationStep.PlayerIndex);
                 break;
+            case SimulationStepType.SpillEnergy:
+                HandleSpillEnergy(simulationStep.Position, simulationStep.SpillAmount);
+                break;
             default:
                 throw new UnreachableException();
+        }
+    }
+
+    private void HandleSpillEnergy(Position position, int spillAmount)
+    {
+        Debug.Assert(spillAmount > 0);
+        if (position.IsTop())
+        {
+            BranchShieldFull(position.Zone);
+            ship.Shields[position.Zone] = Math.Max(0, ship.Shields[position.Zone] - spillAmount);
+        }
+        else
+        {
+            Debug.Assert(position.IsBottom());
+            BranchIfReactorFull(position.Zone);
+            ship.Reactors[position.Zone] = Math.Max(0, ship.Reactors[position.Zone] - spillAmount);
         }
     }
 
@@ -300,10 +319,10 @@ public sealed class Game : IGame
                 _simulationStack.Add(SimulationStep.NewUseLiftStep(playerIndex));
                 break;
             case Act.A:
-                PlayerActionA(player.Position);
+                PlayerActionA(playerIndex);
                 break;
             case Act.B:
-                PlayerActionB(player.Position);
+                PlayerActionB(playerIndex);
                 break;
             case Act.C:
                 PlayerActionC(playerIndex);
@@ -334,16 +353,30 @@ public sealed class Game : IGame
         }
     }
 
-    private void PlayerActionA(Position position)
+    private void PlayerActionA(int playerIndex)
     {
+        Position position = Players[playerIndex].Position;
+        if (ship.HasMalfunctionA(position))
+        {
+            DamageInternalThreat(playerIndex, DamageSource.RepairA);
+            return;
+        }
+
         if (!ship.CanFireCannon(position, out bool costsEnergy))
             return;
 
         _simulationStack.Add(SimulationStep.NewFireCannonStep(position, costsEnergy));
     }
 
-    private void PlayerActionB(Position position)
+    private void PlayerActionB(int playerIndex)
     {
+        Position position = Players[playerIndex].Position;
+        if (ship.HasMalfunctionB(position))
+        {
+            DamageInternalThreat(playerIndex, DamageSource.RepairB);
+            return;
+        }
+
         Debug.Assert(position.IsInShip());
         if (position.IsTop())
         {
@@ -369,6 +402,13 @@ public sealed class Game : IGame
 
     private void PlayerActionC(int playerIndex)
     {
+        Position position = Players[playerIndex].Position;
+        if (ship.HasMalfunctionC(position))
+        {
+            DamageInternalThreat(playerIndex, DamageSource.RepairC);
+            return;
+        }
+
         ref Player player = ref Players[playerIndex];
         switch (player.Position.PositionIndex)
         {
@@ -406,15 +446,21 @@ public sealed class Game : IGame
         if (player.AndroidState != AndroidState.Alive)
             return;
 
+        DamageInternalThreat(playerIndex, DamageSource.Robots);
+    }
+
+    private void DamageInternalThreat(int playerIndex, DamageSource damageSource)
+    {
+        ref Player player = ref Players[playerIndex];
         for (int i = 0; i < Threats.Count; i++)
         {
             ref Threat threat = ref Threats[i];
             if (threat.IsExternal || !threat.Alive)
                 continue;
 
-            if (threat.IsTargetedBy(DamageSource.Robots, player.Position))
+            if (threat.IsTargetedBy(damageSource, player.Position))
             {
-                threat.DealInternalDamage(DamageSource.Robots, 1, playerIndex, player.Position);
+                threat.DealInternalDamage(damageSource, 1, playerIndex, player.Position);
                 break;
             }
         }
@@ -586,6 +632,9 @@ public sealed class Game : IGame
         int target = -1;
         for (int i = 0; i < Threats.Count; i++)
         {
+            if (!Threats[i].IsExternal)
+                continue;
+
             int distance = Threats[i].GetDistance(DamageSource.Interceptors);
             if (distance >= Trajectory.RANGE_2_START)
                 continue;
@@ -765,6 +814,7 @@ public sealed class Game : IGame
         threat.Distance = trajectories[simulationStep.Zone].maxDistance;
         threat.Game = this;
         Threats.Add(in threat);
+        Threats[^1].OnSpawn();
     }
 
     double CalculateScore()
@@ -893,6 +943,18 @@ public sealed class Game : IGame
         }
     }
 
+    public void SpillEnergy(Position position, int amount)
+    {
+        _simulationStack.Add(SimulationStep.NewSpillEnergyStep(position, amount));
+    }
+
+    public void AddMalfunctionA(Position position) => ship.AddMulfunctionA(position);
+    public void AddMalfunctionB(Position position) => ship.AddMulfunctionB(position);
+    public void AddMalfunctionC(Position position) => ship.AddMulfunctionC(position);
+    public void RemoveMalfunctionA(Position position) => ship.RemoveMalfunctionA(position);
+    public void RemoveMalfunctionB(Position position) => ship.RemoveMalfunctionB(position);
+    public void RemoveMalfunctionC(Position position) => ship.RemoveMalfunctionC(position);
+
     private enum SimulationStepType
     {
         TurnStart,
@@ -914,6 +976,7 @@ public sealed class Game : IGame
         RefillShield,
         RefillSideReactor,
         UseLift,
+        SpillEnergy,
     }
 
     private readonly struct SimulationStep
@@ -925,6 +988,7 @@ public sealed class Game : IGame
         public int Damage => _value1;
         public int Speed => _value2;
         public int Zone => _value2;
+        public int SpillAmount => _value2;
         public bool IsExternal => _bool1;
         public bool CostsEnergy => _bool1;
         public bool StartNewObservationPhase => _bool1;
@@ -981,6 +1045,8 @@ public sealed class Game : IGame
         public static SimulationStep NewRefillSideReactorStep(int zone) => new(SimulationStepType.RefillSideReactor, value2: zone);
 
         public static SimulationStep NewUseLiftStep(int playerIndex) => new(SimulationStepType.UseLift, value1: playerIndex);
+
+        public static SimulationStep NewSpillEnergyStep(Position position, int amount) => new(SimulationStepType.SpillEnergy, value1: position.PositionIndex, value2: amount);
     }
 }
 

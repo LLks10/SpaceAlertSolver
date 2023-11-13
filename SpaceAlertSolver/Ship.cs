@@ -32,12 +32,14 @@ internal sealed class Ship
     public readonly int[] ShieldsCap = new int[3];
     public readonly int[] Reactors = new int[3];
     public readonly int[] ReactorsCap = new int[3];
-    public readonly int[] BDefect = new int[6];
-    public readonly int[] CDefect = new int[7];
     public readonly int[] StationStatus = new int[6];
     public readonly int[] Damage = new int[3];
     public readonly bool[] Fissured = new bool[3];
     internal readonly CannonStats[] CannonStats = new CannonStats[6];
+
+    private readonly int[] _malfunctionsA = new int[6];
+    private readonly int[] _malfunctionsB = new int[6];
+    private readonly int[] _malfunctionsC = new int[6];
 
     //Bit flags
     private int _liftUsed;
@@ -74,8 +76,9 @@ internal sealed class Ship
         other.Reactors.CopyTo(Reactors, 0);
         other.ReactorsCap.CopyTo(ReactorsCap, 0);
         other.CannonStats.CopyTo(CannonStats, 0);
-        other.BDefect.CopyTo(BDefect, 0);
-        other.CDefect.CopyTo(CDefect, 0);
+        other._malfunctionsA.CopyTo(_malfunctionsA, 0);
+        other._malfunctionsA.CopyTo(_malfunctionsB, 0);
+        other._malfunctionsC.CopyTo(_malfunctionsC, 0);
         other.StationStatus.CopyTo(StationStatus, 0);
         other.Damage.CopyTo(Damage, 0);
         other.Fissured.CopyTo(Fissured, 0);
@@ -112,8 +115,9 @@ internal sealed class Ship
         ReactorsCap[0] = ReactorsCap[2] = 3;
         ReactorsCap[1] = 5;
         _defaultCannonStats.CopyTo(CannonStats, 0);
-        Array.Fill(BDefect, 0);
-        Array.Fill(CDefect, 0);
+        Array.Fill(_malfunctionsA, 0);
+        Array.Fill(_malfunctionsB, 0);
+        Array.Fill(_malfunctionsC, 0);
         Array.Fill(StationStatus, 0);
         Array.Fill(Damage, 0);
         Array.Fill(Fissured, false);
@@ -137,6 +141,32 @@ internal sealed class Ship
             }
         }
     }
+
+    public void AddMulfunctionA(Position position) => _malfunctionsA[position.PositionIndex]++;
+    public void AddMulfunctionB(Position position) => _malfunctionsB[position.PositionIndex]++;
+    public void AddMulfunctionC(Position position) => _malfunctionsC[position.PositionIndex]++;
+
+    public void RemoveMalfunctionA(Position position)
+    {
+        Debug.Assert(_malfunctionsA[position.PositionIndex] > 0);
+        _malfunctionsA[position.PositionIndex]--;
+    }
+
+    public void RemoveMalfunctionB(Position position)
+    {
+        Debug.Assert(_malfunctionsB[position.PositionIndex] > 0);
+        _malfunctionsB[position.PositionIndex]--;
+    }
+
+    public void RemoveMalfunctionC(Position position)
+    {
+        Debug.Assert(_malfunctionsC[position.PositionIndex] > 0);
+        _malfunctionsC[position.PositionIndex]--;
+    }
+
+    public bool HasMalfunctionA(Position position) => _malfunctionsA[position.PositionIndex] > 0;
+    public bool HasMalfunctionB(Position position) => _malfunctionsB[position.PositionIndex] > 0;
+    public bool HasMalfunctionC(Position position) => _malfunctionsC[position.PositionIndex] > 0;
 
     public bool DealExternalDamage(int zone, int damage)
     {

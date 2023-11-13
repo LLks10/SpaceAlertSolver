@@ -15,4 +15,18 @@ public interface IGame
     public void DestroyShip();
 
     public int ExternalDamageBonus { set; }
+
+    public void SpillEnergy(Position position, int amount);
+
+    public void AddMalfunctionA(Position position);
+
+    public void AddMalfunctionB(Position position);
+
+    public void AddMalfunctionC(Position position);
+
+    public void RemoveMalfunctionA(Position position);
+
+    public void RemoveMalfunctionB(Position position);
+
+    public void RemoveMalfunctionC(Position position);
 }

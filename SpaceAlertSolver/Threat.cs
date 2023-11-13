@@ -21,6 +21,7 @@ public partial struct Threat
     private SimpleDelegate _actX;
     private SimpleDelegate _actY;
     private SimpleDelegate _actZ;
+    private SimpleDelegate _onSpawn;
     private SimpleDelegate _onBeaten;
     private SimpleDelegate _processDamage;
 
@@ -42,12 +43,13 @@ public partial struct Threat
     /// External threat constructor
     /// </summary>
     private Threat(int health, int shield, int speed, int scoreWin, int scoreLose,
-        SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onBeaten = null,
+        SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onSpawn = null, SimpleDelegate? onBeaten = null,
         SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, ExternalDamageDelegate? dealDamage = null)
     {
         _actX = actX!; // if it's null if will be solved externally
         _actY = actY!;
         _actZ = actZ!;
+        _onSpawn = onSpawn!;
         _onBeaten = onBeaten!;
         _processDamage = processDamage!;
         _getDistance = getDistance!;
@@ -75,11 +77,12 @@ public partial struct Threat
     /// </summary>
     private Threat(int health, int speed, Position position, int scoreWin, int scoreLose, TargetDelegate? isTargetedBy = null,
         SimpleDelegate ? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, int inaccessibility = 0,
-        SimpleDelegate? onBeaten = null,SimpleDelegate? processDamage = null, InternalDamageDelegate? dealDamage = null)
+        SimpleDelegate? onSpawn = null, SimpleDelegate? onBeaten = null,SimpleDelegate? processDamage = null, InternalDamageDelegate? dealDamage = null)
     {
         _actX = actX!;
         _actY = actY!;
         _actZ = actZ!;
+        _onSpawn = onSpawn!;
         _onBeaten = onBeaten!;
         _processDamage = processDamage!;
         _getDistance = null;
@@ -125,6 +128,15 @@ public partial struct Threat
             TargetDelegate? method = GetType().GetMethod($"{name}IsTargetedBy")?.CreateDelegate<TargetDelegate>();
             Debug.Assert(method != null, "Cannot find IsTargetedBy method, nor is it set in the Create method");
             _isTargetedBy = method;
+        }
+
+        if (_onSpawn == null)
+        {
+            SimpleDelegate? method = GetType().GetMethod($"{name}OnSpawn")?.CreateDelegate<SimpleDelegate>();
+            if (method == null)
+                _onSpawn = Blank;
+            else
+                _onSpawn = method;
         }
 
         if (_onBeaten == null)
@@ -183,6 +195,7 @@ public partial struct Threat
     public void ActX() => _actX(ref this);
     public void ActY() => _actY(ref this);
     public void ActZ() => _actZ(ref this);
+    public void OnSpawn() => _onSpawn(ref this);
     public void OnBeaten() => _onBeaten(ref this);
     public void ProcessDamage() => _processDamage(ref this);
     public int GetDistance(DamageSource damageSource) => _getDistance!(ref this, damageSource);
