@@ -62,7 +62,7 @@ public class Gene
      * <param name="trajs">The trajectories</param>
      * <param name="evts">The events</param>
      */
-    public Gene RandomNeighbour(Random rng, ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts)
+    internal Gene RandomNeighbour(Random rng, ImmutableArray<Trajectory> trajs, List<SimulationStep> simulationStack)
     {
         Debug.Assert(op_chances.Length == operators.Length);
 
@@ -80,7 +80,7 @@ public class Gene
         }
 
         Gene ret = operators[op_i].Invoke(this, rng);
-        ret.setEval(trajs, evts);
+        ret.setEval(trajs, simulationStack);
         return ret;
     }
 
@@ -203,9 +203,9 @@ public class Gene
         return output;
     }
 
-    public void setEval(ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts)
+    internal void setEval(ImmutableArray<Trajectory> trajs, List<SimulationStep> simulationStack)
     {
-        score = Evaluate(this.gene, trajs, evts);
+        score = Evaluate(this.gene, trajs, simulationStack);
 
         blanks = 0;
         for (int i = 0; i < players * 12; i++)
@@ -217,7 +217,7 @@ public class Gene
         }
     }
 
-    private double Evaluate(int[] gene, ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts)
+    private double Evaluate(int[] gene, ImmutableArray<Trajectory> trajs, List<SimulationStep> simulationStack)
     {
         Player[] ps = new Player[user_actions.Length + players];
 
@@ -267,7 +267,7 @@ public class Gene
         }
 
         Game g = GamePool.GetGame();
-        g.Init(ps, trajs, evts);
+        g.Init(ps, trajs, simulationStack: simulationStack);
         double score = g.Simulate();
         GamePool.FreeGame(g);
         return score;

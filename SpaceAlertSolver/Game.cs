@@ -87,7 +87,7 @@ public sealed class Game : IGame
         _simulationStack.AddRange(other._simulationStack);
     }
 
-    public void Init(Player[] players, ImmutableArray<Trajectory> trajectories, ImmutableArray<Event> events)
+    internal void Init(Player[] players, ImmutableArray<Trajectory> trajectories, ImmutableArray<Event>? events = null, List<SimulationStep>? simulationStack = null)
     {
         ship.Init();
         InitPlayers(players);
@@ -106,7 +106,13 @@ public sealed class Game : IGame
         scoreMultiplier = 1.0;
         scoreAddition = 0.0;
         ExternalDamageBonus = 0;
-        InitSimulationStack(Players.Length, events);
+        if (simulationStack == null)
+            InitSimulationStack(_simulationStack, Players.Length, events!.Value);
+        else
+        {
+            _simulationStack.Clear();
+            _simulationStack.AddRange(simulationStack);
+        }
     }
 
     private void InitPlayers(Player[] other)
@@ -117,47 +123,47 @@ public sealed class Game : IGame
         other.CopyTo(Players, 0);
     }
 
-    private void InitSimulationStack(int numPlayers, ImmutableArray<Event> events)
+    internal static void InitSimulationStack(List<SimulationStep> simulationStack, int numPlayers, ImmutableArray<Event> events)
     {
         const int NUM_NORMAL_TURNS = 12;
 
-        _simulationStack.Clear();
+        simulationStack.Clear();
 
-        _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
-        _simulationStack.Add(SimulationStep.NewCreateMovesStep());
-        _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
-        _simulationStack.Add(SimulationStep.NewProcessDamageStep());
-        _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
+        simulationStack.Add(SimulationStep.NewCleanThreatsStep());
+        simulationStack.Add(SimulationStep.NewCreateMovesStep());
+        simulationStack.Add(SimulationStep.NewCleanThreatsStep());
+        simulationStack.Add(SimulationStep.NewProcessDamageStep());
+        simulationStack.Add(SimulationStep.NewRocketUpdateStep());
 
         int eventIndex = events.Length - 1;
         for (int i = NUM_NORMAL_TURNS; i > 0; i--)
         {
-            _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
-            _simulationStack.Add(SimulationStep.NewCreateMovesStep());
-            _simulationStack.Add(SimulationStep.NewCleanThreatsStep());
-            _simulationStack.Add(SimulationStep.NewProcessDamageStep());
-            _simulationStack.Add(SimulationStep.NewRocketUpdateStep());
+            simulationStack.Add(SimulationStep.NewCleanThreatsStep());
+            simulationStack.Add(SimulationStep.NewCreateMovesStep());
+            simulationStack.Add(SimulationStep.NewCleanThreatsStep());
+            simulationStack.Add(SimulationStep.NewProcessDamageStep());
+            simulationStack.Add(SimulationStep.NewRocketUpdateStep());
 
             bool startNewObservationPhase = (i == 12 || i == 7 || i == 3);
-            _simulationStack.Add(SimulationStep.NewObservationUpdateStep(startNewObservationPhase));
+            simulationStack.Add(SimulationStep.NewObservationUpdateStep(startNewObservationPhase));
 
             for (int j = numPlayers - 1; j >= 0; j--)
             {
-                _simulationStack.Add(SimulationStep.NewPlayerActionStep(j));
+                simulationStack.Add(SimulationStep.NewPlayerActionStep(j));
             }
 
             if (i == 3 || i == 6 || i == 10)
-                _simulationStack.Add(SimulationStep.NewCheckComputerStep());
+                simulationStack.Add(SimulationStep.NewCheckComputerStep());
             else if (i == 4 || i == 8)
-                _simulationStack.Add(SimulationStep.NewResetComputerStep());
+                simulationStack.Add(SimulationStep.NewResetComputerStep());
 
             if (eventIndex >= 0 && events[eventIndex].Turn == i)
             {
-                _simulationStack.Add(SimulationStep.NewThreatSpawnStep(events[eventIndex]));
+                simulationStack.Add(SimulationStep.NewThreatSpawnStep(events[eventIndex]));
                 eventIndex--;
             }
 
-            _simulationStack.Add(SimulationStep.NewTurnStartStep());
+            simulationStack.Add(SimulationStep.NewTurnStartStep());
         }
     }
 
@@ -954,100 +960,100 @@ public sealed class Game : IGame
     public void RemoveMalfunctionA(Position position) => ship.RemoveMalfunctionA(position);
     public void RemoveMalfunctionB(Position position) => ship.RemoveMalfunctionB(position);
     public void RemoveMalfunctionC(Position position) => ship.RemoveMalfunctionC(position);
-
-    private enum SimulationStepType
-    {
-        TurnStart,
-        ResetComputer,
-        CheckComputer,
-        PlayerAction,
-        ObservationUpdate,
-        RocketUpdate,
-        ProcessDamage,
-        CleanThreats,
-        CreateMoves,
-        MoveThreat,
-        SpawnThreat,
-        ActX,
-        ActY,
-        ActZ,
-        DealExternalDamage,
-        FireCannon,
-        RefillShield,
-        RefillSideReactor,
-        UseLift,
-        SpillEnergy,
-    }
-
-    private readonly struct SimulationStep
-    {
-        public readonly SimulationStepType Type;
-        public int PlayerIndex => _value1;
-        public int ThreatIndex => _value1;
-        public int ThreatId => _value1;
-        public int Damage => _value1;
-        public int Speed => _value2;
-        public int Zone => _value2;
-        public int SpillAmount => _value2;
-        public bool IsExternal => _bool1;
-        public bool CostsEnergy => _bool1;
-        public bool StartNewObservationPhase => _bool1;
-        public Position Position => new(_value1);
-
-        private readonly int _value1, _value2;
-        private readonly bool _bool1;
-
-        private SimulationStep(SimulationStepType type, int value1 = default, int value2 = default, bool bool1 = default)
-        {
-            Type = type;
-            _value1 = value1;
-            _value2 = value2;
-            _bool1 = bool1;
-        }
-
-        public static SimulationStep NewCreateMovesStep() => new(SimulationStepType.CreateMoves);
-
-        public static SimulationStep NewMoveThreatStep(int threatId, int speed) => new(SimulationStepType.MoveThreat, value1: threatId, value2: speed);
-
-        public static SimulationStep NewCleanThreatsStep() => new(SimulationStepType.CleanThreats);
-
-        public static SimulationStep NewProcessDamageStep() => new(SimulationStepType.ProcessDamage);
-
-        public static SimulationStep NewRocketUpdateStep() => new(SimulationStepType.RocketUpdate);
-
-        public static SimulationStep NewPlayerActionStep(int playerIndex) => new(SimulationStepType.PlayerAction, value1: playerIndex);
-
-        public static SimulationStep NewTurnStartStep() => new(SimulationStepType.TurnStart);
-
-        public static SimulationStep NewThreatSpawnStep(int creatureId, int zone, bool isExternal)
-            => new(SimulationStepType.SpawnThreat, value1:creatureId, value2: zone, bool1: isExternal);
-
-        public static SimulationStep NewThreatSpawnStep(in Event @event) => NewThreatSpawnStep(@event.CreatureId, @event.Zone, @event.IsExternal);
-
-        public static SimulationStep NewResetComputerStep() => new(SimulationStepType.ResetComputer);
-
-        public static SimulationStep NewCheckComputerStep() => new(SimulationStepType.CheckComputer);
-
-        public static SimulationStep NewObservationUpdateStep(bool startNewPhase) => new(SimulationStepType.ObservationUpdate, bool1: startNewPhase);
-
-        public static SimulationStep NewActXStep(int threatId) => new(SimulationStepType.ActX, value1: threatId);
-
-        public static SimulationStep NewActYStep(int threatId) => new(SimulationStepType.ActY, value1: threatId);
-
-        public static SimulationStep NewActZStep(int threatId) => new(SimulationStepType.ActZ, value1: threatId);
-
-        public static SimulationStep NewDealExternalDamageStep(int zone, int damage) => new(SimulationStepType.DealExternalDamage, value1: damage, value2: zone);
-
-        public static SimulationStep NewFireCannonStep(Position position, bool costsEnergy) => new(SimulationStepType.FireCannon, value1: position.PositionIndex, bool1: costsEnergy);
-
-        public static SimulationStep NewRefillShieldStep(int zone) => new(SimulationStepType.RefillShield, value2: zone);
-
-        public static SimulationStep NewRefillSideReactorStep(int zone) => new(SimulationStepType.RefillSideReactor, value2: zone);
-
-        public static SimulationStep NewUseLiftStep(int playerIndex) => new(SimulationStepType.UseLift, value1: playerIndex);
-
-        public static SimulationStep NewSpillEnergyStep(Position position, int amount) => new(SimulationStepType.SpillEnergy, value1: position.PositionIndex, value2: amount);
-    }
 }
 
 public readonly record struct Event(bool IsExternal, int Turn, int Zone, int CreatureId);
+
+internal enum SimulationStepType
+{
+    TurnStart,
+    ResetComputer,
+    CheckComputer,
+    PlayerAction,
+    ObservationUpdate,
+    RocketUpdate,
+    ProcessDamage,
+    CleanThreats,
+    CreateMoves,
+    MoveThreat,
+    SpawnThreat,
+    ActX,
+    ActY,
+    ActZ,
+    DealExternalDamage,
+    FireCannon,
+    RefillShield,
+    RefillSideReactor,
+    UseLift,
+    SpillEnergy,
+}
+
+internal readonly struct SimulationStep
+{
+    public readonly SimulationStepType Type;
+    public int PlayerIndex => _value1;
+    public int ThreatIndex => _value1;
+    public int ThreatId => _value1;
+    public int Damage => _value1;
+    public int Speed => _value2;
+    public int Zone => _value2;
+    public int SpillAmount => _value2;
+    public bool IsExternal => _bool1;
+    public bool CostsEnergy => _bool1;
+    public bool StartNewObservationPhase => _bool1;
+    public Position Position => new(_value1);
+
+    private readonly int _value1, _value2;
+    private readonly bool _bool1;
+
+    private SimulationStep(SimulationStepType type, int value1 = default, int value2 = default, bool bool1 = default)
+    {
+        Type = type;
+        _value1 = value1;
+        _value2 = value2;
+        _bool1 = bool1;
+    }
+
+    public static SimulationStep NewCreateMovesStep() => new(SimulationStepType.CreateMoves);
+
+    public static SimulationStep NewMoveThreatStep(int threatId, int speed) => new(SimulationStepType.MoveThreat, value1: threatId, value2: speed);
+
+    public static SimulationStep NewCleanThreatsStep() => new(SimulationStepType.CleanThreats);
+
+    public static SimulationStep NewProcessDamageStep() => new(SimulationStepType.ProcessDamage);
+
+    public static SimulationStep NewRocketUpdateStep() => new(SimulationStepType.RocketUpdate);
+
+    public static SimulationStep NewPlayerActionStep(int playerIndex) => new(SimulationStepType.PlayerAction, value1: playerIndex);
+
+    public static SimulationStep NewTurnStartStep() => new(SimulationStepType.TurnStart);
+
+    public static SimulationStep NewThreatSpawnStep(int creatureId, int zone, bool isExternal)
+        => new(SimulationStepType.SpawnThreat, value1: creatureId, value2: zone, bool1: isExternal);
+
+    public static SimulationStep NewThreatSpawnStep(in Event @event) => NewThreatSpawnStep(@event.CreatureId, @event.Zone, @event.IsExternal);
+
+    public static SimulationStep NewResetComputerStep() => new(SimulationStepType.ResetComputer);
+
+    public static SimulationStep NewCheckComputerStep() => new(SimulationStepType.CheckComputer);
+
+    public static SimulationStep NewObservationUpdateStep(bool startNewPhase) => new(SimulationStepType.ObservationUpdate, bool1: startNewPhase);
+
+    public static SimulationStep NewActXStep(int threatId) => new(SimulationStepType.ActX, value1: threatId);
+
+    public static SimulationStep NewActYStep(int threatId) => new(SimulationStepType.ActY, value1: threatId);
+
+    public static SimulationStep NewActZStep(int threatId) => new(SimulationStepType.ActZ, value1: threatId);
+
+    public static SimulationStep NewDealExternalDamageStep(int zone, int damage) => new(SimulationStepType.DealExternalDamage, value1: damage, value2: zone);
+
+    public static SimulationStep NewFireCannonStep(Position position, bool costsEnergy) => new(SimulationStepType.FireCannon, value1: position.PositionIndex, bool1: costsEnergy);
+
+    public static SimulationStep NewRefillShieldStep(int zone) => new(SimulationStepType.RefillShield, value2: zone);
+
+    public static SimulationStep NewRefillSideReactorStep(int zone) => new(SimulationStepType.RefillSideReactor, value2: zone);
+
+    public static SimulationStep NewUseLiftStep(int playerIndex) => new(SimulationStepType.UseLift, value1: playerIndex);
+
+    public static SimulationStep NewSpillEnergyStep(Position position, int amount) => new(SimulationStepType.SpillEnergy, value1: position.PositionIndex, value2: amount);
+}

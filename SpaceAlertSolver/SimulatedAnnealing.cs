@@ -10,11 +10,16 @@ public sealed class SimulatedAnnealing
     private double _highestScore = double.NegativeInfinity;
     private int _highestBlanks = int.MinValue;
     private Gene _bestState; // use for restarts
+    private readonly ImmutableArray<Trajectory> _trajectories;
+    private readonly List<SimulationStep> _simulationStack = new();
 
     public SimulatedAnnealing(int players, ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts)
     {
+        _trajectories = trajs;
+        Game.InitSimulationStack(_simulationStack, players, evts);
+
         _currentState = new Gene(players);
-        _currentState.setEval(trajs, evts);
+        _currentState.setEval(_trajectories, _simulationStack);
     }
 
     /**
@@ -24,7 +29,7 @@ public sealed class SimulatedAnnealing
      * <param name="evts">The events</param>
      * <param name="seed">[optional] The seed to use</param>
      */
-    public void Run(int maxIterations, ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts, int seed, bool printDebug=Program.PRINT_DEBUG)
+    public void Run(int maxIterations, int seed, bool printDebug=Program.PRINT_DEBUG)
     {
         Random rng = new Random(seed);
 
@@ -32,7 +37,7 @@ public sealed class SimulatedAnnealing
         {
             Game.Scores.Clear();
 
-            Gene newState = _currentState.RandomNeighbour(rng, trajs, evts);
+            Gene newState = _currentState.RandomNeighbour(rng, _trajectories, _simulationStack);
             if (P(_currentState, newState,
                     Temperature((double)iteration / maxIterations)) >= rng.NextDouble())
             {
@@ -71,9 +76,9 @@ public sealed class SimulatedAnnealing
      * <param name="trajs">The trajectories</param>
      * <param name="evts">The events</param>
      */
-    public void Run(int maxIterations, ImmutableArray<Trajectory> trajs, ImmutableArray<Event> evts)
+    public void Run(int maxIterations)
     {
-        Run(maxIterations, trajs, evts, Guid.NewGuid().GetHashCode());
+        Run(maxIterations, Guid.NewGuid().GetHashCode());
     }
 
     public Gene getCurrentGene()

@@ -210,7 +210,7 @@ class Program
         Console.ReadLine();*/
 
         SimulatedAnnealing sa = new SimulatedAnnealing(NUM_AI_PLAYERS, trajectories, evArr);
-        sa.Run(NUM_SIMULATIONS, trajectories, evArr, seed);
+        sa.Run(NUM_SIMULATIONS, seed);
         if (PRINT_DEBUG)
         {
             Console.WriteLine(sa.getBestGene().Rep() + sa.getBestGene().getScore());

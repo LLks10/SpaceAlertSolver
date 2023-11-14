@@ -47,6 +47,6 @@ public class AnnealingBenchmark
     public void RunSimulatedAnnealing()
     {
         SimulatedAnnealing sa = new(5, _trajectories, _events);
-        sa.Run(Iterations, _trajectories, _events, seed: Seed, printDebug: false);
+        sa.Run(Iterations, seed: Seed, printDebug: false);
     }
 }
