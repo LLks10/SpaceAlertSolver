@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿//#define RUNLOCAL
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using SpaceAlertSolver;
 using SpaceAlertSolverTests;
@@ -10,7 +11,11 @@ internal sealed class Program
 {
     public static void Main()
     {
+        #if RUNLOCAL
+        new AnnealingBenchmark() { Iterations = 200000 }.RunSimulatedAnnealing();
+        #else
         BenchmarkRunner.Run<AnnealingBenchmark>();
+        #endif
     }
 }
 
