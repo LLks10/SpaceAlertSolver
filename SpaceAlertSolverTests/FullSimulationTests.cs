@@ -56,10 +56,10 @@ public class FullSimulationTests
         ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1463");
         ImmutableArray<Event> events = ImmutableArray.Create<Event>
         (
-            "1 1 cryoshield frigate",
-            "3 0 kamikaze",
-            "4 power system overload",
-            "6 1 scout"
+            new(true, 1, 1, ThreatParser.ParseExThreat("cryoshield frigate").id),
+            new(true, 3, 0, ThreatParser.ParseExThreat("kamikaze").id),
+            new(false, 4, 3, ThreatParser.ParseInThreat("overstrained energy net").id),
+            new(true, 6, 1, ThreatParser.ParseExThreat("scout").id)
         );
         Player[] players = TestUtils.CreatePlayersFromActions
         (
