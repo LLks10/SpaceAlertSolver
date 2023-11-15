@@ -25,10 +25,10 @@ public class AnnealingBenchmark
     private readonly ImmutableArray<Trajectory> _trajectories = TestUtils.GetTrajectoriesFromString("1463");
     private readonly ImmutableArray<Event> _events = ImmutableArray.Create<Event>
     (
-        new(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Cryoshield Frigate")),
-        new(true, 3, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Kamikaze")),
-        new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Power System Overload")),
-        new(true, 6, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Scout"))
+        "1 1 cryoshield frigate",
+        "3 0 kamikaze",
+        "4 power system overload",
+        "6 1 scout"
     );
 
     [Params(100000, 200000)]

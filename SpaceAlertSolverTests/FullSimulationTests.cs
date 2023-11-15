@@ -27,13 +27,14 @@ public class FullSimulationTests
 
         ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("7643");
         ImmutableArray<Event> events = ImmutableArray.Create<Event>
-            ( new(true, 1, 2, TestUtils.GetThreatIdMatchingExactPrimaryName("Amoebe"))
-            , new(true, 3, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Psionic Satellite"))
-            , new(false, 4, 3, TestUtils.GetThreatIdMatchingExactPrimaryName("Executioner"))
-            , new(true, 5, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Cryoshield Fighter"))
-            , new(true, 7, 0, TestUtils.GetThreatIdMatchingExactPrimaryName("Pulse Ball"))
-            , new(true, 8, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Scout"))
-            );
+        (
+            "1 2 amoebe",
+            "3 0 psionic satellite",
+            "4 executioner",
+            "5 1 cryoshield fighter",
+            "7 0 pulse ball",
+            "8 1 scout"
+        );
 
         Act[][] actions = new Act[][]
             { ActUtils.ParseActionsFromString("dcbrccr ce c")

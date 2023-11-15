@@ -29,9 +29,9 @@ public class SimulationTest
         Act[] actions = ActUtils.ParseActionsFromString("a           ");
         Player[] players = new Player[1] { TestUtils.CreatePlayerFromActions(actions) };
         ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
-        ImmutableArray<Event> events = ImmutableArray.Create
+        ImmutableArray<Event> events = ImmutableArray.Create<Event>
         (
-            new Event(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Meteoroid")) // meteorite will be oneshot
+            "1 1 meteoroid"
         );
 
         Game g = GamePool.GetGame();
@@ -54,9 +54,9 @@ public class SimulationTest
         Act[] actions = ActUtils.ParseActionsFromString("c aa        ");
         Player[] players = new Player[1] { TestUtils.CreatePlayerFromActions(actions) };
         ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
-        ImmutableArray<Event> events = ImmutableArray.Create
+        ImmutableArray<Event> events = ImmutableArray.Create<Event>
         (
-            new Event(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Gunship"))
+            "1 1 gunship"
         );
 
         Game g = GamePool.GetGame();
@@ -81,10 +81,10 @@ public class SimulationTest
 
         Player[] players = TestUtils.CreatePlayersFromActions(actions0, actions1, actions2);
         ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("6134");
-        ImmutableArray<Event> events = ImmutableArray.Create
+        ImmutableArray<Event> events = ImmutableArray.Create<Event>
         (
-            new Event(true, 1, 1, TestUtils.GetThreatIdMatchingExactPrimaryName("Nemesis")),
-            new Event(true, 2, 2, TestUtils.GetThreatIdMatchingExactPrimaryName("Gunship"))
+            "1 1 nemesis",
+            "2 2 gunship"
         );
 
         Game g = GamePool.GetGame();

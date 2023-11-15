@@ -962,7 +962,27 @@ public sealed class Game : IGame
     public void RemoveMalfunctionC(Position position) => ship.RemoveMalfunctionC(position);
 }
 
-public readonly record struct Event(bool IsExternal, int Turn, int Zone, int CreatureId);
+public readonly record struct Event(bool IsExternal, int Turn, int Zone, int CreatureId)
+{
+    public static implicit operator Event(string s)
+    {
+        string[] splits = s.Split(' ');
+        string turnString = splits[0];
+        int turn = int.Parse(turnString);
+        string zoneString = splits[1];
+        bool isExternal = int.TryParse(zoneString, out int zone);
+        string threatString;
+        if (isExternal)
+            threatString = string.Join(" ", splits[2..]);
+        else
+        {
+            threatString = string.Join(" ", splits[1..]);
+            zone = 3;
+        }
+        var (_, threatId) = ThreatFactory.Instance.FindThreatMatchingName(threatString);
+        return new(isExternal, turn, zone, threatId);
+    }
+}
 
 internal enum SimulationStepType
 {
