@@ -1,4 +1,5 @@
-﻿//#define RUNLOCAL
+﻿//#define RUNANNEALING
+//#define RUNSINGLE
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using SpaceAlertSolver;
@@ -11,8 +12,10 @@ internal sealed class Program
 {
     public static void Main()
     {
-        #if RUNLOCAL
-        new AnnealingBenchmark() { Iterations = 200000 }.RunSimulatedAnnealing();
+        #if RUNANNEALING
+        new AnnealingBenchmark() { Iterations = 200000 }.SimulatedAnnealing();
+        #elif RUNSINGLE
+        new AnnealingBenchmark().SingleSimulation();
         #else
         BenchmarkRunner.Run<AnnealingBenchmark>();
         #endif
@@ -24,6 +27,13 @@ public class AnnealingBenchmark
 {
     private readonly ImmutableArray<Trajectory> _trajectories = TestUtils.GetTrajectoriesFromString("1463");
     private readonly ImmutableArray<Event> _events = ImmutableArray.Create<Event>( new(true, 1, 1, 17), new(true, 3, 0, 12), new(false, 4, 3, 21), new(true, 6, 1, 15) );
+    private readonly Player[] _players = TestUtils.CreatePlayersFromActions
+    (
+        ActUtils.ParseActionsFromString(" aaaf   a dd"),
+        ActUtils.ParseActionsFromString(" eaae dbbef "),
+        ActUtils.ParseActionsFromString("  drc ce f d"),
+        ActUtils.ParseActionsFromString("   db  f fda")
+    );
 
     [Params(100000, 200000)]
     public int Iterations;
@@ -38,9 +48,23 @@ public class AnnealingBenchmark
     }
 
     [Benchmark]
-    public void RunSimulatedAnnealing()
+    public void SimulatedAnnealing()
     {
         SimulatedAnnealing sa = new(5, _trajectories, _events);
         sa.Run(Iterations, _trajectories, _events, seed: Seed, printDebug: false);
+    }
+
+    [Benchmark]
+    public void SingleSimulation()
+    {
+        List<SimulationStep> simulationStack = new();
+        Game.InitSimulationStack(simulationStack, 4, _events);
+        Game g = GamePool.GetGame();
+        for (int i = 0; i < (int)1e5; i++)
+        {
+            g.Init(_players, _trajectories, simulationStack: simulationStack);
+            g.Simulate();
+        }
+        GamePool.FreeGame(g);
     }
 }
