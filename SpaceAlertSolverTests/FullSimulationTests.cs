@@ -50,4 +50,32 @@ public class FullSimulationTests
         
         Assert.AreEqual(41.0, score);
     }
+
+    [TestMethod]
+    public void TestBenchmark()
+    {
+        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1463");
+        ImmutableArray<Event> events = ImmutableArray.Create<Event>
+        (
+            "1 1 cryoshield frigate",
+            "3 0 kamikaze",
+            "4 power system overload",
+            "6 1 scout"
+        );
+        Player[] players = TestUtils.CreatePlayersFromActions
+        (
+            ActUtils.ParseActionsFromString(" aaaf   a dd"),
+            ActUtils.ParseActionsFromString(" eaae dbbef "),
+            ActUtils.ParseActionsFromString("  drc ce f d"),
+            ActUtils.ParseActionsFromString("   db  f fda")
+        );
+
+        Game g = GamePool.GetGame();
+        g.Init(players, trajectories, events);
+        g.Simulate();
+        GamePool.FreeGame(g);
+
+        Assert.AreEqual(28, Game.Scores.Count);
+        Assert.IsTrue(Game.Scores.All(s => s == 12));
+    }
 }
