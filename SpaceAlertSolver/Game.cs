@@ -935,20 +935,6 @@ public sealed class Game : IGame
         }
     }
 
-    void ApplyStatusEffect(ref Player p)
-    {
-        //Check status effect
-        if (ship.StationStatus[p.Position.PositionIndex] != 0)
-        {
-            // Delay
-            if ((ship.StationStatus[p.Position.PositionIndex] & 1) == 1)
-                p.DelayNext();
-            // Kill
-            else if ((ship.StationStatus[p.Position.PositionIndex] & 2) == 2)
-                p.Kill();
-        }
-    }
-
     public void SpillEnergy(Position position, int amount)
     {
         _simulationStack.Add(SimulationStep.NewSpillEnergyStep(position, amount));
