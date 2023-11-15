@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="SpaceAlertSolverTests" />      
+      <InternalsVisibleTo Include="SpaceAlertSolverTests" />
+      <InternalsVisibleTo Include="Benchmark" />
   </ItemGroup>
 
 </Project>
