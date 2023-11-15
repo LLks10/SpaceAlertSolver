@@ -57,12 +57,10 @@ public class AnnealingBenchmark
     [Benchmark]
     public void SingleSimulation()
     {
-        List<SimulationStep> simulationStack = new();
-        Game.InitSimulationStack(simulationStack, 4, _events);
         Game g = GamePool.GetGame();
         for (int i = 0; i < (int)1e5; i++)
         {
-            g.Init(_players, _trajectories, simulationStack: simulationStack);
+            g.Init(_players, _trajectories, _events);
             g.Simulate();
         }
         GamePool.FreeGame(g);
