@@ -14,7 +14,7 @@ public partial struct Threat
     [InternalSevereThreat("SI2-03", "Power System Overload", "Overbelast Energienet")]
     public static Threat CreatePowerSystemOverload()
     {
-        return new Threat(7, 0, Position.BottomLeft, 12, 6);
+        return new Threat(7, 3, Position.BottomLeft, 12, 6);
     }
 
     public static bool PowerSystemOverloadIsTargetedBy(ref Threat @this, DamageSource damageSource, Position position)
