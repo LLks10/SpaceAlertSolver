@@ -940,6 +940,22 @@ public sealed class Game : IGame
         _simulationStack.Add(SimulationStep.NewSpillEnergyStep(position, amount));
     }
 
+    /// <summary>
+    /// Only use this for testing
+    /// </summary>
+    internal void PerformSingleSimulationStep(SimulationStep step)
+    {
+        int count = _simulationStack.Count;
+        _simulationStack.Add(step);
+        while (!gameover && _simulationStack.Count > count)
+        {
+            int index = _simulationStack.Count - 1;
+            SimulationStep s = _simulationStack[index];
+            HandleSimulationStep(s);
+            _simulationStack.RemoveAt(index);
+        }
+    }
+
     public void AddMalfunctionA(Position position) => ship.AddMulfunctionA(position);
     public void AddMalfunctionB(Position position) => ship.AddMulfunctionB(position);
     public void AddMalfunctionC(Position position) => ship.AddMulfunctionC(position);
