@@ -44,7 +44,7 @@ public partial struct Threat
         Debug.Assert(damageSource == DamageSource.RepairB);
         Debug.Assert(position.IsBottom());
         @this.Health -= damage;
-        @this.DamageBitmask |= position.PositionIndex;
+        @this.DamageBitmask |= 1 << position.PositionIndex;
         if (@this.DamageBitmask == FULL_BOTTOM_DAMAGE_BITMASK)
         {
             @this.Health -= 2;
