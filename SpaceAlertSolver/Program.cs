@@ -158,7 +158,7 @@ class Program
 
                 comExThreats.Remove(threatId);
                 sevExThreats.Remove(threatId);
-                events.Add(new(true, turn, zone, threatId));
+                events.Add(new(turn, zone, threatId));
                 Console.WriteLine($"Loaded {threatName} on turn {turn} in zone {zoneStr[zone]} ({threatId})");
             }
             else
@@ -184,7 +184,7 @@ class Program
 
                 comInThreats.Remove(threatId);
                 sevInThreats.Remove(threatId);
-                events.Add(new(false, turn, 3, threatId));
+                events.Add(new(turn, 3, threatId));
                 Console.WriteLine($"Loaded {threatName} on turn {turn} in zone {zoneStr[3]} ({threatId})");
             }
         }

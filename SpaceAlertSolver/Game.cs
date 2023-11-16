@@ -964,7 +964,7 @@ public sealed class Game : IGame
     public void RemoveMalfunctionC(Position position) => ship.RemoveMalfunctionC(position);
 }
 
-public readonly record struct Event(bool IsExternal, int Turn, int Zone, int CreatureId)
+public readonly record struct Event(int Turn, int Zone, int CreatureId)
 {
     public static implicit operator Event(string s)
     {
@@ -982,7 +982,7 @@ public readonly record struct Event(bool IsExternal, int Turn, int Zone, int Cre
             zone = 3;
         }
         var (_, threatId) = ThreatFactory.Instance.FindThreatMatchingName(threatString);
-        return new(isExternal, turn, zone, threatId);
+        return new(turn, zone, threatId);
     }
 }
 
@@ -1020,7 +1020,6 @@ internal readonly struct SimulationStep
     public int Speed => _value2;
     public int Zone => _value2;
     public int SpillAmount => _value2;
-    public bool IsExternal => _bool1;
     public bool CostsEnergy => _bool1;
     public bool StartNewObservationPhase => _bool1;
     public Position Position => new(_value1);
@@ -1050,10 +1049,10 @@ internal readonly struct SimulationStep
 
     public static SimulationStep NewTurnStartStep() => new(SimulationStepType.TurnStart);
 
-    public static SimulationStep NewThreatSpawnStep(int creatureId, int zone, bool isExternal)
-        => new(SimulationStepType.SpawnThreat, value1: creatureId, value2: zone, bool1: isExternal);
+    public static SimulationStep NewThreatSpawnStep(int creatureId, int zone)
+        => new(SimulationStepType.SpawnThreat, value1: creatureId, value2: zone);
 
-    public static SimulationStep NewThreatSpawnStep(in Event @event) => NewThreatSpawnStep(@event.CreatureId, @event.Zone, @event.IsExternal);
+    public static SimulationStep NewThreatSpawnStep(in Event @event) => NewThreatSpawnStep(@event.CreatureId, @event.Zone);
 
     public static SimulationStep NewResetComputerStep() => new(SimulationStepType.ResetComputer);
 
