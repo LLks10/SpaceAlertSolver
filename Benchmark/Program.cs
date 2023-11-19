@@ -40,12 +40,19 @@ public class AnnealingBenchmark
         ActUtils.ParseActionsFromString("  drc ce f d"),
         ActUtils.ParseActionsFromString("   db  f fda")
     );
+    private readonly List<SimulationStep> _simulationStack = new();
 
     [Params(100000, 200000)]
     public int Iterations;
 
     //[Params(0, 1, 2, 3, 4)]
     public int Seed = 0;
+
+    [GlobalSetup]
+    public void GlobalSetup()
+    {
+        Game.InitSimulationStack(_simulationStack, 4, _events);
+    }
 
     [IterationCleanup]
     public void IterationCleanup()
@@ -63,12 +70,10 @@ public class AnnealingBenchmark
     [Benchmark]
     public void SingleSimulation()
     {
-        List<SimulationStep> simulationStack = new();
-        Game.InitSimulationStack(simulationStack, 4, _events);
         Game g = GamePool.GetGame();
         for (int i = 0; i < (int)1e5; i++)
         {
-            g.Init(_players, _trajectories, simulationStack: simulationStack);
+            g.Init(_players, _trajectories, simulationStack: _simulationStack);
             g.Simulate();
         }
         GamePool.FreeGame(g);

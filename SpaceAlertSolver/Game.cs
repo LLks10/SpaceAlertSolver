@@ -174,7 +174,14 @@ public sealed class Game : IGame
             int index = _simulationStack.Count - 1;
             SimulationStep simulationStep = _simulationStack[index];
             HandleSimulationStep(in simulationStep);
-            _simulationStack.RemoveAt(index);
+            if (_simulationStack.Count - 1 == index)
+            {
+                _simulationStack.RemoveAt(index);
+            }
+            else
+            {
+                _simulationStack[index] = SimulationStep.NewNoneStep();
+            }
         }
 
         return CalculateScore();
@@ -184,6 +191,8 @@ public sealed class Game : IGame
     {
         switch (simulationStep.Type)
         {
+            case SimulationStepType.None:
+                break;
             case SimulationStepType.TurnStart:
                 TurnStart();
                 break;
@@ -988,6 +997,7 @@ public readonly record struct Event(int Turn, int Zone, int CreatureId)
 
 internal enum SimulationStepType
 {
+    None,
     TurnStart,
     ResetComputer,
     CheckComputer,
@@ -1034,6 +1044,8 @@ internal readonly struct SimulationStep
         _value2 = value2;
         _bool1 = bool1;
     }
+
+    public static SimulationStep NewNoneStep() => new(SimulationStepType.None);
 
     public static SimulationStep NewCreateMovesStep() => new(SimulationStepType.CreateMoves);
 
