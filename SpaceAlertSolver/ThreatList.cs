@@ -83,4 +83,10 @@ internal struct ThreatList
         _internalIndex = 0;
         _externalIndex = 0;
     }
+
+    public ThreatList GetEnumerator()
+    {
+        Reset();
+        return this;
+    }
 }
