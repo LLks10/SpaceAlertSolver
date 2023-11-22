@@ -17,6 +17,15 @@ internal struct ThreatList
 
     public ThreatList() { }
 
+    public ref Threat this[int i]
+    {
+        get
+        {
+            Debug.Assert(!_threats[i].Beaten);
+            return ref _threats[i];
+        }
+    }
+
     public void Clear()
     {
         Count = 0;
