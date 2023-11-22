@@ -41,10 +41,28 @@ public sealed class ThreatListTests
     }
 
     [TestMethod]
+    public void TestReverseLoop()
+    {
+        ThreatList list = GetDefaultList();
+
+        List<int> result = new();
+        foreach (int i in list.GetReverseEnumerator())
+        {
+            result.Add(i);
+        }
+
+        Assert.AreEqual(4, result.Count);
+        Assert.AreEqual(3, result[0]);
+        Assert.AreEqual(2, result[1]);
+        Assert.AreEqual(1, result[2]);
+        Assert.AreEqual(0, result[3]);
+    }
+
+    [TestMethod]
     public void TestInternalLoop()
     {
         ThreatList list = GetDefaultList();
-        var internalIds = list.InternalThreatIds.ToImmutableArray();
+        var internalIds = list.InternalThreatIndices.ToImmutableArray();
         Assert.AreEqual(2, internalIds.Length);
         Assert.AreEqual(0, internalIds[0]);
         Assert.AreEqual(2, internalIds[1]);

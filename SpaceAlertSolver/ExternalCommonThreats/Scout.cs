@@ -21,10 +21,10 @@ public partial struct Threat
 
     public static void ScoutActY(ref Threat @this)
     {
-        for (int i = @this.Game.Threats.Count - 1; i >= 0; i--)
+        foreach (int i in @this.Game.Threats.ExternalThreatIndices)
         {
             ref Threat threat = ref @this.Game.Threats[i];
-            if (!threat.IsExternal || threat._actY == @this._actY)
+            if (threat._actY == @this._actY)
                 continue;
             @this.Game.MoveThreat(i, 1);
         }

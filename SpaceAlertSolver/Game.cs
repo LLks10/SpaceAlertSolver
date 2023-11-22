@@ -31,7 +31,7 @@ public sealed class Game : IGame
     internal readonly Ship ship;
     public Player[] Players { get; private set; } = null!;
     public ImmutableArray<Trajectory> trajectories;
-    public RefList<Threat> Threats { get; } = new();
+    public ThreatList Threats { get; } = new();
     double score;
     private bool _didComputerThisPhase;
     bool gameover;
@@ -60,8 +60,8 @@ public sealed class Game : IGame
         InitPlayers(other.Players);
         trajectories = other.trajectories;
         Threats.Clear();
-        Threats.AddRange(other.Threats);
-        for (int i = 0; i < Threats.Count; i++)
+        other.Threats.CopyTo(Threats);
+        foreach (int i in Threats)
         {
             Threats[i].Game = this;
         }
@@ -215,7 +215,7 @@ public sealed class Game : IGame
                 ProcessDamage();
                 break;
             case SimulationStepType.CleanThreats:
-                CleanThreats();
+                score += Threats.CleanBeatenThreats();
                 break;
             case SimulationStepType.CreateMoves:
                 CreateMoves();
@@ -467,10 +467,10 @@ public sealed class Game : IGame
     private void DamageInternalThreat(int playerIndex, DamageSource damageSource)
     {
         ref Player player = ref Players[playerIndex];
-        for (int i = 0; i < Threats.Count; i++)
+        foreach (int i in Threats.InternalThreatIndices)
         {
             ref Threat threat = ref Threats[i];
-            if (threat.IsExternal || !threat.Alive)
+            if (!threat.Alive)
                 continue;
 
             if (threat.IsTargetedBy(damageSource, player.Position))
@@ -576,7 +576,7 @@ public sealed class Game : IGame
 
         if (stats.Type == DamageSource.PulseCannon)
         {
-            for (int i = 0; i < Threats.Count; i++)
+            foreach (int i in Threats.ExternalThreatIndices)
             {
                 ref Threat threat = ref Threats[i];
                 if (!threat.IsExternal)
@@ -589,10 +589,10 @@ public sealed class Game : IGame
         }
         else
         {
-            for (int i = 0; i < Threats.Count; i++)
+            foreach (int i in Threats.ExternalThreatIndices)
             {
                 ref Threat threat = ref Threats[i];
-                if (threat.Zone != position.Zone) // also does isExternal check
+                if (threat.Zone != position.Zone)
                     continue;
 
                 int distance = threat.GetDistance(stats.Type);
@@ -610,12 +610,9 @@ public sealed class Game : IGame
         if (stats.Type == DamageSource.PulseCannon)
         {
             int outOfRangeDistance = Trajectory.SmallestValueOutOfRange[stats.Range];
-            for (int i = 0; i < Threats.Count; i++)
+            foreach (int i in Threats.ExternalThreatIndices)
             {
                 ref Threat threat = ref Threats[i];
-                if (!threat.IsExternal)
-                    continue;
-
                 int distance = threat.GetDistance(DamageSource.PulseCannon);
                 if (distance < outOfRangeDistance)
                     threat.DealExternalDamage(DamageSource.PulseCannon, stats.Damage);
@@ -625,7 +622,7 @@ public sealed class Game : IGame
         {
             int shortestDistance = Trajectory.SmallestValueOutOfRange[stats.Range];
             int threatIndex = -1;
-            for (int i = 0; i < Threats.Count; i++)
+            foreach (int i in Threats.ExternalThreatIndices)
             {
                 ref Threat threat = ref Threats[i];
                 if (threat.Zone != position.Zone)
@@ -645,11 +642,8 @@ public sealed class Game : IGame
     private void UseInterceptors()
     {
         int target = -1;
-        for (int i = 0; i < Threats.Count; i++)
+        foreach (int i in Threats.ExternalThreatIndices)
         {
-            if (!Threats[i].IsExternal)
-                continue;
-
             int distance = Threats[i].GetDistance(DamageSource.Interceptors);
             if (distance >= Trajectory.RANGE_2_START)
                 continue;
@@ -712,11 +706,8 @@ public sealed class Game : IGame
         {
             int shortestDistance = Trajectory.RANGE_3_START;
             int targetIndex = -1;
-            for (int i = 0; i < Threats.Count; i++)
+            foreach (int i in Threats.ExternalThreatIndices)
             {
-                if (!Threats[i].IsExternal)
-                    continue;
-
                 int distance = Threats[i].GetDistance(DamageSource.Rocket);
                 if (distance < shortestDistance)
                 {
@@ -734,7 +725,7 @@ public sealed class Game : IGame
 
     private void ProcessDamage()
     {
-        for (int i = 0; i < Threats.Count; i++)
+        foreach (int i in Threats)
         {
             if (Threats[i].IsExternal)
             {
@@ -749,38 +740,9 @@ public sealed class Game : IGame
         }
     }
 
-    private void CleanThreats()
-    {
-        for (int i = Threats.Count - 1; i >= 0; i--)
-        {
-            ref Threat threat = ref Threats[i];
-            if (threat.Beaten)
-            {
-                if (threat.Alive)
-                {
-                    score += threat.ScoreLose;
-                    if (threat.IsExternal)
-                        exSurvived++;
-                    else
-                        inSurvived++;
-                }
-                else
-                {
-                    score += threat.ScoreWin;
-                    if (threat.IsExternal)
-                        exSlain++;
-                    else
-                        inSlain++;
-                }
-                threat.OnBeaten();
-                Threats.RemoveAt(i);
-            }
-        }
-    }
-
     private void CreateMoves()
     {
-        for (int i = Threats.Count - 1; i >= 0; i--)
+        foreach (int i in Threats.GetReverseEnumerator())
         {
             if (!Threats[i].Alive)
             {
@@ -817,19 +779,18 @@ public sealed class Game : IGame
         Threats[threatId].Distance = newPos;
         if (newPos <= 0)
         {
-            Threats[threatId].Beaten = true;
             Debug.Assert(Threats[threatId].Alive, "Assuming that Alive does not need to be set");
+            Threats[threatId].Beaten = true;
         }
     }
 
     private void SpawnThreat(in SimulationStep simulationStep)
     {
-        Threat threat = ThreatFactory.Instance.ThreatsById[simulationStep.ThreatId];
+        ref Threat threat = ref Threats.AddThreat(simulationStep.ThreatId);
         threat.Zone = simulationStep.Zone;
         threat.Distance = trajectories[simulationStep.Zone].maxDistance;
         threat.Game = this;
-        Threats.Add(in threat);
-        Threats[^1].OnSpawn();
+        threat.OnSpawn();
     }
 
     double CalculateScore()
