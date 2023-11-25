@@ -4,7 +4,7 @@ public interface IGame
 {
     public Player[] Players { get; }
 
-    public ref ThreatList Threats { get; }
+    public ThreatList Threats { get; }
 
     public void MoveThreat(int threatId, int speed);
 

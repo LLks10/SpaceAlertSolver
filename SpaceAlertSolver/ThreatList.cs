@@ -2,7 +2,7 @@
 
 namespace SpaceAlertSolver;
 
-public struct ThreatList
+public class ThreatList
 {
     private int _count = 0;
     private Threat[] _threats = new Threat[8];
@@ -26,6 +26,8 @@ public struct ThreatList
     public void Clear()
     {
         _count = 0;
+        _internalThreats.Clear();
+        _externalThreats.Clear();
     }
 
     public ref Threat AddThreat(int threatId)
@@ -56,6 +58,11 @@ public struct ThreatList
 
         Array.Copy(_threats, 0, other._threats, 0, _count);
         other._count = _count;
+
+        other._internalThreats.Clear();
+        other._internalThreats.AddRange(_internalThreats);
+        other._externalThreats.Clear();
+        other._externalThreats.AddRange(_externalThreats);
     }
     
     public int CleanBeatenThreats()
