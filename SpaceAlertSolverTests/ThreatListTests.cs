@@ -68,6 +68,18 @@ public sealed class ThreatListTests
         Assert.AreEqual(2, internalIds[1]);
     }
 
+    [TestMethod]
+    public void TestClear()
+    {
+        throw new NotImplementedException();
+    }
+
+    [TestMethod]
+    public void TestCopyTo()
+    {
+        throw new NotImplementedException();
+    }
+
     private static ThreatList GetDefaultList()
     {
         ThreatList list = new();
