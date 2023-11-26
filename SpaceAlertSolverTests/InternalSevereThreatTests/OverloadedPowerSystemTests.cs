@@ -62,7 +62,7 @@ public sealed class PowerSystemOverload : ThreatTestsBase
 
         _defaultGame.Threats[0].Alive = false;
         _defaultGame.Threats[0].Beaten = true;
-        _defaultGame.PerformSingleSimulationStep(SimulationStep.NewCleanThreatsStep());
+        _defaultGame.PerformSingleSimulationStep(SimulationStep.NewCleanExternalThreatsStep());
 
         Assert.IsFalse(_defaultGame.ship.HasMalfunctionB(Position.BottomLeft));
         Assert.IsFalse(_defaultGame.ship.HasMalfunctionB(Position.BottomMiddle));

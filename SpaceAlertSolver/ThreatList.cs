@@ -23,6 +23,11 @@ public class ThreatList
         }
     }
 
+    public bool IsAlive(int i)
+    {
+        return _threats[i].Alive;
+    }
+
     public void Clear()
     {
         _count = 0;
@@ -46,6 +51,28 @@ public class ThreatList
         return ref threat;
     }
 
+    public int RemoveThreat(int threatId)
+    {
+        int internalIndex = _internalThreats.IndexOf(threatId);
+        if (internalIndex >= 0)
+            return DeleteInternalThreat(internalIndex);
+
+        int externalIndex = _externalThreats.IndexOf(threatId);
+        return DeleteExternalThreat(externalIndex);
+    }
+
+    public int RemoveInternalThreat(int threatId)
+    {
+        int internalIndex = _internalThreats.IndexOf(threatId);
+        return DeleteInternalThreat(internalIndex);
+    }
+
+    public int RemoveExternalThreat(int threatId)
+    {
+        int externalIndex = _externalThreats.IndexOf(threatId);
+        return DeleteExternalThreat(externalIndex);
+    }
+
     public void CopyTo(ThreatList other)
     {
         if (other._threats.Length < _count)
@@ -65,35 +92,45 @@ public class ThreatList
         other._externalThreats.AddRange(_externalThreats);
     }
     
-    public int CleanBeatenThreats()
+    public int CleanExternalThreats()
     {
         int score = 0;
-        for (int i = _internalThreats.Count - 1; i >= 0; i--)
-        {
-            int index = _internalThreats[i];
-            if (_threats[index].Beaten)
-            {
-                if (_threats[index].Alive)
-                    score += _threats[index].ScoreLose;
-                else
-                    score += _threats[index].ScoreWin;
-                _threats[index].OnBeaten();
-                _internalThreats.RemoveAt(i);
-            }
-        }
         for (int i = _externalThreats.Count - 1; i >= 0; i--)
         {
             int index = _externalThreats[i];
             if (_threats[index].Beaten)
             {
-                if (_threats[index].Alive)
-                    score += _threats[index].ScoreLose;
-                else
-                    score += _threats[index].ScoreWin;
-                _threats[index].OnBeaten();
-                _externalThreats.RemoveAt(i);
+                score += DeleteExternalThreat(i);
             }
         }
+        return score;
+    }
+
+    private int DeleteInternalThreat(int internalIndex)
+    {
+        int score;
+        int index = _internalThreats[internalIndex];
+        Debug.Assert(_threats[index].Beaten);
+        if (IsAlive(index))
+            score = _threats[index].ScoreLose;
+        else
+            score = _threats[index].ScoreWin;
+        _threats[index].OnBeaten();
+        _internalThreats.RemoveAt(internalIndex);
+        return score;
+    }
+
+    private int DeleteExternalThreat(int externalIndex)
+    {
+        int score;
+        int index = _externalThreats[externalIndex];
+        Debug.Assert(_threats[index].Beaten);
+        if (IsAlive(index))
+            score = _threats[index].ScoreLose;
+        else
+            score = _threats[index].ScoreWin;
+        _threats[index].OnBeaten();
+        _externalThreats.RemoveAt(externalIndex);
         return score;
     }
 

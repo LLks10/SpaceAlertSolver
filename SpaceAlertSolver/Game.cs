@@ -130,18 +130,16 @@ public sealed class Game : IGame
 
         simulationStack.Clear();
 
-        simulationStack.Add(SimulationStep.NewCleanThreatsStep());
         simulationStack.Add(SimulationStep.NewCreateMovesStep());
-        simulationStack.Add(SimulationStep.NewCleanThreatsStep());
+        simulationStack.Add(SimulationStep.NewCleanExternalThreatsStep());
         simulationStack.Add(SimulationStep.NewProcessDamageStep());
         simulationStack.Add(SimulationStep.NewRocketUpdateStep());
 
         int eventIndex = events.Length - 1;
         for (int i = NUM_NORMAL_TURNS; i > 0; i--)
         {
-            simulationStack.Add(SimulationStep.NewCleanThreatsStep());
             simulationStack.Add(SimulationStep.NewCreateMovesStep());
-            simulationStack.Add(SimulationStep.NewCleanThreatsStep());
+            simulationStack.Add(SimulationStep.NewCleanExternalThreatsStep());
             simulationStack.Add(SimulationStep.NewProcessDamageStep());
             simulationStack.Add(SimulationStep.NewRocketUpdateStep());
 
@@ -215,8 +213,8 @@ public sealed class Game : IGame
             case SimulationStepType.ProcessDamage:
                 ProcessDamage();
                 break;
-            case SimulationStepType.CleanThreats:
-                score += Threats.CleanBeatenThreats();
+            case SimulationStepType.CleanExternalThreats:
+                score += Threats.CleanExternalThreats();
                 break;
             case SimulationStepType.CreateMoves:
                 CreateMoves();
@@ -237,6 +235,7 @@ public sealed class Game : IGame
                 Threats[simulationStep.ThreatIndex].ActZ();
                 Debug.Assert(Threats[simulationStep.ThreatIndex].Alive, "Assuming that Alive does not need to be set");
                 Threats[simulationStep.ThreatIndex].Beaten = true;
+                Threats.RemoveThreat(simulationStep.ThreatIndex);
                 break;
             case SimulationStepType.DealExternalDamage:
                 HandleExternalDamageStep(simulationStep.Zone, simulationStep.Damage);
@@ -473,12 +472,11 @@ public sealed class Game : IGame
         foreach (int i in Threats.InternalThreatIndices)
         {
             ref Threat threat = ref Threats[i];
-            if (!threat.Alive)
-                continue;
-
             if (threat.IsTargetedBy(damageSource, player.Position))
             {
                 threat.DealInternalDamage(damageSource, 1, playerIndex, player.Position);
+                if (!Threats.IsAlive(i))
+                    score += Threats.RemoveInternalThreat(i);
                 break;
             }
         }
@@ -962,7 +960,7 @@ internal enum SimulationStepType
     ObservationUpdate,
     RocketUpdate,
     ProcessDamage,
-    CleanThreats,
+    CleanExternalThreats,
     CreateMoves,
     MoveThreat,
     SpawnThreat,
@@ -1008,7 +1006,7 @@ internal readonly struct SimulationStep
 
     public static SimulationStep NewMoveThreatStep(int threatId, int speed) => new(SimulationStepType.MoveThreat, value1: threatId, value2: speed);
 
-    public static SimulationStep NewCleanThreatsStep() => new(SimulationStepType.CleanThreats);
+    public static SimulationStep NewCleanExternalThreatsStep() => new(SimulationStepType.CleanExternalThreats);
 
     public static SimulationStep NewProcessDamageStep() => new(SimulationStepType.ProcessDamage);
 
