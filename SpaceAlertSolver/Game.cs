@@ -235,7 +235,7 @@ public sealed class Game : IGame
                 Threats[simulationStep.ThreatIndex].ActZ();
                 Debug.Assert(Threats[simulationStep.ThreatIndex].Alive, "Assuming that Alive does not need to be set");
                 Threats[simulationStep.ThreatIndex].Beaten = true;
-                Threats.RemoveThreat(simulationStep.ThreatIndex);
+                score += Threats.RemoveThreat(simulationStep.ThreatIndex);
                 break;
             case SimulationStepType.DealExternalDamage:
                 HandleExternalDamageStep(simulationStep.Zone, simulationStep.Damage);
