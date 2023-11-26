@@ -728,18 +728,16 @@ public sealed class Game : IGame
 
     private void ProcessDamage()
     {
-        foreach (int i in Threats)
+        foreach (int i in Threats.ExternalThreatIndices)
         {
-            if (Threats[i].IsExternal)
-            {
-                if (Threats[i].Damage > 0)
-                    Threats[i].ProcessDamage();
-            }
-            else
-            {
-                if (Threats[i].Alive)
-                    Threats[i].ProcessDamage();
-            }
+            if (Threats[i].Damage > 0)
+                Threats[i].ProcessDamageOrEndTurn();
+        }
+
+        foreach (int i in Threats.InternalThreatIndices)
+        {
+            Debug.Assert(Threats[i].Alive);
+            Threats[i].ProcessDamageOrEndTurn();
         }
     }
 

@@ -23,7 +23,7 @@ public partial struct Threat
     private SimpleDelegate _actZ;
     private SimpleDelegate _onSpawn;
     private SimpleDelegate _onBeaten;
-    private SimpleDelegate _processDamage;
+    private SimpleDelegate _processDamageOrEndTurn;
 
     private delegate bool TargetDelegate(ref Threat @this, DamageSource damageSource, Position position);
     private TargetDelegate? _isTargetedBy;
@@ -51,7 +51,7 @@ public partial struct Threat
         _actZ = actZ!;
         _onSpawn = onSpawn!;
         _onBeaten = onBeaten!;
-        _processDamage = processDamage!;
+        _processDamageOrEndTurn = processDamage!;
         _getDistance = getDistance!;
         _dealExternalDamage = dealDamage;
         _dealInternalDamage = null;
@@ -77,14 +77,14 @@ public partial struct Threat
     /// </summary>
     private Threat(int health, int speed, Position position, int scoreWin, int scoreLose, TargetDelegate? isTargetedBy = null,
         SimpleDelegate ? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, int inaccessibility = 0,
-        SimpleDelegate? onSpawn = null, SimpleDelegate? onBeaten = null,SimpleDelegate? processDamage = null, InternalDamageDelegate? dealDamage = null)
+        SimpleDelegate? onSpawn = null, SimpleDelegate? onBeaten = null,SimpleDelegate? endTurn = null, InternalDamageDelegate? dealDamage = null)
     {
         _actX = actX!;
         _actY = actY!;
         _actZ = actZ!;
         _onSpawn = onSpawn!;
         _onBeaten = onBeaten!;
-        _processDamage = processDamage!;
+        _processDamageOrEndTurn = endTurn!;
         _getDistance = null;
         _dealExternalDamage = null;
         _dealInternalDamage = dealDamage;
@@ -148,19 +148,21 @@ public partial struct Threat
                 _onBeaten = method;
         }
 
-        if (_processDamage == null)
+        if (_processDamageOrEndTurn == null)
         {
             SimpleDelegate? method = GetType().GetMethod($"{name}ProcessDamage")?.CreateDelegate<SimpleDelegate>();
+            method ??= GetType().GetMethod($"{name}EndTurn")?.CreateDelegate<SimpleDelegate>();
+            method ??= GetType().GetMethod($"{name}ProcessDamageOrEndTurn")?.CreateDelegate<SimpleDelegate>();
             if (method == null)
             {
                 if (IsExternal)
-                    _processDamage = DefaultExternalProcessDamage;
+                    _processDamageOrEndTurn = DefaultExternalProcessDamage;
                 else
-                    _processDamage = Blank;
+                    _processDamageOrEndTurn = Blank;
             }
             else
             {
-                _processDamage = method;
+                _processDamageOrEndTurn = method;
             }
         }
 
@@ -197,7 +199,7 @@ public partial struct Threat
     public void ActZ() => _actZ(ref this);
     public void OnSpawn() => _onSpawn(ref this);
     public void OnBeaten() => _onBeaten(ref this);
-    public void ProcessDamage() => _processDamage(ref this);
+    public void ProcessDamageOrEndTurn() => _processDamageOrEndTurn(ref this);
     public int GetDistance(DamageSource damageSource) => _getDistance!(ref this, damageSource);
     public void DealExternalDamage(DamageSource damageSource, int damage) => _dealExternalDamage!(ref this, damageSource, damage);
     public void DealInternalDamage(DamageSource damageSource, int damage, int playerId, Position position) => _dealInternalDamage!(ref this, damageSource, damage, playerId, position);

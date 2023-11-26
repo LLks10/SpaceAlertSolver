@@ -41,7 +41,7 @@ public sealed class PowerSystemOverload : ThreatTestsBase
 
         threat.DealInternalDamage(DamageSource.RepairB, 1, -1, Position.BottomLeft);
         threat.DealInternalDamage(DamageSource.RepairB, 1, -1, Position.BottomMiddle);
-        threat.ProcessDamage();
+        threat.ProcessDamageOrEndTurn();
         threat.DealInternalDamage(DamageSource.RepairB, 1, -1, Position.BottomRight);
         threat.DealInternalDamage(DamageSource.RepairB, 1, -1, Position.BottomRight);
         threat.DealInternalDamage(DamageSource.RepairB, 1, -1, Position.BottomRight);

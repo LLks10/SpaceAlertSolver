@@ -54,7 +54,7 @@ public partial struct Threat
         @this.UpdateAlive();
     }
 
-    public static void PowerSystemOverloadProcessDamage(ref Threat @this)
+    public static void PowerSystemOverloadEndTurn(ref Threat @this)
     {
         @this.DamageBitmask = 0;
     }
