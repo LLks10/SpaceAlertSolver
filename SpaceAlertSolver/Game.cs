@@ -49,6 +49,7 @@ public sealed class Game : IGame
     public int ExternalDamageBonus { private get; set; }
 
     private readonly List<SimulationStep> _simulationStack = new();
+    private readonly List<SimulationStep> _newSimulationSteps = new();
 
     public Game()
     {
@@ -86,6 +87,7 @@ public sealed class Game : IGame
 
         _simulationStack.Clear();
         _simulationStack.AddRange(other._simulationStack);
+        Debug.Assert(_newSimulationSteps.Count == 0);
     }
 
     internal void Init(Player[] players, ImmutableArray<Trajectory> trajectories, ImmutableArray<Event>? events = null, List<SimulationStep>? simulationStack = null)
@@ -114,6 +116,7 @@ public sealed class Game : IGame
             _simulationStack.Clear();
             _simulationStack.AddRange(simulationStack);
         }
+        Debug.Assert(_newSimulationSteps.Count == 0);
     }
 
     private void InitPlayers(Player[] other)
@@ -173,14 +176,13 @@ public sealed class Game : IGame
             int index = _simulationStack.Count - 1;
             SimulationStep simulationStep = _simulationStack[index];
             HandleSimulationStep(in simulationStep);
-            if (_simulationStack.Count - 1 == index)
+            _simulationStack.RemoveAt(index);
+
+            for (int i = _newSimulationSteps.Count - 1; i >= 0; i--)
             {
-                _simulationStack.RemoveAt(index);
+                _simulationStack.Add(_newSimulationSteps[i]);
             }
-            else
-            {
-                _simulationStack[index] = SimulationStep.NewNoneStep();
-            }
+            _newSimulationSteps.Clear();
         }
 
         return CalculateScore();
@@ -190,8 +192,6 @@ public sealed class Game : IGame
     {
         switch (simulationStep.Type)
         {
-            case SimulationStepType.None:
-                break;
             case SimulationStepType.TurnStart:
                 TurnStart();
                 break;
@@ -283,7 +283,7 @@ public sealed class Game : IGame
 
     public void DealExternalDamage(int zone, int damage)
     {
-        _simulationStack.Add(SimulationStep.NewDealExternalDamageStep(zone, damage));
+        _newSimulationSteps.Add(SimulationStep.NewDealExternalDamageStep(zone, damage));
     }
 
     public void DealInternalDamage(int zone, int damage)
@@ -293,7 +293,7 @@ public sealed class Game : IGame
 
     public void MoveThreat(int threatId, int speed)
     {
-        _simulationStack.Add(SimulationStep.NewMoveThreatStep(threatId, speed));
+        _newSimulationSteps.Add(SimulationStep.NewMoveThreatStep(threatId, speed));
     }
 
     private void HandleExternalDamageStep(int zone, int damage)
@@ -333,7 +333,7 @@ public sealed class Game : IGame
                 player.TryMoveLeft();
                 break;
             case Act.Lift:
-                _simulationStack.Add(SimulationStep.NewUseLiftStep(playerIndex));
+                _newSimulationSteps.Add(SimulationStep.NewUseLiftStep(playerIndex));
                 break;
             case Act.A:
                 PlayerActionA(playerIndex);
@@ -382,7 +382,7 @@ public sealed class Game : IGame
         if (!ship.CanFireCannon(position, out bool costsEnergy))
             return;
 
-        _simulationStack.Add(SimulationStep.NewFireCannonStep(position, costsEnergy));
+        _newSimulationSteps.Add(SimulationStep.NewFireCannonStep(position, costsEnergy));
     }
 
     private void PlayerActionB(int playerIndex)
@@ -401,7 +401,7 @@ public sealed class Game : IGame
                 return;
             if (ship.Reactors[position.Zone] <= 0)
                 return;
-            _simulationStack.Add(SimulationStep.NewRefillShieldStep(position.Zone));
+            _newSimulationSteps.Add(SimulationStep.NewRefillShieldStep(position.Zone));
         }
         else if (position == Position.BottomMiddle)
         {
@@ -413,7 +413,7 @@ public sealed class Game : IGame
                 return;
             if (ship.Reactors[Position.BottomMiddle.Zone] <= 0)
                 return;
-            _simulationStack.Add(SimulationStep.NewRefillSideReactorStep(position.Zone));
+            _newSimulationSteps.Add(SimulationStep.NewRefillSideReactorStep(position.Zone));
         }
     }
 
@@ -741,35 +741,31 @@ public sealed class Game : IGame
 
     private void CreateMoves()
     {
-        foreach (int i in Threats.GetReverseEnumerator())
+        foreach (int i in Threats)
         {
-            if (!Threats[i].Alive)
-            {
-                Debug.Assert(!Threats[i].IsExternal, "external threat cannot be dead here");
-                continue;
-            }
+            Debug.Assert(Threats.IsAlive(i));
             Debug.Assert(Threats[i].Speed > 0, "If the threat has no more distance to travel it should not exist");
-            _simulationStack.Add(SimulationStep.NewMoveThreatStep(i, Threats[i].Speed));
+            _newSimulationSteps.Add(SimulationStep.NewMoveThreatStep(i, Threats[i].Speed));
         }
     }
 
     private void HandleMoveThreat(int threatId, int speed)
     {
         int newPos = Math.Max(0, Threats[threatId].Distance - speed);
-        for (int d = newPos; d < Threats[threatId].Distance; d++)
+        for (int d = Threats[threatId].Distance - 1; d >= newPos; d--)
         {
             switch (trajectories[Threats[threatId].Zone].actions[d])
             {
                 case 0:
                     break;
                 case 1:
-                    _simulationStack.Add(SimulationStep.NewActXStep(threatId));
+                    _newSimulationSteps.Add(SimulationStep.NewActXStep(threatId));
                     break;
                 case 2:
-                    _simulationStack.Add(SimulationStep.NewActYStep(threatId));
+                    _newSimulationSteps.Add(SimulationStep.NewActYStep(threatId));
                     break;
                 case 3:
-                    _simulationStack.Add(SimulationStep.NewActZStep(threatId));
+                    _newSimulationSteps.Add(SimulationStep.NewActZStep(threatId));
                     break;
                 default:
                     throw new UnreachableException();
@@ -901,7 +897,7 @@ public sealed class Game : IGame
 
     public void SpillEnergy(Position position, int amount)
     {
-        _simulationStack.Add(SimulationStep.NewSpillEnergyStep(position, amount));
+        _newSimulationSteps.Add(SimulationStep.NewSpillEnergyStep(position, amount));
     }
 
     /// <summary>
@@ -914,9 +910,15 @@ public sealed class Game : IGame
         while (!gameover && _simulationStack.Count > count)
         {
             int index = _simulationStack.Count - 1;
-            SimulationStep s = _simulationStack[index];
-            HandleSimulationStep(s);
+            SimulationStep simulationStep = _simulationStack[index];
+            HandleSimulationStep(in simulationStep);
             _simulationStack.RemoveAt(index);
+
+            for (int i = _newSimulationSteps.Count - 1; i >= 0; i--)
+            {
+                _simulationStack.Add(_newSimulationSteps[i]);
+            }
+            _newSimulationSteps.Clear();
         }
     }
 
@@ -952,7 +954,6 @@ public readonly record struct Event(int Turn, int Zone, int CreatureId)
 
 internal enum SimulationStepType
 {
-    None,
     TurnStart,
     ResetComputer,
     CheckComputer,
@@ -999,8 +1000,6 @@ internal readonly struct SimulationStep
         _value2 = value2;
         _bool1 = bool1;
     }
-
-    public static SimulationStep NewNoneStep() => new(SimulationStepType.None);
 
     public static SimulationStep NewCreateMovesStep() => new(SimulationStepType.CreateMoves);
 
