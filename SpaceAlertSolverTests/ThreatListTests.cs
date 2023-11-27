@@ -71,13 +71,42 @@ public sealed class ThreatListTests
     [TestMethod]
     public void TestClear()
     {
-        throw new NotImplementedException();
+        ThreatList list = GetDefaultList();
+        list.Clear();
+        Assert.AreEqual(0, list.InternalThreatIndices.Count());
+        Assert.AreEqual(0, list.ExternalThreatIndices.Count());
+        foreach (int i in list)
+        {
+            Assert.Fail();
+        }
     }
 
     [TestMethod]
     public void TestCopyTo()
     {
-        throw new NotImplementedException();
+        ThreatList list = GetDefaultList();
+        ThreatList other = new();
+        list.CopyTo(other);
+
+        other.AddThreat(_pso);
+        other.AddThreat(_amoebe);
+
+        // adding to other list doesn't change original
+        Assert.AreEqual(2, list.InternalThreatIndices.Count());
+        Assert.AreEqual(2, list.ExternalThreatIndices.Count());
+
+        // test that other list has correct items
+        var internalIds = other.InternalThreatIndices.ToImmutableArray();
+        Assert.AreEqual(3, internalIds.Length);
+        Assert.AreEqual(0, internalIds[0]);
+        Assert.AreEqual(2, internalIds[1]);
+        Assert.AreEqual(4, internalIds[2]);
+
+        var externalIds = other.ExternalThreatIndices.ToImmutableArray();
+        Assert.AreEqual(3, externalIds.Length);
+        Assert.AreEqual(1, externalIds[0]);
+        Assert.AreEqual(3, externalIds[1]);
+        Assert.AreEqual(5, externalIds[2]);
     }
 
     private static ThreatList GetDefaultList()
