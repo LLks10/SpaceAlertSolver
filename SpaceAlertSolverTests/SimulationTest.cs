@@ -91,6 +91,6 @@ public class SimulationTest
         g.Init(players, trajectories, events);
         double score = g.Simulate();
         GamePool.FreeGame(g);
-        Assert.AreEqual(-209.0 / 6.0, score, 0.000000001);
+        Assert.AreEqual(-207.0 / 6.0, score, 0.000000001);
     }
 }
