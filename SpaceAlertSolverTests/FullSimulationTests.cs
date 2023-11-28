@@ -63,10 +63,10 @@ public class FullSimulationTests
         );
         Player[] players = TestUtils.CreatePlayersFromActions
         (
-            ActUtils.ParseActionsFromString(" aaaf   a dd"),
-            ActUtils.ParseActionsFromString(" eaae dbbef "),
-            ActUtils.ParseActionsFromString("  drc ce f d"),
-            ActUtils.ParseActionsFromString("   db  f fda")
+            ActUtils.ParseActionsFromString(" ardacca eaa"),
+            ActUtils.ParseActionsFromString("dbc  cdbd df"),
+            ActUtils.ParseActionsFromString("bcabafcreaeb"),
+            ActUtils.ParseActionsFromString("bfeaaedfrbc ")
         );
 
         Game g = GamePool.GetGame();

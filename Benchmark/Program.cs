@@ -29,10 +29,10 @@ public class AnnealingBenchmark
     private readonly ImmutableArray<Event> _events = ImmutableArray.Create<Event>( new(true, 1, 1, 17), new(true, 3, 0, 12), new(false, 4, 3, 21), new(true, 6, 1, 15) );
     private readonly Player[] _players = TestUtils.CreatePlayersFromActions
     (
-        ActUtils.ParseActionsFromString(" aaaf   a dd"),
-        ActUtils.ParseActionsFromString(" eaae dbbef "),
-        ActUtils.ParseActionsFromString("  drc ce f d"),
-        ActUtils.ParseActionsFromString("   db  f fda")
+        ActUtils.ParseActionsFromString(" ardacca eaa"),
+        ActUtils.ParseActionsFromString("dbc  cdbd df"),
+        ActUtils.ParseActionsFromString("bcabafcreaeb"),
+        ActUtils.ParseActionsFromString("bfeaaedfrbc ")
     );
 
     [Params(100000, 200000)]
