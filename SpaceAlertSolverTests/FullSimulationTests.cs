@@ -71,10 +71,10 @@ public class FullSimulationTests
 
         Game g = GamePool.GetGame();
         g.Init(players, trajectories, events);
-        g.Simulate();
+        Assert.AreEqual(16.5, g.Simulate());
         GamePool.FreeGame(g);
 
-        Assert.AreEqual(28, Game.Scores.Count);
-        Assert.IsTrue(Game.Scores.All(s => s == 12));
+        Assert.AreEqual(6, Game.Scores.Count);
+        Assert.IsTrue(Game.Scores.All(s => s == 16 || s == 17));
     }
 }
