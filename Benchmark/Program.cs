@@ -35,10 +35,10 @@ public class AnnealingBenchmark
     );
     private readonly Player[] _players = TestUtils.CreatePlayersFromActions
     (
-        ActUtils.ParseActionsFromString(" aaaf   a dd"),
-        ActUtils.ParseActionsFromString(" eaae dbbef "),
-        ActUtils.ParseActionsFromString("  drc ce f d"),
-        ActUtils.ParseActionsFromString("   db  f fda")
+        ActUtils.ParseActionsFromString(" ardacca eaa"),
+        ActUtils.ParseActionsFromString("dbc  cdbd df"),
+        ActUtils.ParseActionsFromString("bcabafcreaeb"),
+        ActUtils.ParseActionsFromString("bfeaaedfrbc ")
     );
     private readonly List<SimulationStep> _simulationStack = new();
 
