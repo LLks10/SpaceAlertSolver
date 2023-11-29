@@ -1,22 +1,31 @@
-﻿namespace SpaceAlertSolver;
+﻿//#define LOGGING
 
-internal class Log
+namespace SpaceAlertSolver;
+
+#if LOGGING
+public static class Log
 {
-    private static Log? _instance = null;
-    public static Log Instance => _instance ?? (_instance = new Log());
+    private static FileStream? _fileStream;
+    private static StreamWriter? _streamWriter;
 
-    private readonly string _fileName;
-
-    private Log()
+    public static void WriteLine(object line)
     {
-        _fileName = $"Log-{DateTime.Now}";
-    }
+        if (_fileStream == null || _streamWriter == null)
+        {
+            string fileName = $"Log-{DateTime.Now}";
+            _fileStream = new(fileName, FileMode.CreateNew, FileAccess.Write);
+            _streamWriter = new(_fileStream);
+            _streamWriter.AutoFlush = true;
+        }
 
-    public void WriteLine(object line)
-    {
         string str = line.ToString() ?? "";
-        using FileStream fs = new(_fileName, FileMode.Append, FileAccess.Write);
-        using StreamWriter sw = new(fs);
-        sw.WriteLine(str);
+        _streamWriter.WriteLine(str);
+        _fileStream.Flush();
     }
 }
+#else
+public static class Log
+{
+    public static void WriteLine(object _) { }
+}
+#endif
