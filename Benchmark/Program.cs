@@ -42,12 +42,6 @@ public class AnnealingBenchmark
     //[Params(0, 1, 2, 3, 4)]
     public int Seed = 0;
 
-    [IterationCleanup]
-    public void IterationCleanup()
-    {
-        GamePool.Clear();
-    }
-
     [Benchmark]
     public void SimulatedAnnealing()
     {
@@ -59,11 +53,8 @@ public class AnnealingBenchmark
     public void SingleSimulation()
     {
         Game g = GamePool.GetGame();
-        for (int i = 0; i < (int)1e5; i++)
-        {
-            g.Init(_players, _trajectories, _events);
-            Debug.Assert(16.5 == g.Simulate());
-        }
+        g.Init(_players, _trajectories, _events);
+        Debug.Assert(16.5 == g.Simulate());
         GamePool.FreeGame(g);
     }
 }
