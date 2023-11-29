@@ -12,10 +12,15 @@ internal sealed class Program
 {
     public static void Main()
     {
-        #if RUNANNEALING
-        new AnnealingBenchmark() { Iterations = 200000 }.SimulatedAnnealing();
-        #elif RUNSINGLE
-        new AnnealingBenchmark().SingleSimulation();
+#if RUNANNEALING
+        AnnealingBenchmark benchmark = new();
+        benchmark.GlobalSetup();
+        benchmark.Iterations = 200000;
+        benchmark.SimulatedAnnealing();
+#elif RUNSINGLE
+        AnnealingBenchmark benchmark = new();
+        benchmark.GlobalSetup();
+        benchmark.SingleSimulation();
         #else
         BenchmarkRunner.Run<AnnealingBenchmark>();
         #endif
