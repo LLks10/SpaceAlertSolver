@@ -5,6 +5,7 @@ using BenchmarkDotNet.Running;
 using SpaceAlertSolver;
 using SpaceAlertSolverTests;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Benchmark;
 
@@ -61,7 +62,7 @@ public class AnnealingBenchmark
         for (int i = 0; i < (int)1e5; i++)
         {
             g.Init(_players, _trajectories, _events);
-            g.Simulate();
+            Debug.Assert(16.5 == g.Simulate());
         }
         GamePool.FreeGame(g);
     }
