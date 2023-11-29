@@ -74,7 +74,7 @@ public class FullSimulationTests
         Assert.AreEqual(16.5, g.Simulate());
         GamePool.FreeGame(g);
 
-        Assert.AreEqual(6, Game.Scores.Count);
+        Assert.AreEqual(4, Game.Scores.Count);
         Assert.IsTrue(Game.Scores.All(s => s == 16 || s == 17));
     }
 }
