@@ -93,18 +93,35 @@ public struct Player
         _lastActionWasEmpty = true;
     }
 
-    public void TryMoveLeft() => Position = Position.GetLeft();
+    public void TryMoveLeft()
+    {
+        Position = Position.GetLeft();
+        Log.WriteLine($"Player is at {Position}");
+    }
 
-    public void TryMoveRight() => Position = Position.GetRight();
+    public void TryMoveRight()
+    {
+        Position = Position.GetRight();
+        Log.WriteLine($"Player is at {Position}");
+    }
 
-    public void TryTakeElevator() => Position = Position.GetElevator();
+    public void TryTakeElevator()
+    {
+        Position = Position.GetElevator();
+        Log.WriteLine($"Player is at {Position}");
+    }
 
-    public void MoveToSpace() => Position = Position.Space;
+    public void MoveToSpace()
+    {
+        Position = Position.Space;
+        Log.WriteLine($"Player is in space");
+    }
 
     public void ReturnFromSpace()
     {
         Debug.Assert(Position == Position.Space);
         Position = Position.TopLeft;
+        Log.WriteLine($"Player is at {Position}");
     }
 }
 

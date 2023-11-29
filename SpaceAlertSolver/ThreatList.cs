@@ -39,6 +39,9 @@ public class ThreatList
     {
         if (_count >= _threats.Length)
             ResizeArray(_count * 2);
+
+        Log.WriteLine($"Spawning threat {_count}: {ThreatFactory.Instance.ThreatNameById[threatId]}");
+
         _threats[_count] = ThreatFactory.Instance.ThreatsById[threatId];
         ref Threat threat = ref _threats[_count];
 
@@ -100,7 +103,9 @@ public class ThreatList
             int index = _externalThreats[i];
             if (_threats[index].Beaten)
             {
-                score += DeleteExternalThreat(i);
+                int points = DeleteExternalThreat(i);
+                Log.WriteLine($"Received {points} points for defeating threat {index}");
+                score += points;
             }
         }
         return score;

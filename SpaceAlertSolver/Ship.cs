@@ -170,6 +170,7 @@ internal sealed class Ship
 
     public bool DealExternalDamage(int zone, int damage)
     {
+        Log.WriteLine($"Ship hit for {damage} damage in zone {zone} with {Shields[zone]} shield");
         Shields[zone] -= damage;
 
         //Excess damage
@@ -183,7 +184,11 @@ internal sealed class Ship
         return false;
     }
 
-    public bool DealInternalDamage(int zone, int damage) => ApplyDamage(zone, damage);
+    public bool DealInternalDamage(int zone, int damage)
+    {
+        Log.WriteLine($"Taking {damage} damage in zone {zone}");
+        return ApplyDamage(zone, damage);
+    }
 
     bool ApplyDamage(int zone, int damage)
     {
@@ -289,6 +294,8 @@ internal sealed class Ship
     public void MoveRockets()
     {
         RocketReady = _rocketFired;
+        if (RocketReady)
+            Log.WriteLine("Rocket moved");
         _rocketFired = false;
     }
 
@@ -335,10 +342,14 @@ internal sealed class Ship
     public void TryRefillMainReactor()
     {
         if (CapsulesLeft <= 0)
+        {
+            Log.WriteLine("No capsules left!");
             return;
+        }
 
         CapsulesLeft--;
         Reactors[1] = ReactorsCap[1];
+        Log.WriteLine($"Refilled main reactor, {CapsulesLeft} capsules left");
     }
 }
 

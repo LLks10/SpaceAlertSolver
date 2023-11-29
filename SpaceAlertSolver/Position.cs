@@ -93,4 +93,19 @@ public readonly struct Position : IEquatable<Position>
     public bool IsMiddle() => Zone == 1;
 
     public bool IsRight() => Zone == 2;
+
+    public override string ToString()
+    {
+        return PositionIndex switch
+        {
+            TOP_LEFT_INDEX => "Top-left",
+            TOP_MIDDLE_INDEX => "Top-middle",
+            TOP_RIGHT_INDEX => "Top-right",
+            BOTTOM_LEFT_INDEX => "Bottom-left",
+            BOTTOM_MIDDLE_INDEX => "Bottom-middle",
+            BOTTOM_RIGHT_INDEX => "Bottom-right",
+            SPACE_INDEX => "Space",
+            _ => "Invalid position",
+        };
+    }
 }

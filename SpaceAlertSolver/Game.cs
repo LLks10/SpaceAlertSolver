@@ -171,6 +171,8 @@ public sealed class Game : IGame
 
     public double Simulate()
     {
+        Log.WriteLine("Starting new branch");
+        Log.Indent();
         while (!gameover && _simulationStack.Count > 0)
         {
             int index = _simulationStack.Count - 1;
@@ -185,11 +187,15 @@ public sealed class Game : IGame
             _newSimulationSteps.Clear();
         }
 
-        return CalculateScore();
+        double score = CalculateScore();
+        Log.Dedent();
+        Log.WriteLine($"Branch completed with score {score}");
+        return score;
     }
 
     private void HandleSimulationStep(in SimulationStep simulationStep)
     {
+        Log.WriteLine($"Performing simulation step: {simulationStep.Type}");
         switch (simulationStep.Type)
         {
             case SimulationStepType.TurnStart:
@@ -235,7 +241,9 @@ public sealed class Game : IGame
                 Threats[simulationStep.ThreatIndex].ActZ();
                 Debug.Assert(Threats[simulationStep.ThreatIndex].Alive, "Assuming that Alive does not need to be set");
                 Threats[simulationStep.ThreatIndex].Beaten = true;
-                score += Threats.RemoveThreat(simulationStep.ThreatIndex);
+                int points = Threats.RemoveThreat(simulationStep.ThreatIndex);
+                Log.WriteLine($"Receiving {points} points for threat {simulationStep.ThreatIndex} reaching Z");
+                score += points;
                 break;
             case SimulationStepType.DealExternalDamage:
                 HandleExternalDamageStep(simulationStep.Zone, simulationStep.Damage);
@@ -262,17 +270,20 @@ public sealed class Game : IGame
 
     private void HandleSpillEnergy(Position position, int spillAmount)
     {
+        Log.WriteLine($"Spilling {spillAmount} energy");
         Debug.Assert(spillAmount > 0);
         if (position.IsTop())
         {
             BranchShieldFull(position.Zone);
             ship.Shields[position.Zone] = Math.Max(0, ship.Shields[position.Zone] - spillAmount);
+            Log.WriteLine($"New shield amount in zone {position.Zone} = {ship.Shields[position.Zone]}");
         }
         else
         {
             Debug.Assert(position.IsBottom());
             BranchIfReactorFull(position.Zone);
             ship.Reactors[position.Zone] = Math.Max(0, ship.Reactors[position.Zone] - spillAmount);
+            Log.WriteLine($"New reactor amount in zone {position.Zone} = {ship.Reactors[position.Zone]}");
         }
     }
 
@@ -306,9 +317,13 @@ public sealed class Game : IGame
     {
         ref Player player = ref Players[playerIndex];
         if (!player.Alive)
+        {
+            Log.WriteLine("Player is dead, no action was taken");
             return;
+        }
 
         Act action = player.GetNextAction();
+        Log.WriteLine($"Player will perform action {action} at {player.Position}");
         if (player.Position == Position.Space)
         {
             if (action == Act.Fight)
@@ -501,7 +516,11 @@ public sealed class Game : IGame
         if (player.PeekNextAction() != Act.Empty) // broken lift would delay actions
             BranchConditional(player.Position.Zone, Defects.lift);
         if (ship.LiftWillDelay(player.Position))
+        {
+            Log.WriteLine("Player got delayed by lift");
             player.DelayNext();
+        }
+
         ship.UseLift(player.Position);
         player.TryTakeElevator();
     }
@@ -525,6 +544,7 @@ public sealed class Game : IGame
             BranchIfReactorFull(zone);
         }
 
+        Log.WriteLine($"Pumping over {deficit} energy");
         ship.Shields[zone] += deficit;
         ship.Reactors[zone] -= deficit;
     }
@@ -548,6 +568,7 @@ public sealed class Game : IGame
             BranchIfReactorFull(Position.BottomMiddle.Zone);
         }
 
+        Log.WriteLine($"Pumping over {deficit} energy");
         ship.Reactors[zone] += deficit;
         ship.Reactors[Position.BottomMiddle.Zone] -= deficit;
     }
@@ -559,6 +580,7 @@ public sealed class Game : IGame
 
         if (!CannonHasAtleastOneTarget(position))
         {
+            Log.WriteLine("Cannon misses");
             ship.FireCannon(position, costsEnergy);
             return;
         }
@@ -616,7 +638,10 @@ public sealed class Game : IGame
                 ref Threat threat = ref Threats[i];
                 int distance = threat.GetDistance(DamageSource.PulseCannon);
                 if (distance < outOfRangeDistance)
+                {
+                    Log.WriteLine($"Shooting threat {threat}");
                     threat.DealExternalDamage(DamageSource.PulseCannon, stats.Damage);
+                }
             }
         }
         else
@@ -636,6 +661,7 @@ public sealed class Game : IGame
                     threatIndex = i;
                 }
             }
+            Log.WriteLine($"Shooting threat {threatIndex}");
             Threats[threatIndex].DealExternalDamage(stats.Type, stats.Damage);
         }
     }
@@ -662,7 +688,14 @@ public sealed class Game : IGame
             }
         }
         if (target >= 0)
+        {
+            Log.WriteLine($"Attacking threat {target} with interceptors");
             Threats[target].DealExternalDamage(DamageSource.Interceptors, 3);
+        }
+        else
+        {
+            Log.WriteLine("No targets for the interceptors");
+        }
     }
 
     private void TurnStart()
@@ -681,10 +714,14 @@ public sealed class Game : IGame
     private void CheckComputer()
     {
         if (_didComputerThisPhase)
+        {
+            Log.WriteLine("Computer was done");
             return;
+        }
 
         for (int i = 0; i < Players.Length; i++)
         {
+            Log.WriteLine("Computer was not done, delaying all players in the ship");
             if (Players[i].Position.IsInShip())
                 Players[i].DelayNext();
         }
@@ -696,7 +733,9 @@ public sealed class Game : IGame
         _observationThisTurn = 0;
         if (startNewPhase)
         {
-            _totalObservationPoints += _obsBonus[_maxObservationThisPhase];
+            int obsBonus = _obsBonus[_maxObservationThisPhase];
+            Log.WriteLine($"Observation bonus this round: {obsBonus}");
+            _totalObservationPoints += obsBonus;
             _maxObservationThisPhase = 0;
         }
     }
@@ -718,7 +757,12 @@ public sealed class Game : IGame
             }
             if (targetIndex != -1)
             {
+                Log.WriteLine($"Firing rocket at threat {targetIndex}");
                 Threats[targetIndex].DealExternalDamage(DamageSource.Rocket, ROCKET_DAMAGE);
+            }
+            else
+            {
+                Log.WriteLine("Rocket missed");
             }
         }
         ship.MoveRockets();
@@ -771,6 +815,7 @@ public sealed class Game : IGame
                     throw new UnreachableException();
             }
         }
+        Log.WriteLine($"Threat {threatId} moved {speed} steps to end up at distance {newPos + 1}");
         Threats[threatId].Distance = newPos;
     }
 
