@@ -77,7 +77,7 @@ internal sealed class Ship
         other.ReactorsCap.CopyTo(ReactorsCap, 0);
         other.CannonStats.CopyTo(CannonStats, 0);
         other._malfunctionsA.CopyTo(_malfunctionsA, 0);
-        other._malfunctionsA.CopyTo(_malfunctionsB, 0);
+        other._malfunctionsB.CopyTo(_malfunctionsB, 0);
         other._malfunctionsC.CopyTo(_malfunctionsC, 0);
         other.StationStatus.CopyTo(StationStatus, 0);
         other.Damage.CopyTo(Damage, 0);
