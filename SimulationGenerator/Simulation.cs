@@ -14,7 +14,7 @@ public readonly record struct Simulation(string Trajectories, ImmutableArray<str
         {
             builder.AppendLine(s);
         }
-        builder.AppendLine();
+        builder.AppendLine("-");
         foreach (Act[] acts in Actions)
         {
             builder.AppendLine(ActUtils.ActArrayToString(acts));
@@ -28,7 +28,7 @@ public readonly record struct Simulation(string Trajectories, ImmutableArray<str
         string trajectories = lines[0];
         List<string> eventStrings = new();
         int i = 1;
-        while (lines[i] != "")
+        while (lines[i] != "-")
         {
             eventStrings.Add(lines[i]);
             i++;
