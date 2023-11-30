@@ -55,6 +55,36 @@ public static class ActUtils
         return str.PadLeft(numSpacesLeft + str.Length).PadRight(length);
     }
 
+    public static string ActArrayToString(Act[] acts)
+    {
+        char[] result = new char[acts.Length];
+        for (int i = 0; i < acts.Length; i++)
+        {
+            result[i] = acts[i] switch
+            {
+                Act.Empty => ' ',
+                Act.Right => 'r',
+                Act.Left => 'e',
+                Act.Lift => 'd',
+                Act.A => 'a',
+                Act.B => 'b',
+                Act.C => 'c',
+                Act.Fight => 'f',
+                Act.HeroicTopLeft => '1',
+                Act.HeroicTopMiddle => '2',
+                Act.HeroicTopRight => '3',
+                Act.HeroicDownLeft => '4',
+                Act.HeroicDownMiddle => '5',
+                Act.HeroicDownRight => '6',
+                Act.HeroicA => 'A',
+                Act.HeroicB => 'B',
+                Act.HeroicFight => 'F',
+                _ => throw new UnreachableException(),
+            };
+        }
+        return new string(result);
+    }
+
     public static Act[] ParseActionsFromString(string str)
     {
         const int NUM_ACTIONS = 12;
