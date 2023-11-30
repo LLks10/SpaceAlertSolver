@@ -4,7 +4,7 @@ namespace SpaceAlertSolver;
 
 public partial struct Threat
 {
-    public readonly int MaxHealth;
+    public int MaxHealth;
     public int Health, Shield, Damage, Speed, Distance, ScoreWin, ScoreLose;
     public int Inaccessibility
     {
@@ -12,7 +12,7 @@ public partial struct Threat
         set => Shield = value;
     }
     public bool Alive, Beaten;
-    public readonly bool IsExternal;
+    public bool IsExternal;
     public int Zone;
     public IGame Game = null!;
     public Position Position;
@@ -39,66 +39,8 @@ public partial struct Threat
 
     private int _value1;
 
-    /// <summary>
-    /// External threat constructor
-    /// </summary>
-    private Threat(int health, int shield, int speed, int scoreWin, int scoreLose,
-        SimpleDelegate? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, SimpleDelegate? onSpawn = null, SimpleDelegate? onBeaten = null,
-        SimpleDelegate? processDamage = null, DistanceDelegate? getDistance = null, ExternalDamageDelegate? dealDamage = null)
+    public Threat()
     {
-        _actX = actX!; // if it's null if will be solved externally
-        _actY = actY!;
-        _actZ = actZ!;
-        _onSpawn = onSpawn!;
-        _onBeaten = onBeaten!;
-        _processDamageOrEndTurn = processDamage!;
-        _getDistance = getDistance!;
-        _dealExternalDamage = dealDamage;
-        _dealInternalDamage = null;
-        _isTargetedBy = null;
-
-        Position = Position.Space;
-        IsExternal = true;
-        // Zone is set externally
-        MaxHealth = health;
-        Health = health;
-        Shield = shield;
-        Damage = 0;
-        Speed = speed;
-        // Distance is set externally
-        ScoreWin = scoreWin;
-        ScoreLose = scoreLose;
-        Alive = true;
-        Beaten = false;
-    }
-
-    /// <summary>
-    /// Internal threat constructor
-    /// </summary>
-    private Threat(int health, int speed, Position position, int scoreWin, int scoreLose, TargetDelegate? isTargetedBy = null,
-        SimpleDelegate ? actX = null, SimpleDelegate? actY = null, SimpleDelegate? actZ = null, int inaccessibility = 0,
-        SimpleDelegate? onSpawn = null, SimpleDelegate? onBeaten = null,SimpleDelegate? endTurn = null, InternalDamageDelegate? dealDamage = null)
-    {
-        _actX = actX!;
-        _actY = actY!;
-        _actZ = actZ!;
-        _onSpawn = onSpawn!;
-        _onBeaten = onBeaten!;
-        _processDamageOrEndTurn = endTurn!;
-        _getDistance = null;
-        _dealExternalDamage = null;
-        _dealInternalDamage = dealDamage;
-        _isTargetedBy = isTargetedBy;
-
-        IsExternal = false;
-        Health = health;
-        MaxHealth = health;
-        Inaccessibility = inaccessibility;
-        Position = position;
-        Damage = 0;
-        Speed = speed;
-        ScoreWin = scoreWin;
-        ScoreLose = scoreLose;
         Alive = true;
         Beaten = false;
     }

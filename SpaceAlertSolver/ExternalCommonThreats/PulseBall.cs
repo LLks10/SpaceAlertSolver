@@ -5,6 +5,16 @@ public partial struct Threat
     [ExternalCommonThreat("E1-01", "Pulse Ball", "Impulsbal")]
     public static Threat CreatePulseBall()
     {
-        return new Threat(5, 1, 2, 4, 2, actX: ActDealDamageAll(1), actY: ActDealDamageAll(1), actZ: ActDealDamageAll(2));
+        return new Threat()
+        {
+            MaxHealth = 5,
+            Shield = 1,
+            Speed = 2,
+            ScoreWin = 4,
+            ScoreLose = 2,
+            _actX = ActDealDamageAll(1),
+            _actY = ActDealDamageAll(1),
+            _actZ = ActDealDamageAll(2),
+        };
     }
 }

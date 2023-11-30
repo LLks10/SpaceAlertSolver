@@ -37,9 +37,8 @@ public sealed class ThreatFactory
 
             Debug.Assert(method.Name.StartsWith("Create"), "Create method of threat should start with 'Create'");
             Threat threat = (Threat)method.Invoke(null, null)!;
-            threat.InitializeUndefinedDelegates(method.Name["Create".Length..]);
+
             int id = _threatsById.Count;
-            _threatsById.Add(threat);
 
             string primaryName;
             if (createAttribute.Names.Length == 0)
@@ -55,15 +54,32 @@ public sealed class ThreatFactory
             }
 
             if (createAttribute is InternalCommonThreatAttribute)
+            {
                 _internalCommonThreatIds.Add(id);
+                threat.IsExternal = false;
+            }
             else if (createAttribute is InternalSevereThreatAttribute)
+            {
                 _internalSevereThreatIds.Add(id);
+                threat.IsExternal = false;
+            }
             else if (createAttribute is ExternalCommonThreatAttribute)
+            {
                 _externalCommonThreatIds.Add(id);
+                threat.IsExternal = true;
+            }
             else if (createAttribute is ExternalSevereThreatAttribute)
+            {
                 _externalSevereThreatIds.Add(id);
+                threat.IsExternal = true;
+            }
             else
                 throw new UnreachableException("Unknown threat type");
+
+            threat.InitializeUndefinedDelegates(method.Name["Create".Length..]);
+            Debug.Assert(threat.Health == 0, "threat health should not be set, set maxhealth instead");
+            threat.Health = threat.MaxHealth;
+            _threatsById.Add(threat);
         }
     }
 

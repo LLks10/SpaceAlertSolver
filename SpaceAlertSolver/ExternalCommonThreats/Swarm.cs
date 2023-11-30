@@ -7,7 +7,16 @@ public partial struct Threat
     [ExternalCommonThreat("E2-04", "Swarm", "Zwerm")]
     public static Threat CreateSwarm()
     {
-        return new Threat(3, 0, 2, 6, 3, actX: ActDealDamage(1), getDistance: RocketImmuneGetDistance);
+        return new Threat()
+        {
+            MaxHealth = 3,
+            Shield = 0,
+            Speed = 2,
+            ScoreWin = 6,
+            ScoreLose = 3,
+            _actX = ActDealDamage(1),
+            _getDistance = RocketImmuneGetDistance,
+        };
     }
 
     public static void SwarmActY(ref Threat @this)

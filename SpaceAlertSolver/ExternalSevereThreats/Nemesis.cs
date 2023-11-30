@@ -5,7 +5,15 @@ public partial struct Threat
     [ExternalSevereThreat("SE2-05", "Nemesis")]
     public static Threat CreateNemesis()
     {
-        return new Threat(9, 1, 3, 12, 0, actZ: DestroyShip);
+        return new Threat()
+        {
+            MaxHealth = 9,
+            Shield = 1,
+            Speed = 3,
+            ScoreWin = 12,
+            ScoreLose = 0,
+            _actZ = DestroyShip,
+        };
     }
 
     public static void NemesisActX(ref Threat @this)

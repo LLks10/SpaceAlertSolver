@@ -5,7 +5,14 @@ public partial struct Threat
     [ExternalSevereThreat("SE2-03", "Psionic Satellite", "Psionische Satelliet")]
     public static Threat CreatePsionicSatellite()
     {
-        return new(5, 2, 2, 12, 6);
+        return new Threat()
+        {
+            MaxHealth = 5,
+            Shield = 2,
+            Speed = 2,
+            ScoreWin = 12,
+            ScoreLose = 6,
+        };
     }
 
     public static int PsionicSatelliteGetDistance(ref Threat @this, DamageSource _)

@@ -5,7 +5,15 @@ public partial struct Threat
     [ExternalCommonThreat("E2-02", "Scout", "Verkenner")]
     public static Threat CreateScout()
     {
-        return new(3, 1, 2, 6, 3, getDistance: HeavyLaserImmuneGetDistance);
+        return new Threat()
+        {
+            MaxHealth = 3,
+            Shield = 1,
+            Speed = 2,
+            ScoreWin = 6,
+            ScoreLose = 3,
+            _getDistance = HeavyLaserImmuneGetDistance,
+        };
     }
 
     public static void ScoutOnBeaten(ref Threat @this)

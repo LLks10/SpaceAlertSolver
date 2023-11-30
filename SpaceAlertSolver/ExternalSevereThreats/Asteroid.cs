@@ -12,7 +12,20 @@ public partial struct Threat
     public static Threat CreateAsteroid()
     {
         SimpleDelegate revengeDelegate = IncreaseRevengeAct(2);
-        return new Threat(9, 0, 3, 8, 4, actX: revengeDelegate, actY: revengeDelegate, actZ: AsteroidLikeActZ, getDistance: RocketImmuneGetDistance, onBeaten: DealAsteroidRevengeDamage) { RevengeDamage = 0 };
+        return new Threat()
+        {
+            MaxHealth = 9,
+            Shield = 0,
+            Speed = 3,
+            ScoreWin = 8,
+            ScoreLose = 4,
+            _actX = revengeDelegate,
+            _actY = revengeDelegate,
+            _actZ = AsteroidLikeActZ,
+            _getDistance = RocketImmuneGetDistance,
+            _onBeaten = DealAsteroidRevengeDamage,
+            RevengeDamage = 0,
+        };
     }
 
     private static SimpleDelegate IncreaseRevengeAct(int revengeDamage)
