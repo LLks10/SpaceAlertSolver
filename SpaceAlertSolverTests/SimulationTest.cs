@@ -13,7 +13,7 @@ public class SimulationTest
         Player[] players = new Player[3];
         Array.Fill(players, emptyPlayer);
 
-        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
+        ImmutableArray<Trajectory> trajectories = TrajectoryUtils.GetTrajectoriesFromString("1234");
         ImmutableArray<Event> events = ImmutableArray<Event>.Empty;
 
         Game g = GamePool.GetGame();
@@ -28,7 +28,7 @@ public class SimulationTest
     {
         Act[] actions = ActUtils.ParseActionsFromString("a           ");
         Player[] players = new Player[1] { TestUtils.CreatePlayerFromActions(actions) };
-        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
+        ImmutableArray<Trajectory> trajectories = TrajectoryUtils.GetTrajectoriesFromString("1234");
         ImmutableArray<Event> events = ImmutableArray.Create
         (
             new Event(true, 1, 1, 6) // meteorite will be oneshot
@@ -56,7 +56,7 @@ public class SimulationTest
         actions[2] = Act.A;
         actions[3] = Act.A;
         Player[] players = new Player[1] { TestUtils.CreatePlayerFromActions(actions) };
-        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("1234");
+        ImmutableArray<Trajectory> trajectories = TrajectoryUtils.GetTrajectoriesFromString("1234");
         ImmutableArray<Event> events = ImmutableArray.Create
         (
             new Event(true, 1, 1, 2)
@@ -83,7 +83,7 @@ public class SimulationTest
         Act[] actions2 = ActUtils.ParseActionsFromString("crb         ");
 
         Player[] players = TestUtils.CreatePlayersFromActions(actions0, actions1, actions2);
-        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("6134");
+        ImmutableArray<Trajectory> trajectories = TrajectoryUtils.GetTrajectoriesFromString("6134");
         ImmutableArray<Event> events = ImmutableArray.Create
         (
             new Event(true, 1, 1, 23),

@@ -19,7 +19,7 @@ internal sealed class MissionGenerator
 
     public Simulation GetNextSimulation()
     {
-        ImmutableArray<Trajectory> trajectories = PickRandomTrajectories();
+        string trajectories = PickRandomTrajectories();
         int numberOfThreats = GetRandomThreatCount();
         int numberOfPlayers = GetRandomPlayerCount();
         ImmutableArray<Event> events = GetRandomEvents(numberOfThreats);
@@ -28,7 +28,7 @@ internal sealed class MissionGenerator
             .Select(e => $"{e.Turn} {e.Zone} {(e.IsExternal ? ThreatFactory.ExName(e.CreatureId) : ThreatFactory.InName(e.CreatureId))}")
             .ToImmutableArray();
 
-        Act[][] actions = GetPlayerActions(numberOfPlayers, trajectories, events);
+        Act[][] actions = GetPlayerActions(numberOfPlayers, TrajectoryUtils.GetTrajectoriesFromString(trajectories), events);
         return new(trajectories, eventStrings, actions);
     }
 
@@ -136,17 +136,17 @@ internal sealed class MissionGenerator
         return t;
     }
 
-    private ImmutableArray<Trajectory> PickRandomTrajectories()
+    private string PickRandomTrajectories()
     {
-        int[] trajectories = new int[] { 1, 2, 3, 4, 5, 6, 7 };
-        int[] result = new int[4];
+        char[] trajectories = new char[] { '1', '2', '3', '4', '5', '6', '7' };
+        char[] result = new char[4];
         for (int i = 0; i < 4; i++)
         {
             int randomIndex = _random.Next(i, trajectories.Length);
             result[i] = trajectories[randomIndex];
             trajectories[randomIndex] = trajectories[i];
         }
-        return result.Select(t => new Trajectory(t)).ToImmutableArray();
+        return "" + result[0] + result[1] + result[2] + result[3];
     }
 
     private readonly record struct ThreatId(bool IsExternal, int Id)

@@ -25,7 +25,7 @@ public class FullSimulationTests
          * G |  Blue   -     C   Robot   C   Robot  Red  Robot   A    Lift   C     -
         */
 
-        ImmutableArray<Trajectory> trajectories = TestUtils.GetTrajectoriesFromString("7643");
+        ImmutableArray<Trajectory> trajectories = TrajectoryUtils.GetTrajectoriesFromString("7643");
         ImmutableArray<Event> events = ImmutableArray.Create<Event>
             ( new(true, 1, 2, ThreatParser.ParseExThreat("amoebe").id)
             , new(true, 3, 0, ThreatParser.ParseExThreat("psionische satelliet").id)
