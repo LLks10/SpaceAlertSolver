@@ -3,6 +3,26 @@
 //Create threats
 public static class ThreatFactory
 {
+    public static List<int> GetInternalThreatPool()
+    {
+        List<int> pool = new();
+        for (int i = 0; i <= 23; i++)
+        {
+            pool.Add(i);
+        }
+        return pool;
+    }
+
+    public static List<int> GetExternalThreatPool()
+    {
+        List<int> pool = new();
+        for (int i = 0; i <= 28; i++)
+        {
+            pool.Add(i);
+        }
+        return pool;
+    }
+
     const int sevInStart = 13;
     //External threat
     internal static ExThreat SummonEx(int number, Trajectory traj, int zone, Game game, int time)
