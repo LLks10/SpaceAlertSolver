@@ -7,10 +7,15 @@ namespace SimulationGenerator;
 
 internal sealed class MissionGenerator
 {
-    private readonly Random _random = new();
+    private readonly Random _random;
     private static readonly double[] THREAT_COUNT_DISTRIBUTION = new double[] { 0, 3, 4, 6, 6, 8, 6, 3, 3 };
     private static readonly double[] PLAYER_COUNT_DISTRIBUTION = new double[] { 0, 0, 0, 1, 10, 10 };
     private const double INTERNAL_CHANCE = 0.3;
+
+    public MissionGenerator(int seed)
+    {
+        _random = new(seed);
+    }
 
     public Simulation GetNextSimulation()
     {
@@ -23,13 +28,26 @@ internal sealed class MissionGenerator
             .Select(e => $"{e.Turn} {e.Zone} {(e.IsExternal ? ThreatFactory.ExName(e.CreatureId) : ThreatFactory.InName(e.CreatureId))}")
             .ToImmutableArray();
 
-        Act[][] actions = GetPlayerActions(trajectories, events);
+        Act[][] actions = GetPlayerActions(numberOfPlayers, trajectories, events);
         return new(trajectories, eventStrings, actions);
     }
 
-    private Act[][] GetPlayerActions(ImmutableArray<Trajectory> trajectories, ImmutableArray<Event> events)
+    private Act[][] GetPlayerActions(int playerCount, ImmutableArray<Trajectory> trajectories, ImmutableArray<Event> events)
     {
-        throw new NotImplementedException();
+        SimulatedAnnealing simulatedAnnealing = new(playerCount, trajectories, events);
+        simulatedAnnealing.Run((int)1e6, trajectories, events, _random.Next(), false);
+        int[] gene = simulatedAnnealing.getBestGene().gene;
+        Act[][] acts = new Act[playerCount][];
+        for (int i = 0; i < playerCount; i++)
+        {
+            Act[] row = new Act[12];
+            for (int j = 0; j < 12; j++)
+            {
+                row[j] = (Act)gene[i * 12 + j];
+            }
+            acts[i] = row;
+        }
+        return acts;
     }
 
     private ImmutableArray<Event> GetRandomEvents(int count)
