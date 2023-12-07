@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaceAlertSolverTests", "Sp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "Benchmark\Benchmark.csproj", "{5FF8F607-98E6-491B-AC47-0FD22A8BB931}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulationGenerator", "SimulationGenerator\SimulationGenerator.csproj", "{2C47ABF3-370A-40F3-9CCD-AE9BA0041E21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimulationGenerator", "SimulationGenerator\SimulationGenerator.csproj", "{2C47ABF3-370A-40F3-9CCD-AE9BA0041E21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
