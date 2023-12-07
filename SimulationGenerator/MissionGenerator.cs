@@ -1,7 +1,6 @@
 ﻿using SpaceAlertSolver;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Text.Json.Serialization;
 
 namespace SimulationGenerator;
 

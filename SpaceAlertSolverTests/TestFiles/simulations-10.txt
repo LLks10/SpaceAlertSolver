@@ -1,0 +1,119 @@
+6123
+5 2 Pulse Ball
+6 0 Kamikaze
+8 3 Blue Slime
+-
+dfcafc    ac
+dc   ccac cr
+dc    cf bc 
+ac  eaardc  
+dc    c   ac
+
+5372
+1 3 Unstable Warheads
+2 3 Blue Hacked Shields
+3 1 Gunship
+4 2 Moloch
+5 0 Scout
+6 1 Nemesis
+7 0 Interstellar Octopus
+8 3 Fissure
+-
+cdccface    
+d cc  fc  rc
+dcceaa  daa 
+
+2716
+1 3 Crossed Wire
+2 1 Psionic Satellite
+3 3 Blue Commandos
+4 1 Gyro Fregat
+5 0 Energy Cloud
+7 1 Meteorite
+8 2 Kamikaze
+-
+cdcc  r  eac
+d cccdca  dc
+dcc  cfberc 
+dc cbb   fbc
+dc c   ba ac
+
+6127
+1 1 Stealth Fighter
+6 3 Rebellious Robots
+7 3 Red Soldiers
+-
+cca a  rc a 
+dfcc       c
+dcc ebc c rc
+d ac   a   c
+
+2731
+1 3 Red Skirmisher
+2 2 Scout
+4 2 Moloch
+6 3 Blue Commandos
+8 2 Gyro Fighter
+-
+dfcra bcacec
+cf  c bc d c
+dccrcaa bebc
+  raa afedc 
+
+4356
+5 0 Nebula Crab
+-
+c  c ceba f 
+rfedc rcb ec
+d cbc      c
+dc  cecba rc
+
+3716
+3 0 Scout
+5 3 Red Soldiers
+6 1 Pulse Ball
+7 0 Fregat
+8 3 Virus
+-
+dbcce dar dc
+dccaeb a  rc
+dcc   rf  ec
+cf c   acdac
+dccbrcbbae c
+
+5126
+1 0 Meteorite
+2 2 Pulse Satellite
+3 3 Blue Soldiers
+4 3 Unstable Warheads
+5 3 Rebellious Robots
+6 1 Armored Grappler
+7 3 Overheated Reactor
+8 3 Blue Slime
+-
+fdccc  c   c
+cr c d ff ec
+d cfc   ddc 
+d c c  ear c
+
+7321
+2 0 Stealth Fighter
+8 2 Pulse Satellite
+-
+d c   ccdra 
+dc    ccrra 
+ dc   cc cdd
+cfaaf   c   
+dc  fccb   c
+
+4512
+1 3 Blue Commandos
+7 1 Armored Grappler
+8 2 Interstellar Octopus
+-
+ dcf  ccrcb 
+c   rcac ra 
+dbc  c c fa 
+dc  bcce af 
+dccaccr   dr
+

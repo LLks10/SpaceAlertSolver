@@ -9,111 +9,1163 @@ dc    cf bc
 ac  eaardc  
 dc    c   ac
 
-5372
-1 3 Unstable Warheads
-2 3 Blue Hacked Shields
-3 1 Gunship
-4 2 Moloch
-5 0 Scout
-6 1 Nemesis
-7 0 Interstellar Octopus
+2157
+1 0 Behemoth
+3 0 Moloch
+6 3 Alien
+7 3 Blue Soldiers
+8 1 Gyro Fregat
+-
+dfc fccb cd 
+cb  cdc  c  
+e   bbrcdcc 
+debcr ffccec
+
+6437
+2 3 Red Saboteur
+7 0 Kamikaze
+-
+cfdbca  c  c
+d c crc r ec
+d c ccea r c
+dc cc  a b c
+
+3674
+1 3 Fissure
+2 1 Pulse Satellite
+5 3 Crossed Wire
+6 0 Armored Grappler
+7 1 Minor Asteroid
+-
+c    cb    a
+ebd a   d   
+a       bre 
+c  c   b a a
+
+6753
+4 2 Swarm
+-
+d crac   ecc
+cdc  ac r ec
+dcdc dcf   c
+dc cb c a ac
+
+3146
+1 3 Blue Saboteur
+3 2 Fighter
+4 3 Fissure
+8 0 Jellyfish
+-
+dccce cdcfe 
+dcc   fdccdc
+cdcc feb r c
+dcc  frbbe c
+dcce  dd  rc
+
+7513
+1 2 Psionic Satellite
+2 1 Scout
+3 2 Gyro Fighter
+4 0 Behemoth
+5 1 Swarm
+6 3 Atomic Bomb
+7 0 Gyro Fregat
+-
+bcdc recd   
+dccccac c b 
+dcc  cbc aa 
+dcc  cac  d 
+dcc r  ec  f
+
+3764
+4 2 Nebula Crab
+5 2 Fighter
+7 0 Major Asteroid
 8 3 Fissure
 -
-cdccface    
-d cc  fc  rc
-dcceaa  daa 
+cdcccdc  d c
+dfccec fd cf
+ e   ee  drc
+dccr  eaf fc
+dcc  aa    c
 
-2716
-1 3 Crossed Wire
-2 1 Psionic Satellite
+7245
+1 3 Seeker
+2 3 Power System Overload
 3 3 Blue Commandos
-4 1 Gyro Fregat
-5 0 Energy Cloud
-7 1 Meteorite
-8 2 Kamikaze
+4 2 Meteorite
+6 2 Armored Grappler
+8 1 Swarm
 -
-cdcc  r  eac
-d cccdca  dc
-dcc  cfberc 
-dc cbb   fbc
-dc c   ba ac
+d ccaf cf a 
+d cc bcrd  a
+d cc   ccc d
+d cc   c   a
+cdccc bca   
 
-6127
-1 1 Stealth Fighter
-6 3 Rebellious Robots
-7 3 Red Soldiers
+3415
+3 3 Blue Commandos
+4 1 Swarm
+7 1 Moloch
 -
-cca a  rc a 
-dfcc       c
-dcc ebc c rc
-d ac   a   c
+c    aa a aa
+bdcc   c   b
+dcccbf cbe  
+dccerc fe  f
 
-2731
-1 3 Red Skirmisher
-2 2 Scout
-4 2 Moloch
-6 3 Blue Commandos
-8 2 Gyro Fighter
+7623
+2 2 Pulse Ball
+3 3 Contamination
+4 3 Red Soldiers
+5 1 Man-o-War
+7 2 Moloch
+8 2 Swarm
 -
-dfcra bcacec
-cf  c bc d c
-dccrcaa bebc
-  raa afedc 
+d ccc  ca ae
+d cc  bcca a
+cdcc   c    
+d cca  cre  
 
-4356
-5 0 Nebula Crab
+4257
+2 0 Stealth Fighter
+4 0 Moloch
 -
-c  c ceba f 
-rfedc rcb ec
-d cbc      c
-dc  cecba rc
+dfcc   ebfrc
+ dccb dafdac
+c e bcbbb c 
+d ccd  cbdc 
 
-3716
-3 0 Scout
-5 3 Red Soldiers
-6 1 Pulse Ball
-7 0 Fregat
-8 3 Virus
--
-dbcce dar dc
-dccaeb a  rc
-dcc   rf  ec
-cf c   acdac
-dccbrcbbae c
-
-5126
-1 0 Meteorite
-2 2 Pulse Satellite
-3 3 Blue Soldiers
-4 3 Unstable Warheads
-5 3 Rebellious Robots
-6 1 Armored Grappler
-7 3 Overheated Reactor
+7432
+1 0 Interstellar Octopus
+3 3 Rebellious Robots
+5 2 Maelstorm
+6 0 Phantom Fighter
 8 3 Blue Slime
 -
-fdccc  c   c
-cr c d ff ec
-d cfc   ddc 
-d c c  ear c
+d c   c f  c
+dcf   ca  bc
+cc r c  df f
 
-7321
-2 0 Stealth Fighter
+4572
+5 0 Moloch
+-
+dbcca  fbcfc
+dccf  dc dac
+r  ecb  e bf
+dccedfbbd rc
+cedfbaf abrc
+
+1756
+1 0 Kamikaze
+3 1 Minor Asteroid
+4 2 Maelstorm
+6 3 Blue Slime
+7 3 Seeker
+-
+dfc   cfd dc
+cdc  c eferc
+d c fcdc dac
+dc f  cddc  
+r cd  bffe c
+
+4317
+1 3 Red Hacked Shields
+2 1 Pulse Ball
+3 1 Pulse Satellite
+4 0 Gyro Fighter
+5 2 Behemoth
+6 3 Red Skirmisher
+7 1 Kamikaze
+8 2 Stealth Fighter
+-
+dacc  rf e c
+cb frara e  
+d ccrac  e c
+dccccr a  ec
+dcc f e   rc
+
+1573
+1 0 Energy Cloud
+2 3 Blue Slime
+6 3 Fissure
+8 1 Pulse Satellite
+-
+dbc   cbc  a
+dcab cbcd   
+cdc  c acerb
+d c c c c   
+dcf  c  cc  
+
+5624
+1 0 Behemoth
+2 3 Red Commandos
+3 2 Destroyer
+4 3 Rebellious Robots
+6 1 Fregat
+7 3 Red Slime
+8 0 Maelstorm
+-
+eb aarcrf b 
+drcc  ec fe 
+cdeaa rcdbb 
+d c ac cda  
+
+1245
+1 0 Swarm
+6 1 Phantom Fighter
+7 3 Power System Overload
+-
+dacca   b bc
+d ccbf  b  c
+dac  r bbec 
+cdcca  bb  c
+
+5436
+1 0 Stealth Fighter
+2 1 Behemoth
+3 3 Crossed Wire
+5 3 Red Hacked Shields
+6 2 Pulse Ball
+8 1 Maelstorm
+-
+d ccrcca aec
+caaca abcdcc
+dc cbcf    c
+dcc bbrc  ec
+
+2617
+2 3 Blue Saboteur
+4 1 Swarm
+8 0 Man-o-War
+-
+fbd   caa cf
+erbdbeaa   b
+cfbae  aa  r
+
+5714
+1 3 Overheated Reactor
+2 1 Armored Grappler
+4 1 Nemesis
+6 0 Behemoth
+7 2 Fighter
+-
+d ccfe b  rc
+dccrc afe  c
+ dcc  eaar c
+d cc      cc
+ca  ebaada  
+
+2315
+4 2 Swarm
+6 2 Jellyfish
+-
+dccc  b   cc
+dcc  aa  abc
+d ccbrcace c
+ca c  fc  dc
+dc cabffb ac
+
+6572
+1 2 Kamikaze
+3 1 Asteroid
+4 3 Overheated Reactor
+5 3 Contamination
+8 3 Blue Hacked Shields
+-
+dbcc   b   c
+cabccrcf   e
+dce cfdfab d
+dcc     a ac
+dcc f  f  bc
+
+2756
+8 0 Swarm
+-
+d cerccr  c 
+dce rccab e 
+ cdf  ccb  b
+d c   cc    
+dcf bccaa  d
+
+6247
+1 2 Gyro Fregat
+2 2 Behemoth
+3 3 Contamination
+5 3 Blue Slime
+8 0 Swarm
+-
+bcbc dc   fc
+rcfdfff   ec
+decfrfcfercf
+dcb  ac    c
+
+3472
+1 0 Asteroid
+2 3 Crossed Wire
+3 2 Stealth Fighter
+4 2 Phantom Fighter
+5 2 Major Asteroid
+6 3 Virus
+7 3 Red Soldiers
+8 1 Gunship
+-
+dcccrae er c
+ dcc  fecrc 
+c cr afe d c
+ f ca  db cc
+
+6125
+1 1 Meteorite
+4 3 Red Slime
+7 3 Blue Slime
+8 3 Contamination
+-
+dfcfb cab c 
+dcaa cec  fb
+  c dc  cc  
+cf  r cfdf a
+
+3246
+1 2 Fighter
+2 1 Destroyer
+3 1 Major Asteroid
+5 0 Phantom Fighter
+6 2 Kamikaze
+7 0 Fregat
+8 1 Armored Grappler
+-
+dfcc eaaer c
+ dccrrc   ec
+c  cecaard c
+
+7326
+1 0 Moloch
+4 2 Gunship
+5 0 Behemoth
+-
+ cdcr ccbe c
+dfccffe b rc
+e b    aaae 
+dc cbb cc ac
+d cc   c fc 
+
+3567
+1 0 Interstellar Octopus
+3 2 Behemoth
+4 1 Phantom Fighter
+5 3 Blue Saboteur
+7 2 Nemesis
+8 2 Stealth Fighter
+-
+rcbecdccrr  
+dccbreccc   
+dce  rcccra 
+dcdaad c b a
+cb  dacdcra 
+
+7154
+6 2 Interstellar Octopus
+7 3 Eliminator
+8 1 Behemoth
+-
+cb dcccr  cr
+d cbc  cd aa
+d cfc fc  ab
+dca c  crr  
+d c c ac  ba
+
+4325
+2 0 Fighter
+3 3 Blue Slime
+5 2 Armored Grappler
+6 1 Kamikaze
+7 2 Gunship
+-
+ cfc    cdfc
+d ccdr abedc
+dcc  f   erc
+rcdffc  b ec
+
+7516
+3 3 Unstable Warheads
+5 0 Behemoth
+-
+cdccedaa    
+dcccf     fc
+e bbdb  ar c
+dccr  ccfe c
+
+4657
+1 3 Atomic Bomb
+2 3 Blue Slime
+3 3 Blue Skirmisher
+4 2 Pulse Ball
+6 0 Armored Grappler
+-
+bcerdccc fa 
+d cc  cc   r
+dc   cc   b 
+d cc cc  bfb
+
+1243
+3 0 Armored Grappler
+-
+d ccebc  r c
+ ceaaad   rc
+dccr  b  ec 
+ dccb area c
+
+4172
+1 1 Energy Cloud
+2 3 Red Slime
+5 1 Scout
+8 0 Fregat
+-
+      bceaa 
+dcrcecrccd  
+recdaccec c 
+
+1625
+1 2 Fighter
+2 3 Seeker
+3 0 Scout
+4 2 Stealth Fighter
+5 0 Nemesis
+6 1 Armored Grappler
+8 2 Psionic Satellite
+-
+dfc cbcd  a 
+ dc c  c  fa
+d cfc  ccd a
+dc bc  cdra 
+credc fcrca 
+
+5746
+5 2 Phantom Fighter
+6 2 Meteorite
+7 0 Destroyer
+8 3 Blue Skirmisher
+-
+c rb  acfccb
+d cc  eda b 
+dccr  ac  ec
+dcc ca a   c
+ dccr  bbec 
+
+1327
+1 1 Maelstorm
+4 1 Man-o-War
+5 3 Blue Skirmisher
+6 1 Armored Grappler
+7 3 Blue Hacked Shields
+8 3 Power System Overload
+-
+dbcc  rc cec
+dccdbc bd  c
+ca erbfa dc 
+d ccf b e rc
+dc cc  cr ec
+
+5164
+2 0 Phantom Fighter
+3 2 Armored Grappler
+8 2 Man-o-War
+-
+dcea  r dd c
+d   cr ba ec
+derc   bafc 
+c earrf ab  
+
+2753
+1 3 Fissure
+2 0 Gyro Fregat
+3 3 Overheated Reactor
+4 2 Swarm
+7 3 Red Saboteur
 8 2 Pulse Satellite
 -
-d c   ccdra 
-dc    ccrra 
- dc   cc cdd
-cfaaf   c   
-dc  fccb   c
+c  c dcc   b
+r cdrefcc f 
+d c abcc rda
+dcr ecccr   
 
-4512
-1 3 Blue Commandos
-7 1 Armored Grappler
-8 2 Interstellar Octopus
+5236
+2 1 Phantom Fighter
+3 3 Atomic Bomb
 -
- dcf  ccrcb 
-c   rcac ra 
-dbc  c c fa 
-dc  bcce af 
-dccaccr   dr
+dc c ac   ac
+d c  cc cc c
+dcaf c     c
+  cadc    ac
+
+2476
+1 1 Amoebe
+3 3 Atomic Bomb
+6 3 Red Skirmisher
+7 3 Power System Overload
+8 3 Red Saboteur
+-
+cdccb   acc 
+d cc      c 
+dccfb abc  a
+d ccecrfcb  
+
+5617
+4 1 Phantom Fighter
+-
+ dc c aa c  
+dbcac  a c  
+bc    adccad
+
+2143
+1 2 Nemesis
+2 1 Fregat
+3 0 Fighter
+7 3 Red Saboteur
+8 2 Psionic Satellite
+-
+d cfcc  f  c
+dcf cecfrcb 
+ c  rcc   ab
+dcac    fa c
+dc  ccr   a 
+
+6375
+1 2 Fighter
+2 1 Meteorite
+3 3 Contamination
+4 3 Overheated Reactor
+5 3 Unstable Warheads
+6 3 Eliminator
+7 0 Scout
+8 0 Major Asteroid
+-
+  f dc cd a 
+c   d ccdf r
+ dc a ccb c 
+dcca c crc  
+dc ab cc  fa
+
+2563
+2 1 Nemesis
+4 1 Fregat
+6 0 Gyro Fighter
+8 2 Armored Grappler
+-
+dac   ccrcf 
+dcac cc   fc
+ c  d ccfe  
+ dccfccrda  
+dca bcc  c  
+
+6742
+1 0 Armored Grappler
+2 1 Scout
+3 2 Psionic Satellite
+5 1 Asteroid
+6 2 Moloch
+7 3 Atomic Bomb
+8 2 Minor Asteroid
+-
+rd c a c ec 
+ca cra aab  
+d ccaabbddc 
+dc ccrba  ec
+
+3124
+3 1 Armored Grappler
+4 1 Maelstorm
+8 3 Blue Hacked Shields
+-
+caaa  abcdac
+   c  rabb b
+dbcca   dfdc
+ dccecb rffc
+
+6412
+1 1 Scout
+2 2 Pulse Ball
+4 3 Unstable Warheads
+5 3 Blue Slime
+6 3 Seeker
+7 2 Major Asteroid
+-
+ dc bac   fc
+r cdcecff f 
+d c fbc   bc
+cefrcdca bca
+
+3651
+2 3 Blue Saboteur
+6 2 Armored Grappler
+7 0 Pulse Ball
+-
+dac c bc   e
+dc  cf ce   
+cdc c acd ra
+dc  c  crc r
+
+7236
+1 0 Phantom Fighter
+2 2 Amoebe
+3 1 Swarm
+6 3 Red Slime
+7 2 Behemoth
+-
+cdc   c b  c
+dbc   c c  c
+dce cfcfr c 
+
+3471
+3 0 Armored Grappler
+7 0 Pulse Satellite
+-
+d ccf   fafc
+ a eeeaadr c
+ dccf f   bc
+dccrc c cbec
+c   c  cd bc
+
+7524
+1 0 Energy Cloud
+2 0 Scout
+3 3 Blue Commandos
+5 3 Red Slime
+8 2 Maelstorm
+-
+d cc    bf c
+c    c  c dc
+d cecff  rfc
+d ccrc b  ec
+dcc fa   afc
+
+4715
+7 1 Amoebe
+-
+d cc fddffc 
+dcc da c fdc
+d cc  bbb fc
+cdcc  b   fc
+dccdba cda c
+
+7316
+1 1 Energy Cloud
+4 1 Scout
+6 3 Red Saboteur
+7 1 Psionic Satellite
+8 3 Blue Commandos
+-
+d cccrcce  c
+dcc ar  c ec
+cf ccf c adc
+dcc  b a   c
+
+4563
+1 1 Destroyer
+2 0 Fregat
+3 1 Fighter
+4 3 Fissure
+5 1 Maelstorm
+6 0 Amoebe
+7 3 Blue Hacked Shields
+8 3 Red Hacked Shields
+-
+dfcddcdc  dc
+d cbbc  f  c
+c e  fbba ab
+e radc     c
+
+1742
+3 3 Alien
+4 3 Seeker
+5 0 Scout
+8 2 Man-o-War
+-
+d cc   ca cc
+cdcc   ra ec
+dcc  c     c
+d ccrac ae c
+
+4231
+1 3 Red Saboteur
+3 1 Amoebe
+5 3 Blue Skirmisher
+6 1 Phantom Fighter
+7 1 Scout
+8 3 Rebellious Robots
+-
+ dcfcf     c
+ caa a b d c
+dac c    b c
+dcaccf ccc  
+
+1465
+1 0 Destroyer
+6 0 Minor Asteroid
+8 1 Scout
+-
+dacc   cbf c
+dcc  r   cc 
+cdcc  ad  dc
+dcc rbc be c
+d cc  b  b c
+
+5612
+1 2 Energy Cloud
+2 3 Red Skirmisher
+3 3 Blue Saboteur
+6 1 Fighter
+7 1 Asteroid
+8 2 Pulse Satellite
+-
+dbcc   cerc 
+crcdffrc ec 
+d cc  der dc
+dcc    f   c
+dc cf rcaec 
+
+1237
+3 2 Scout
+5 1 Nemesis
+7 2 Fighter
+-
+dccarec    c
+cdcba c  c c
+dc dcdcbaac 
+dc  a c rec 
+dcracccae  c
+
+5374
+1 3 Blue Hacked Shields
+2 0 Phantom Fighter
+3 3 Blue Saboteur
+5 1 Man-o-War
+7 0 Meteorite
+-
+rcdfeccafdd 
+ceardc c    
+d cac ccdceb
+dcaa  ccc   
+dc  accb  a 
+
+2514
+4 1 Scout
+5 2 Nebula Crab
+-
+  f  da   bc
+dccr ca   ec
+ f fa efrdc 
+f c raafd ec
+
+5741
+1 2 Gyro Fregat
+2 3 Blue Saboteur
+4 3 Blue Soldiers
+5 3 Red Soldiers
+6 2 Destroyer
+-
+rcdf  cc  ec
+cdc cr a ec 
+dac cbf    c
+d ccc r ae c
+
+2376
+2 1 Fregat
+-
+d c ccaccar 
+dc  cabccd  
+cbac adc  be
+ dcbc  c  be
+
+6417
+1 3 Contamination
+3 0 Asteroid
+6 2 Destroyer
+8 1 Amoebe
+-
+ caf  caadc 
+dcc bca    c
+d ca c  fa c
+dcf bc  bbcf
+
+2643
+1 0 Pulse Satellite
+2 2 Scout
+3 1 Fighter
+4 2 Phantom Fighter
+5 0 Stealth Fighter
+6 1 Kamikaze
+7 2 Fregat
+-
+dcccd   c dc
+ dcb  ff acc
+ dcrf f ca  
+dcabb a  a c
+d cr dba dec
+
+6275
+2 0 Maelstorm
+3 1 Amoebe
+7 3 Contamination
+8 3 Blue Hacked Shields
+-
+dcc bacc c  
+dcdcd cf  c 
+dca  fccaceb
+ caadac   cf
+dc  b c   ce
+
+3465
+2 0 Nemesis
+3 1 Fighter
+4 1 Gunship
+5 3 Red Commandos
+7 3 Overheated Reactor
+8 0 Interstellar Octopus
+-
+d cc  ac   f
+cdcc   ccc  
+dc ca bc f a
+decf  cdr fd
+dcc   ccf ca
+
+6541
+1 2 Kamikaze
+4 1 Amoebe
+7 0 Nebula Crab
+-
+dfcc rc b ec
+dc c br   ec
+cdccr eda dc
+dc c ab  bcc
+d cc rae  fc
+
+3712
+1 3 Power System Overload
+2 2 Major Asteroid
+3 2 Nemesis
+4 3 Contamination
+5 2 Interstellar Octopus
+6 3 Red Commandos
+-
+dac   ca   c
+d cerc  b  c
+d cc  c    c
+cdcaccbb   c
+
+7364
+1 2 Amoebe
+5 3 Red Soldiers
+-
+d ccc f   cb
+dcca a   c  
+crc aad ecr 
+dc c bc f c 
+
+3521
+1 3 Red Slime
+2 1 Moloch
+3 2 Behemoth
+7 0 Meteorite
+8 3 Red Commandos
+-
+b eb racf be
+  ee aer  cd
+  edcfcfcd  
+efd rca raer
+
+7632
+3 2 Amoebe
+-
+d ccfab  a c
+craaeb dr ec
+dccb    f  c
+d cc   f ac 
+
+4273
+1 3 Rebellious Robots
+2 2 Destroyer
+3 1 Armored Grappler
+7 1 Fregat
+8 3 Blue Slime
+-
+bdc    c a  
+ dca ccd  dr
+r fre a  aa 
+dc cr ecdr  
+dc   b cb ea
+
+7451
+1 1 Gunship
+2 1 Psionic Satellite
+3 0 Phantom Fighter
+4 3 Red Commandos
+5 2 Fighter
+6 3 Fissure
+7 3 Eliminator
+8 2 Man-o-War
+-
+dbc recc  f 
+dc fcccc ba 
+d c   ccf rb
+acfac rb aa 
+bdcfaaccr aa
+
+4613
+1 3 Blue Saboteur
+5 2 Fregat
+6 0 Stealth Fighter
+7 1 Amoebe
+-
+d cccbabc   
+c bcbad cdar
+dcrcc  ec rc
+d ccc cfc f 
+rc  baedca a
+
+7125
+1 1 Minor Asteroid
+3 1 Gunship
+4 3 Fissure
+5 2 Fighter
+6 3 Blue Hacked Shields
+7 1 Phantom Fighter
+8 0 Pulse Satellite
+-
+b  cadccr  r
+  cadfcc    
+d ccaacccc d
+cdcc  cc  ea
+dcbre ccbfe 
+
+4362
+2 1 Asteroid
+6 2 Fregat
+8 3 Fissure
+-
+cfaerr bac  
+d cc f     c
+dccarca   ec
+d ccb   b  c
+
+1547
+1 1 Fregat
+2 1 Interstellar Octopus
+3 2 Energy Cloud
+4 2 Major Asteroid
+6 1 Gyro Fighter
+7 3 Blue Saboteur
+-
+ dcecrcrfec 
+dacb ccc  bc
+ c cd cfc  c
+d cab c ddc 
+
+4731
+1 0 Fregat
+2 3 Red Slime
+5 0 Swarm
+-
+deaab aaa rc
+eb a bfbdrc 
+rdc aecc   c
+c c cdc f  c
+
+1365
+3 3 Rebellious Robots
+5 3 Crossed Wire
+6 0 Man-o-War
+7 3 Blue Saboteur
+8 0 Pulse Ball
+-
+dacca   a  c
+ ca  fac d c
+dccec c drdc
+d cecrrfaec 
+
+5413
+1 0 Meteorite
+2 1 Fregat
+-
+c b dbc   c 
+ a adc  fca 
+c  cadcca c 
+dbcdd c f c 
+a   dcrec b 
+
+1632
+1 3 Eliminator
+4 0 Behemoth
+5 2 Gunship
+6 1 Gyro Fregat
+8 2 Pulse Satellite
+-
+c   caaacbdc
+dfcdd cr aec
+f c radcccec
+dc c cc  rec
+dcrc ecbabfc
+
+5273
+5 2 Gyro Fregat
+-
+dccc b a   c
+cbaare  cd c
+dccraaac ecc
+   crbaef dc
+   r f  daec
+
+2451
+1 0 Interstellar Octopus
+4 0 Stealth Fighter
+5 1 Jellyfish
+8 0 Gunship
+-
+dccc c ca d 
+dc  a cceeab
+bc e   bbae 
+dca   cc   d
+dc reccrc   
+
+5142
+1 1 Maelstorm
+2 2 Major Asteroid
+3 3 Blue Soldiers
+4 3 Red Soldiers
+5 1 Jellyfish
+6 0 Phantom Fighter
+7 2 Gyro Fregat
+8 3 Blue Hacked Shields
+-
+dccc       c
+dccrac  a ec
+c  rbrae d c
+dccr  r recc
+
+2716
+1 2 Maelstorm
+3 0 Gunship
+4 1 Psionic Satellite
+6 2 Behemoth
+-
+cbdrrcaaecrr
+fbd ccbd abf
+ebfeabr  fb 
+dcrcfdaafbe 
+
+6317
+1 3 Blue Commandos
+2 1 Maelstorm
+3 3 Unstable Warheads
+5 0 Meteorite
+7 1 Asteroid
+8 1 Destroyer
+-
+rcdfcc    ec
+ cb cfaaa dc
+dbcccecfcr c
+dc ccrcce  c
+
+2547
+1 0 Phantom Fighter
+2 2 Gunship
+7 3 Rebellious Robots
+-
+rbra c rc  c
+drcrecb b  c
+cdc ccec r c
+dc af c    c
+
+6134
+2 3 Blue Commandos
+3 3 Virus
+4 2 Armored Grappler
+6 2 Stealth Fighter
+7 0 Swarm
+8 2 Energy Cloud
+-
+dacbfcc b f 
+dcc   ccrc  
+cdcacc c  db
+d cddcca   a
+dc recc d   
+
+3265
+3 1 Amoebe
+5 0 Gunship
+7 2 Scout
+-
+er cadccr  c
+ ec  ae c   
+dcrcecc ba f
+dr  ceccra  
+d bbb cc   b
+
+6451
+1 2 Nemesis
+3 2 Moloch
+4 3 Blue Commandos
+6 2 Interstellar Octopus
+7 3 Blue Hacked Shields
+-
+dcc bc c re 
+d c acc ade 
+cdc  c ce  r
+dc    cc  b 
+d cb c cfff 
+
+3617
+3 2 Gunship
+6 2 Destroyer
+-
+dc crcca  ec
+r  aad a  ec
+bdc a b  f c
+d  caf f   c
+d  c c     c
+
+7124
+2 1 Gyro Fregat
+4 3 Overheated Reactor
+5 0 Man-o-War
+6 1 Minor Asteroid
+7 3 Fissure
+-
+c faard f ec
+ebbbbre b  b
+ cadceb  b  
+dacbcaba   c
+
+3152
+8 0 Fighter
+-
+dfcer cbc  a
+dcc  bc cd  
+c  c beaa  a
+dc  b c cf f
+
+7542
+2 0 Moloch
+3 3 Overheated Reactor
+5 0 Gyro Fregat
+7 3 Unstable Warheads
+-
+dbc cebaddrc
+aeb a aae   
+cc  c fccd c
+dcbc e e  rc
+
+4726
+2 3 Seeker
+3 0 Behemoth
+4 2 Gyro Fregat
+5 2 Jellyfish
+6 3 Atomic Bomb
+7 3 Eliminator
+8 3 Red Skirmisher
+-
+dacc  rbecc 
+ dcc   bb cf
+dc cer  a c 
+c   arfce fe
 

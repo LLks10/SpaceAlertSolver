@@ -1,18 +1,21 @@
-﻿namespace SimulationGenerator;
+﻿using SpaceAlertSolver;
+
+namespace SimulationGenerator;
 
 internal class Program
 {
-    const int NUM_SIMULATIONS = 10;
+    const int NUM_SIMULATIONS = 100;
     const string FILE_NAME = "simulations.txt";
 
     public static void Main()
     {
-        MissionGenerator generator = new(0);
+        GamePool.EnableConcurrent = true;
         Simulation[] simulations = new Simulation[NUM_SIMULATIONS];
-        for (int i = 0; i < NUM_SIMULATIONS; i++)
+        Parallel.For(0, NUM_SIMULATIONS, i =>
         {
+            MissionGenerator generator = new(i);
             simulations[i] = generator.GetNextSimulation();
-        }
+        });
         WriteSimulationsToFile(simulations, FILE_NAME);
     }
 
