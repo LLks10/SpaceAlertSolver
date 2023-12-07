@@ -79,7 +79,7 @@ public class BulkTests
             if (!matchesOne)
             {
                 Assert.Fail($"Scores do not match for game {i}.\r\n" +
-                    $"String to create the game is {simulations[i].Serialize()}.\r\n\r\n" +
+                    $"String to create the game is\r\n{simulations[i].Serialize()}\r\n\r\n" +
                     $"Result from external resolver is won: {externalResults[i].Won}, score: {externalResults[i].Score}\r\n" +
                     $"Possible scores from internal resolver are: {String.Join(' ', selfResults[i])}");
             }
