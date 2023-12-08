@@ -604,7 +604,7 @@ public class Game
         if (!ship.RocketReady)
             return;
 
-        int distance = int.MaxValue;
+        int distance = 99;
         ExThreat? target = null;
         for (int i = 0; i < exThreats.Count; i++)
         {

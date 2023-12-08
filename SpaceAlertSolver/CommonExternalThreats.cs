@@ -77,7 +77,7 @@ class Amoebe : ExThreat
     public override void ActZ()
     {
         game.BranchShieldFull(zone);
-        game.ship.DealDamage(zone, 4);
+        game.ship.DealDamage(zone, 5);
     }
 }
 

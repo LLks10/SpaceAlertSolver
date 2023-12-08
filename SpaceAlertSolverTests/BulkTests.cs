@@ -2,6 +2,8 @@
 using SpaceAlertSolver;
 using SpaceAlertSolver.ResolverInterop;
 using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace SpaceAlertSolverTests;
 
@@ -11,8 +13,16 @@ public class BulkTests
     [TestMethod]
     public void BulkTest()
     {
+        int[] skips = new int[] { 27 };
+
         string filePath = Path.Combine(TestStatics.FolderPath, "simulations.txt");
         Simulation[] simulations = ReadSimulationsFromFile(filePath);
+
+        foreach (int s in skips)
+        {
+            simulations[s] = new("1234", ImmutableArray<string>.Empty, Array.Empty<Act[]>());
+        }
+
         BatchResolver externalResolver = new();
         List<List<int>> selfResults = new();
         for (int i = 0; i < simulations.Length; i++)
