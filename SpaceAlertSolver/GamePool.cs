@@ -42,6 +42,7 @@ public static class GamePool
             Debug.Assert(!_freeGamesConcurrent.Contains(game), "Game must not already be freed");
             _freeGamesConcurrent.Add(game);
         }
+        else
         {
             Debug.Assert(!_freeGames.Contains(game), "Game must not already be freed");
             _freeGames.Add(game);
